@@ -1,12 +1,16 @@
-# XenForo2-Utils
- Standardized utilities that all my XenForo2 Addons use
+# XenForo2-StandardLib
 
-Example `build.json` to include these files, assuming https://github.com/Xon/XenForo2-Utils is cloned to src/addons/SV/Utils
+A number of helper utilities designed to ease add-on development
+
+During use, Add the requires section to `addon.json` to document the dependancy
 
 ```json
 {
-  "additional_files": [
-    "src/addons/SV/Utils/"
-  ]
+
+    "require": {
+        "XF": [2010070, "XenForo 2.1.0+"],
+        "php": ["7.0.0", "PHP 7.0.0+"],
+        "SV/StandardLib": [1000000,"Standard Library by Xon v1.0.0+"]
+    }
 }
 ```
