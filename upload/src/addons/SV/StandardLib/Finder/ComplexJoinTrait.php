@@ -14,12 +14,9 @@ trait ComplexJoinTrait
     public $originalStructure  = null;
 
     /**
-     *
      * @param array $condition - this is an XF Entity relationship condition
-     * @param bool  $mustExist
-     * @return string
      */
-    public function complexJoin(array $condition, $mustExist = false)
+    public function complexJoin(array $condition, bool $mustExist = false) : string
     {
         $alias = 'complex_join_' . $this->complexJoinCounter++;
 

@@ -16,6 +16,7 @@ trait EarlyJoinFinderTrait
 {
     /**
      * @param array $options
+     *
      * @return string
      */
     public function getQuery(array $options = [])
@@ -175,8 +176,8 @@ trait EarlyJoinFinderTrait
     }
 
     /**
-     * @param      $field
-     * @param bool $markJoinFundamental
+     * @param string $field
+     * @param bool   $markJoinFundamental
      *
      * @return array
      */

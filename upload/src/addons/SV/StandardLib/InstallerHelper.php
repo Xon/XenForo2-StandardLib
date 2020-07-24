@@ -3,6 +3,7 @@
 namespace SV\StandardLib;
 
 use XF\Db\Schema\Alter;
+use XF\Db\Schema\Column as DbColumnSchema;
 use XF\Db\Schema\Create;
 
 /**
@@ -17,7 +18,6 @@ trait InstallerHelper
      * Default checkRequirements which triggers various actions,
      *
      * @param array $errors
-     * @param array $warnings
      */
     public function checkRequirements(&$errors = [], &$warnings = [])
     {
@@ -26,11 +26,9 @@ trait InstallerHelper
     }
 
     /**
-     * @param string $addonId
-     * @param int    $minVersion
      * @return bool|int
      */
-    protected function addonExists($addonId, $minVersion = 0)
+    protected function addonExists(string $addonId, int $minVersion = 0)
     {
         $addOns = \XF::app()->container('addon.cache');
         if (empty($addOns[$addonId]))
@@ -45,14 +43,10 @@ trait InstallerHelper
         return $addOns[$addonId];
     }
 
-    /*
-     * @param      $title
-     * @param      $value
-     * @param bool $deOwn
-     *
+    /**
      * @throws \XF\PrintableException
      */
-    protected function addDefaultPhrase($title, $value, $deOwn = true)
+    protected function addDefaultPhrase(string $title, string $value, bool $deOwn = true)
     {
         /** @var \XF\Entity\Phrase $phrase */
         $phrase = \XF::app()->finder('XF:Phrase')
@@ -77,11 +71,9 @@ trait InstallerHelper
     }
 
     /**
-     * @param int   $groupId
-     * @param int   $permissionId
      * @param int[] $userGroups
      */
-    protected function applyGlobalPermissionByGroup($groupId, $permissionId, array $userGroups)
+    protected function applyGlobalPermissionByGroup(int $groupId, int $permissionId, array $userGroups)
     {
         foreach($userGroups as $userGroupId)
         {
@@ -90,11 +82,9 @@ trait InstallerHelper
     }
 
     /**
-     * @param string      $applyGroupId
-     * @param string      $applyPermissionId
-     * @param int         $userGroupId
+     * @throws \XF\Db\Exception
      */
-    public function applyGlobalPermissionForGroup($applyGroupId, $applyPermissionId, $userGroupId)
+    public function applyGlobalPermissionForGroup(int $applyGroupId, int $applyPermissionId, int $userGroupId)
     {
         $this->db()->query(
             "INSERT IGNORE INTO xf_permission_entry (user_group_id, user_id, permission_group_id, permission_id, permission_value, permission_value_int) VALUES
@@ -118,9 +108,6 @@ trait InstallerHelper
         );
     }
 
-    /**
-     * @param array $newRegistrationDefaults
-     */
     protected function applyRegistrationDefaults(array $newRegistrationDefaults)
     {
         /** @var \XF\Entity\Option $option */
@@ -133,8 +120,8 @@ trait InstallerHelper
             // Option: Mr. XenForo I don't feel so good
             throw new \LogicException("XenForo installation is damaged. Expected option 'registrationDefaults' to exist.");
         }
-        $registrationDefaults = $option->option_value;
 
+        $registrationDefaults = $option->option_value;
         foreach ($newRegistrationDefaults AS $optionName => $optionDefault)
         {
             if (!isset($registrationDefaults[$optionName]))
@@ -148,12 +135,9 @@ trait InstallerHelper
     }
 
     /**
-     * @param $oldGroupId
-     * @param $oldPermissionId
-     * @param $newGroupId
-     * @param $newPermissionId
+     * @throws \XF\Db\Exception
      */
-    protected function renamePermission($oldGroupId, $oldPermissionId, $newGroupId, $newPermissionId)
+    protected function renamePermission(string $oldGroupId, string $oldPermissionId, string $newGroupId, string $newPermissionId)
     {
         $this->db()->query('
             UPDATE IGNORE xf_permission_entry
@@ -178,12 +162,7 @@ trait InstallerHelper
         ', [$oldGroupId, $oldPermissionId]);
     }
 
-    /**
-     * @param string $old
-     * @param string $new
-     * @param bool   $takeOwnership
-     */
-    protected function renameOption($old, $new, $takeOwnership = false)
+    protected function renameOption(string $old, string $new, bool $takeOwnership = false)
     {
         /** @var \XF\Entity\Option $optionOld */
         $optionOld = \XF::finder('XF:Option')->whereId($old)->fetchOne();
@@ -207,12 +186,7 @@ trait InstallerHelper
         }
     }
 
-    /**
-     * @param array $map
-     * @param bool  $deOwn
-     * @throws \XF\PrintableException
-     */
-    protected function renamePhrases($map, $deOwn = false)
+    protected function renamePhrases(array $map, bool $deOwn = false)
     {
         $db = $this->db();
 
@@ -253,10 +227,7 @@ trait InstallerHelper
         }
     }
 
-    /**
-     * @param string[] $map
-     */
-    protected function deletePhrases($map)
+    protected function deletePhrases(array $map)
     {
         $titles = [];
         foreach($map as $titlePattern)
@@ -278,11 +249,7 @@ trait InstallerHelper
         }
     }
 
-    /**
-     * @param string $old
-     * @param string $new
-     */
-    protected function renameStyleProperty($old, $new)
+    protected function renameStyleProperty(string $old, string $new)
     {
         /** @var \XF\Entity\StyleProperty $optionOld */
         $optionOld = \XF::finder('XF:StyleProperty')->where('property_name', '=', $old)->fetchOne();
@@ -294,12 +261,7 @@ trait InstallerHelper
         }
     }
 
-    /**
-     * @param string $old
-     * @param string $new
-     * @param bool   $dropOldIfNewExists
-     */
-    protected function migrateTable($old, $new, $dropOldIfNewExists = false)
+    protected function migrateTable(string $old, string $new, bool $dropOldIfNewExists = false)
     {
         $sm = $this->schemaManager();
         if ($sm->tableExists($old))
@@ -316,14 +278,9 @@ trait InstallerHelper
     }
 
     /**
-     * @param Create|Alter $table
-     * @param string       $name
-     * @param string|null  $type
-     * @param string|null  $length
-     * @return \XF\Db\Schema\Column
      * @throws \LogicException If table is unknown schema object
      */
-    protected function addOrChangeColumn($table, $name, $type = null, $length = null)
+    protected function addOrChangeColumn(string $table, string $name, string $type = null, int $length = null) : DbColumnSchema
     {
         if ($table instanceof Create)
         {
@@ -340,20 +297,11 @@ trait InstallerHelper
 
             return $table->addColumn($name, $type, $length);
         }
-        else
-        {
-            throw new \LogicException('Unknown schema DDL type ' . \get_class($table));
-        }
+
+        throw new \LogicException('Unknown schema DDL type ' . \get_class($table));
     }
 
-    /**
-     * @param int $minAddonVersion
-     * @param int $maxThreads
-     * @param int $maxPosts
-     * @param int $maxUsers
-     * @return bool
-     */
-    protected function isCliRecommendedCheck($minAddonVersion, $maxThreads, $maxPosts, $maxUsers)
+    protected function isCliRecommendedCheck(int $minAddonVersion, int $maxThreads, int $maxPosts, int $maxUsers) : bool
     {
         $totals = \XF::app()->db()->fetchOne("
 			SELECT data_value
@@ -399,15 +347,7 @@ trait InstallerHelper
         return false;
     }
 
-    /**
-     * @param string[] $warnings
-     * @param int      $minAddonVersion
-     * @param int      $maxThreads
-     * @param int      $maxPosts
-     * @param int      $maxUsers
-     * @return bool
-     */
-    public function isCliRecommended(&$warnings, $minAddonVersion = 0, $maxThreads = 0, $maxPosts = 500000, $maxUsers = 50000)
+    public function isCliRecommended(array &$warnings, int $minAddonVersion = 0, int $maxThreads = 0, int $maxPosts = 500000, int $maxUsers = 50000) : bool
     {
         if (\XF::app() instanceof \XF\Admin\App && $this->isCliRecommendedCheck($minAddonVersion, $maxThreads, $maxPosts, $maxUsers))
         {
@@ -456,13 +396,14 @@ trait InstallerHelper
      * @param array $errors
      * @param array $warnings
      */
-    protected function checkSoftRequires(&$errors, &$warnings)
+    protected function checkSoftRequires(array &$errors, array &$warnings)
     {
         $json = $this->addOn->getJson();
         if (empty($json['require-soft']))
         {
             return;
         }
+
         $addOns = \XF::app()->container('addon.cache');
         foreach ((array)$json['require-soft'] as $productKey => $requirement)
         {
@@ -472,6 +413,7 @@ trait InstallerHelper
             }
             list ($version, $product) = $requirement;
             $errorType = count($requirement) >= 3 ? $requirement[2] : null;
+
             // advisory
             if ($errorType === null)
             {

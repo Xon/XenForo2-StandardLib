@@ -10,24 +10,14 @@ use XF\Mvc\Entity\FinderExpression;
  */
 trait RlikeOperatorTrait
 {
-    /**
-     * @param string $column
-     * @param string $value
-     * @return FinderExpression
-     */
-    public function RegexLikeExpressionLHS($column, $value)
+    public function RegexLikeExpressionLHS(string $column, string $value) : FinderExpression
     {
         $quoted = $this->db->quote($value);
 
         return $this->expression("%s RLIKE {$quoted}", $column);
     }
 
-    /**
-     * @param string $column
-     * @param string $value
-     * @return FinderExpression
-     */
-    public function RegexLikeExpressionRHS($column, $value)
+    public function RegexLikeExpressionRHS(string $column, string $value) : FinderExpression
     {
         $quoted = $this->db->quote($value);
 

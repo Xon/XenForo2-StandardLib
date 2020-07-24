@@ -8,11 +8,10 @@ class Helper extends Repository
 {
     /**
      * @param \XF\Mvc\Entity\Entity|null $entity
-     * @param string                     $relationOrGetter
-     * @param string                     $backupColumn
+     *
      * @return \XF\Entity\User|null
      */
-    public function getUserEntity($entity, $relationOrGetter = 'User', $backupColumn = 'user_id')
+    public function getUserEntity($entity, string $relationOrGetter = 'User', string $backupColumn = 'user_id')
     {
         if (!($entity instanceof \XF\Mvc\Entity\Entity))
         {

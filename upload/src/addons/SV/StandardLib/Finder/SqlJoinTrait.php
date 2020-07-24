@@ -59,15 +59,7 @@ trait SqlJoinTrait
         }
     }
 
-    /**
-     * @param string $rawJoinTable
-     * @param string $alias
-     * @param array  $columns
-     * @param bool   $mustExist
-     * @param bool   $hasTableExpr
-     * @return $this
-     */
-    public function sqlJoin($rawJoinTable, $alias, array $columns, $mustExist = false, $hasTableExpr = false)
+    public function sqlJoin(string $rawJoinTable, string $alias, array $columns, bool $mustExist = false, bool $hasTableExpr = false) : self
     {
         $columns = \array_fill_keys($columns, true);
         $this->rawJoins[$alias] = isset($this->rawJoins[$alias]) ? $this->rawJoins[$alias] + $columns : $columns;
@@ -105,11 +97,7 @@ trait SqlJoinTrait
         return $this;
     }
 
-    /**
-     * @param string $alias
-     * @param array  $conditions
-     */
-    public function sqlJoinConditions($alias, array $conditions)
+    public function sqlJoinConditions(string $alias, array $conditions)
     {
         if (empty($this->rawJoins[$alias]) || empty($this->joins[$alias]))
         {
@@ -172,7 +160,7 @@ trait SqlJoinTrait
     }
 
     /**
-     * @param      $field
+     * @param string $field
      * @param bool $markJoinFundamental
      *
      * @return array
