@@ -2,19 +2,23 @@
 
 namespace SV\StandardLib\Finder;
 
-use XF\Mvc\Entity\Entity;
+use XF\Mvc\Entity\Structure;
 
 /**
  * @property \XF\Mvc\Entity\Structure structure
- * @method \XF\Mvc\Entity\Finder with($name, $mustExist = false)
+ * @method \XF\Mvc\Entity\Finder with(string|string[] $name, bool $mustExist = false)
  */
 trait ComplexJoinTrait
 {
+    /** @var int */
     public $complexJoinCounter = 0;
+    /** @var null|Structure */
     public $originalStructure  = null;
 
     /**
      * @param array $condition - this is an XF Entity relationship condition
+     * @param bool  $mustExist
+     * @return string
      */
     public function complexJoin(array $condition, bool $mustExist = false) : string
     {

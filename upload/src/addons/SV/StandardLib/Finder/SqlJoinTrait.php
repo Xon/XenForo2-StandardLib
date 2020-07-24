@@ -13,6 +13,7 @@ trait SqlJoinTrait
 {
     /** @var array */
     protected $rawJoins = [];
+    /** @var bool */
     protected $hasTableExpr = false;
 
     public function getQuery(array $options = [])

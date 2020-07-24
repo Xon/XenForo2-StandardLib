@@ -18,6 +18,7 @@ trait InstallerHelper
      * Default checkRequirements which triggers various actions,
      *
      * @param array $errors
+     * @param array $warnings
      */
     public function checkRequirements(&$errors = [], &$warnings = [])
     {
@@ -26,6 +27,8 @@ trait InstallerHelper
     }
 
     /**
+     * @param string $addonId
+     * @param int    $minVersion
      * @return bool|int
      */
     protected function addonExists(string $addonId, int $minVersion = 0)
@@ -44,6 +47,9 @@ trait InstallerHelper
     }
 
     /**
+     * @param string $title
+     * @param string $value
+     * @param bool   $deOwn
      * @throws \XF\PrintableException
      */
     protected function addDefaultPhrase(string $title, string $value, bool $deOwn = true)
@@ -71,7 +77,10 @@ trait InstallerHelper
     }
 
     /**
+     * @param int   $groupId
+     * @param int   $permissionId
      * @param int[] $userGroups
+     * @throws \XF\Db\Exception
      */
     protected function applyGlobalPermissionByGroup(int $groupId, int $permissionId, array $userGroups)
     {
@@ -82,6 +91,9 @@ trait InstallerHelper
     }
 
     /**
+     * @param int $applyGroupId
+     * @param int $applyPermissionId
+     * @param int $userGroupId
      * @throws \XF\Db\Exception
      */
     public function applyGlobalPermissionForGroup(int $applyGroupId, int $applyPermissionId, int $userGroupId)
@@ -135,6 +147,10 @@ trait InstallerHelper
     }
 
     /**
+     * @param string $oldGroupId
+     * @param string $oldPermissionId
+     * @param string $newGroupId
+     * @param string $newPermissionId
      * @throws \XF\Db\Exception
      */
     protected function renamePermission(string $oldGroupId, string $oldPermissionId, string $newGroupId, string $newPermissionId)
@@ -227,6 +243,10 @@ trait InstallerHelper
         }
     }
 
+    /**
+     * @param string[] $map
+     * @throws \XF\PrintableException
+     */
     protected function deletePhrases(array $map)
     {
         $titles = [];
@@ -278,7 +298,11 @@ trait InstallerHelper
     }
 
     /**
-     * @throws \LogicException If table is unknown schema object
+     * @param string      $table
+     * @param string      $name
+     * @param string|null $type
+     * @param int|null    $length
+     * @return DbColumnSchema
      */
     protected function addOrChangeColumn(string $table, string $name, string $type = null, int $length = null) : DbColumnSchema
     {
