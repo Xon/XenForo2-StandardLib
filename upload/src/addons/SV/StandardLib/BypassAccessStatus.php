@@ -4,7 +4,13 @@ namespace SV\StandardLib;
 
 class BypassAccessStatus
 {
-    public function getPrivate($obj, $attribute, $context = null)
+    /**
+     * @param object $obj
+     * @param string $attribute
+     * @param mixed  $context
+     * @return \Closure
+     */
+    public function getPrivate($obj, string $attribute, $context = null) : \Closure
     {
         $getter = function () use ($attribute) { return $this->$attribute; };
         if (!$context)
@@ -15,7 +21,13 @@ class BypassAccessStatus
         return \Closure::bind($getter, $obj, $context);
     }
 
-    public function setPrivate($obj, $attribute, $context = null)
+    /**
+     * @param object $obj
+     * @param string $attribute
+     * @param mixed  $context
+     * @return \Closure
+     */
+    public function setPrivate($obj, string $attribute, $context = null) : \Closure
     {
         $setter = function ($value) use ($attribute) { $this->$attribute = $value; };
         if (!$context)
@@ -26,20 +38,28 @@ class BypassAccessStatus
         return \Closure::bind($setter, $obj, $context);
     }
 
-    public function getStaticPrivate($obj, $attribute)
+    /**
+     * @param object $obj
+     * @param string $attribute
+     * @return \Closure
+     */
+    public function getStaticPrivate($obj, string $attribute) : \Closure
     {
         $getter = function () use ($attribute) {
-            /** @noinspection PhpUndefinedFieldInspection */
             return static::$$attribute;
         };
 
         return \Closure::bind($getter, null, $obj);
     }
 
-    public function setStaticPrivate($obj, $attribute)
+    /**
+     * @param object $obj
+     * @param string $attribute
+     * @return \Closure
+     */
+    public function setStaticPrivate($obj, string $attribute) : \Closure
     {
         $setter = function ($value) use ($attribute) {
-            /** @noinspection PhpUndefinedFieldInspection */
             static::$$attribute = $value;
         };
 
