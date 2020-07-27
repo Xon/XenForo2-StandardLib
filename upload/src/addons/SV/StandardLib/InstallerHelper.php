@@ -154,7 +154,7 @@ trait InstallerHelper
      * @param string $oldPermissionId
      * @param string $newGroupId
      * @param string $newPermissionId
-     * 
+     *
      * @throws \XF\Db\Exception
      */
     protected function renamePermission(string $oldGroupId, string $oldPermissionId, string $newGroupId, string $newPermissionId)
@@ -421,8 +421,8 @@ trait InstallerHelper
      *   false - if the item exists and is below the minimum version, log as a warning
      *   true - if the item exists and is below the minimum version, log as an error
      *
-     * @param array $errors
-     * @param array $warnings
+     * @param string[] $errors
+     * @param string[] $warnings
      */
     protected function checkSoftRequires(array &$errors, array &$warnings)
     {
