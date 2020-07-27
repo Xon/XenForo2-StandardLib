@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib;
 
+use XF\Db\Schema\AbstractDdl;
 use XF\Db\Schema\Alter;
 use XF\Db\Schema\Column as DbColumnSchema;
 use XF\Db\Schema\Create;
@@ -82,7 +83,7 @@ trait InstallerHelper
      * @param int[] $userGroups
      * @throws \XF\Db\Exception
      */
-    protected function applyGlobalPermissionByGroup(int $groupId, int $permissionId, array $userGroups)
+    protected function applyGlobalPermissionByGroup(string $groupId, string $permissionId, array $userGroups)
     {
         foreach($userGroups as $userGroupId)
         {
@@ -96,7 +97,7 @@ trait InstallerHelper
      * @param int $userGroupId
      * @throws \XF\Db\Exception
      */
-    public function applyGlobalPermissionForGroup(int $applyGroupId, int $applyPermissionId, int $userGroupId)
+    public function applyGlobalPermissionForGroup(string $applyGroupId, string $applyPermissionId, int $userGroupId)
     {
         $this->db()->query(
             "INSERT IGNORE INTO xf_permission_entry (user_group_id, user_id, permission_group_id, permission_id, permission_value, permission_value_int) VALUES
@@ -108,10 +109,12 @@ trait InstallerHelper
     /**
      * @param string $applyGroupId
      * @param string $applyPermissionId
-     * @param int    $applyValue
-     * @param int    $userGroupId
+     * @param int $applyValue
+     * @param int $userGroupId
+     *
+     * @throws \XF\Db\Exception
      */
-    public function applyGlobalPermissionIntForGroup($applyGroupId, $applyPermissionId, $applyValue, $userGroupId)
+    public function applyGlobalPermissionIntForGroup(string $applyGroupId, string $applyPermissionId, int $applyValue, int $userGroupId)
     {
         $this->db()->query(
             "INSERT IGNORE INTO xf_permission_entry (user_group_id, user_id, permission_group_id, permission_id, permission_value, permission_value_int) VALUES
@@ -151,6 +154,7 @@ trait InstallerHelper
      * @param string $oldPermissionId
      * @param string $newGroupId
      * @param string $newPermissionId
+     * 
      * @throws \XF\Db\Exception
      */
     protected function renamePermission(string $oldGroupId, string $oldPermissionId, string $newGroupId, string $newPermissionId)
@@ -298,13 +302,13 @@ trait InstallerHelper
     }
 
     /**
-     * @param string      $table
+     * @param AbstractDdl      $table
      * @param string      $name
      * @param string|null $type
      * @param int|null    $length
      * @return DbColumnSchema
      */
-    protected function addOrChangeColumn(string $table, string $name, string $type = null, int $length = null) : DbColumnSchema
+    protected function addOrChangeColumn(AbstractDdl $table, string $name, string $type = null, int $length = null) : DbColumnSchema
     {
         if ($table instanceof Create)
         {
