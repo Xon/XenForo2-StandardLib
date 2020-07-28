@@ -411,15 +411,20 @@ trait InstallerHelper
      * An example;
     "require-soft" :{
         "SV/Threadmarks": [
-            2000100,
+            2000370,
             "Threadmarks v2.0.3+",
-            false
+            false,
+            "Please provide feedback if you are unable to upgrade."
         ]
     },
      * The 3rd array argument has 3 supported values, null/true/false
      *   null/no exists - this is advisory for "Extra Cli Tools" when determining bulk install order, and isn't actually checked
      *   false - if the item exists and is below the minimum version, log as a warning
      *   true - if the item exists and is below the minimum version, log as an error
+     *
+     * The 4th array argument is extra help text intended to offer a more detailed explanation why
+     * this version is required. For instance, if you're checking for PHP 7.2.0+, you can explain
+     * that you plan to bump the minimum version going forward.
      *
      * @param string[] $errors
      * @param string[] $warnings
@@ -487,13 +492,25 @@ trait InstallerHelper
 
             if (!$versionValid)
             {
+                $reason = count($requirement) >= 4 ? (' ' . $requirement[3]) : '';
+
                 if ($errorType)
                 {
-                    $errors[] = "{$json['title']} requires {$product}.";
+                    $errors[] = new \XF\PreEscaped(sprintf(
+                        '%s requires %s.%s',
+                        $json['title'],
+                        $product,
+                        $reason
+                    ));
                 }
                 else
                 {
-                    $warnings[] = "{$json['title']} recommends {$product}.";
+                    $warnings[] = new \XF\PreEscaped(sprintf(
+                        '%s recommends %s.%s',
+                        $json['title'],
+                        $product,
+                        $reason
+                    ));
                 }
             }
         }
