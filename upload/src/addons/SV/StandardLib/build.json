@@ -1,0 +1,15 @@
+{
+    "additional_files":  [
+        "js/sv/standard-lib/xf/action.js"
+    ],
+    "minify": [
+        "js/sv/standard-lib/xf/action.js"
+    ],
+    "exec": [
+        "composer install --working-dir=_build/upload/src/addons/{addon_id}/ --no-dev --optimize-autoloader"
+    ],
+    "exclude_files": [
+        "composer.json",
+        "composer.lock"
+    ]
+}
