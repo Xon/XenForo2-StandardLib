@@ -393,7 +393,7 @@ trait InstallerHelper
                 $html = 'Your XenForo installation is large. You may wish to install via the command line.<br/>
 			Simply run this command from within the root XenForo directory and follow the on-screen instructions:<br/>
 			<pre style="margin: 1em 2em">php cmd.php xf-addon:install ' . \XF::escapeString($this->addOn->getAddOnId()) . '</pre>
-			You can continue with the browser-based upgrade, but large queries may cause browser timeouts<br/>
+			You can continue with the browser-based install, but large queries may cause browser timeouts<br/>
 			that will force you to reload the page.';
             }
 
