@@ -60,7 +60,15 @@ trait SqlJoinTrait
         }
     }
 
-    public function sqlJoin(string $rawJoinTable, string $alias, array $columns, bool $mustExist = false, bool $hasTableExpr = false) : self
+    /**
+     * @param string $rawJoinTable
+     * @param string $alias
+     * @param array  $columns
+     * @param bool   $mustExist
+     * @param bool   $hasTableExpr
+     * @return $this
+     */
+    public function sqlJoin(string $rawJoinTable, string $alias, array $columns, bool $mustExist = false, bool $hasTableExpr = false)
     {
         $columns = \array_fill_keys($columns, true);
         $this->rawJoins[$alias] = isset($this->rawJoins[$alias]) ? $this->rawJoins[$alias] + $columns : $columns;
