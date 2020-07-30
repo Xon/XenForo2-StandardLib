@@ -78,9 +78,9 @@ trait InstallerHelper
     }
 
     /**
-     * @param int   $groupId
-     * @param int   $permissionId
-     * @param int[] $userGroups
+     * @param string $groupId
+     * @param string $permissionId
+     * @param int[]  $userGroups
      * @throws \XF\Db\Exception
      */
     protected function applyGlobalPermissionByGroup(string $groupId, string $permissionId, array $userGroups)
@@ -92,9 +92,9 @@ trait InstallerHelper
     }
 
     /**
-     * @param int $applyGroupId
-     * @param int $applyPermissionId
-     * @param int $userGroupId
+     * @param string $applyGroupId
+     * @param string $applyPermissionId
+     * @param int    $userGroupId
      * @throws \XF\Db\Exception
      */
     public function applyGlobalPermissionForGroup(string $applyGroupId, string $applyPermissionId, int $userGroupId)
@@ -302,13 +302,13 @@ trait InstallerHelper
     }
 
     /**
-     * @param AbstractDdl      $table
-     * @param string      $name
-     * @param string|null $type
-     * @param int|null    $length
+     * @param AbstractDdl       $table
+     * @param string            $name
+     * @param string|null       $type
+     * @param int|string[]|null $length
      * @return DbColumnSchema
      */
-    protected function addOrChangeColumn(AbstractDdl $table, string $name, string $type = null, int $length = null) : DbColumnSchema
+    protected function addOrChangeColumn(AbstractDdl $table, string $name, string $type = null, $length = null) : DbColumnSchema
     {
         if ($table instanceof Create)
         {
