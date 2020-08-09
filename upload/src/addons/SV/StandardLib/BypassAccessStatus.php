@@ -39,7 +39,7 @@ class BypassAccessStatus
     }
 
     /**
-     * @param object $obj
+     * @param string|object $obj
      * @param string $attribute
      * @return \Closure
      */
@@ -53,7 +53,7 @@ class BypassAccessStatus
     }
 
     /**
-     * @param object $obj
+     * @param string|object $obj
      * @param string $attribute
      * @return \Closure
      */
