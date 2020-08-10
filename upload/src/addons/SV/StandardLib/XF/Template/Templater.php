@@ -36,7 +36,7 @@ class Templater extends XFCP_Templater
      * @return int[]|string[]
      * @noinspection PhpUnusedParameterInspection
      */
-    public function fnReplaceValue($templater, $value, &$escape, $toReplace, $replaceWith)
+    public function fnSvReplaceValue($templater, $value, &$escape, $toReplace, $replaceWith)
     {
         foreach ($value as $key => $_val)
         {
