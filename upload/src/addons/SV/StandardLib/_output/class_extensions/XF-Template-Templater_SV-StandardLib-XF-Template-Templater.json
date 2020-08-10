@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Template\\Templater",
+    "to_class": "SV\\StandardLib\\XF\\Template\\Templater",
+    "execute_order": 7915,
+    "active": true
+}
