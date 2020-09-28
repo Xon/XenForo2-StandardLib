@@ -195,12 +195,20 @@ trait InstallerHelper
             {
                 $optionOld->addon_id = $this->addOn->getAddOnId();
             }
+            if ($optionOld->hasBehavior('XF:DevOutputWritable'))
+            {
+                $optionOld->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
+            }
             $optionOld->saveIfChanged();
         }
         else if ($takeOwnership && $optionOld && $optionNew)
         {
             $optionNew->option_value = $optionOld->option_value;
             $optionNew->addon_id = $this->addOn->getAddOnId();
+            if ($optionNew->hasBehavior('XF:DevOutputWritable'))
+            {
+                $optionNew->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
+            }
             $optionNew->save();
             $optionOld->delete();
         }
@@ -239,6 +247,10 @@ trait InstallerHelper
                         if ($deOwn)
                         {
                             $phrase->addon_id = '';
+                        }
+                        if ($phrase->hasBehavior('XF:DevOutputWritable'))
+                        {
+                            $phrase->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
                         }
                         $phrase->save(false);
                     }
@@ -280,6 +292,10 @@ trait InstallerHelper
         $optionNew = \XF::finder('XF:StyleProperty')->where('property_name', '=', $new)->fetchOne();
         if ($optionOld && !$optionNew)
         {
+            if ($optionOld->hasBehavior('XF:DevOutputWritable'))
+            {
+                $optionOld->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
+            }
             $optionOld->property_name = $new;
             $optionOld->saveIfChanged();
         }
