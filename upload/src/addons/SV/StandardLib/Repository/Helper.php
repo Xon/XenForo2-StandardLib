@@ -41,4 +41,30 @@ class Helper extends Repository
 
         return null;
     }
+
+    public function aliasClass(string $destClass, string $srcClass)
+    {
+        \class_alias($srcClass, $destClass);
+
+        $nsEnd = strrpos($srcClass, '\\');
+        if ($nsEnd)
+        {
+            $srcAlias = substr($srcClass, 0, $nsEnd) . '\\XFCP_' . substr($srcClass, $nsEnd + 1);
+        }
+        else
+        {
+            $srcAlias = "XFCP_$srcClass";
+        }
+        $nsEnd = strrpos($destClass, '\\');
+        if ($nsEnd)
+        {
+            $destAlias = substr($destClass, 0, $nsEnd) . '\\XFCP_' . substr($destClass, $nsEnd + 1);
+        }
+        else
+        {
+            $destAlias = "XFCP_$destClass";
+        }
+
+        \class_alias($destAlias, $srcAlias, false);
+    }
 }
