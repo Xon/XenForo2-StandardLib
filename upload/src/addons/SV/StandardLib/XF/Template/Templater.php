@@ -26,7 +26,7 @@ class Templater extends XFCP_Templater
             $this->addFilter('replacevalue', $callable);
         }
 
-        $this->addFunction('sv_array_reverse', 'fnSvReverseArray');
+        $this->addFunction('sv_array_reverse', 'fnSvArrayReverse');
     }
 
     /**
