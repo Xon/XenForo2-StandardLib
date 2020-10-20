@@ -59,8 +59,7 @@ class Templater extends XFCP_Templater
     }
 
     /**
-     * @param $templater
-     * @param $value
+     * @param Templater $templater
      * @param bool $escape
      * @param AbstractCollection|array $array
      * @param bool $preserveKeys
