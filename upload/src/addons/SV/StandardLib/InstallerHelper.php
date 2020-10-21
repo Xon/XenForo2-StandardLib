@@ -227,7 +227,7 @@ trait InstallerHelper
             $results = $db->fetchPairs("
 				SELECT phrase_id, title
 				FROM xf_phrase
-				WHERE title RLIKE ?
+				WHERE CONVERT(title USING utf8mb4) RLIKE ?
 					AND addon_id = ''
 			", $mySqlRegex);
 
