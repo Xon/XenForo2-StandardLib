@@ -214,7 +214,7 @@ trait InstallerHelper
         }
     }
 
-    protected function renamePhrases(array $map, bool $deOwn = false)
+    protected function renamePhrases(array $map, bool $deOwn = false, bool $replace = true)
     {
         $db = $this->db();
 
@@ -233,6 +233,7 @@ trait InstallerHelper
 
             if ($results)
             {
+                $em = \XF::em();
                 /** @var \XF\Entity\Phrase[] $phrases */
                 $phrases = \XF::em()->findByIds('XF:Phrase', array_keys($results));
                 foreach ($results AS $phraseId => $oldTitle)
@@ -240,19 +241,49 @@ trait InstallerHelper
                     if (isset($phrases[$phraseId]))
                     {
                         $newTitle = preg_replace($phpRegex, $replace, $oldTitle);
-
                         $phrase = $phrases[$phraseId];
-                        $phrase->title = $newTitle;
-                        $phrase->global_cache = false;
-                        if ($deOwn)
+
+                        $db->beginTransaction();
+
+                        /** @var \XF\Entity\Phrase $newPhrase */
+                        $newPhrase = $replace
+                            ? $em->getFinder('XF:Phrase', false)
+                                 ->where('title', '=', $newTitle)
+                                 ->fetchOne()
+                            : null;
+
+                        if ($newPhrase)
                         {
-                            $phrase->addon_id = '';
+                            // already exists, replace the value and delete
+                            $newPhrase->set('title', $phrase->phrase_text, ['forceSet' => true]);
+                            $newPhrase->set('global_cache', false, ['forceSet' => true]);
+                            if ($deOwn)
+                            {
+                                $newPhrase->addon_id = '';
+                            }
+                            if ($newPhrase->hasBehavior('XF:DevOutputWritable'))
+                            {
+                                $newPhrase->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
+                            }
+                            $newPhrase->save(false);
+                            $phrase->delete(false);
                         }
-                        if ($phrase->hasBehavior('XF:DevOutputWritable'))
+                        else
                         {
-                            $phrase->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
+                            $phrase->set('title', $newTitle, ['forceSet' => true]);
+                            $phrase->set('global_cache', false, ['forceSet' => true]);
+                            if ($deOwn)
+                            {
+                                $phrase->addon_id = '';
+                            }
+                            if ($phrase->hasBehavior('XF:DevOutputWritable'))
+                            {
+                                $phrase->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
+                            }
+                            $phrase->save(false);
                         }
-                        $phrase->save(false);
+
+                        $db->commit();
                     }
                 }
             }
