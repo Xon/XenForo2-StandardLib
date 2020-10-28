@@ -36,9 +36,9 @@
 					</xf:foreach>
 				</xf:select>
 			</div>
-
+			
 			<div class="inputGroup">
-				<xf:select name="{$name}[timezone]" value="{{ $timestampOrDateTimeArr.timezone ?: $visitor.timezone }}">
+				<xf:select name="{$name}[tz]" value="{{ $timestampOrDateTimeArr.tz ?: $visitor.timezone }}">
 					<xf:options source="{$timeZones}" />
 				</xf:select>
 			</div>
