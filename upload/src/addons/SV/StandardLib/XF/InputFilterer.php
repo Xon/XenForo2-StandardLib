@@ -87,7 +87,7 @@ class InputFilterer extends XFCP_InputFilterer
 
                     $timeSanitizer = function (string $key) use(&$value, &$intSanitizer)
                     {
-                        $value[$key] = $intSanitizer($value[$key], null, null);
+                        $value[$key] = $intSanitizer($value[$key], 0, null);
                     };
 
                     $timeSanitizer('hh'); // hours
