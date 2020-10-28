@@ -1,9 +1,0 @@
-{
-    "event_id": "templater_macro_pre_render",
-    "execute_order": 10,
-    "callback_class": "SV\\StandardLib\\Listener",
-    "callback_method": "templaterMacroPreRender",
-    "active": true,
-    "hint": "public:svStandardLib_helper_macros:date_time_input",
-    "description": "Sets required data for rendering date and time input."
-}

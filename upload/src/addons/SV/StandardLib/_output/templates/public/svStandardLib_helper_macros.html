@@ -3,43 +3,55 @@
 		  arg-label=""
 		  arg-explain=""
 		  arg-hint=""
-		  arg-timestampOrDateTimeArr="{{ null }}"
-		  arg-readOnly="{{ false }}"
-		  arg-hours="{{ null }}"
-		  arg-minutes="{{ null }}"
-		  arg-seconds="{{ null }}"
-		  arg-timeZones="{{ null }}">
+		  arg-timestamp="{{ $xf.time }}"
+		  arg-dateTimeArr="{{ [] }}"
+		  arg-readOnly="{{ false }}">
 	<xf:css src="svStandardLib_helper_macros_date_time_input.less" />
+	
+	<xf:set var="$selectedYMD" value="{{ $dateTimeArr.ymd ?: ($timestamp ? date($timestamp, 'picker') : '') }}" />
+	<xf:set var="$selectedHour" value="{{ $dateTimeArr.hh ?: ($timestamp ? time($timestamp, 'H') : 0) }}" />
+	<xf:set var="$selectedMinute" value="{{ $dateTimeArr.mm ?: ($timestamp ? time($timestamp, 'i') : 0) }}" />
+	<xf:set var="$selectedSecond" value="{{ $dateTimeArr.ss ?: ($timestamp ? time($timestamp, 's') : 0) }}" />
+	<xf:set var="$selectedTz" value="{{ $dateTimeArr.tz ?: $xf.visitor.timezone }}" />
 	
 	<xf:formrow label="{$label}" explain="{$explain}" hint="{$hint}" rowtype="input svStandardLibDateTime">
 		<div class="inputGroup-container">
 			<div class="inputGroup">
-				<xf:dateinput name="{$name}[ymd]" value="{$timestampOrDateTimeArr.ymd}" />
+				<xf:dateinput name="{$name}[ymd]" value="{$selectedYMD}" />
+				
 				<span class="inputGroup-text">
 					{{ phrase('svStandardLib_at:') }}
 				</span>
+				
 				<xf:select name="{$name}[hh]" value="{$timestampOrDateTimeArr.hh}" class="input--inline input--autoSize">
-					<xf:foreach loop="$hours" key="$hourVal" value="$hour">
-						<xf:option value="{$hourVal}" label="{$hour}" />
+					<xf:foreach loop="{{ range(0, 23, 1) }}" value="$hour">
+						<xf:set var="$readableHour" value="{{ $hour|pad('0', 2) }}" />
+						<xf:option value="{$hour}" label="{$readableHour}" selected="{{ $readableHour === $selectedHour }}" />
 					</xf:foreach>
 				</xf:select>
+				
 				<span class="inputGroup-text">:</span>
+				
 				<xf:select name="{$name}[mm]" value="{$timestampOrDateTimeArr.mm}" class="input--inline input--autoSize">
-					<xf:foreach loop="$minutes" key="$minuteVal" value="$minute">
-						<xf:option value="{$minuteVal}" label="{$minute}" />
+					<xf:foreach loop="{{ range(0, 59, 1) }}" value="$minute">
+						<xf:set var="$readableMinute" value="{{ $minute|pad('0', 2) }}" />
+						<xf:option value="{$minute}" label="{$readableMinute}" selected="{{ $readableMinute === $selectedMinute }}" />
 					</xf:foreach>
 				</xf:select>
+				
 				<span class="inputGroup-text">:</span>
+				
 				<xf:select name="{$name}[ss]" value="{$timestampOrDateTimeArr.ss}" class="input--inline input--autoSize">
-					<xf:foreach loop="$seconds" key="$secondVal" value="$second">
-						<xf:option value="{$secondVal}" label="{$second}" />
+					<xf:foreach loop="{{ range(0, 59, 1) }}" value="$second">
+						<xf:set var="$readableSecond" value="{{ $second|pad('0', 2) }}" />
+						<xf:option value="{$second}" label="{$readableSecond}" selected="{{ $readableSecond === $selectedSecond }}" />
 					</xf:foreach>
 				</xf:select>
 			</div>
 			
 			<div class="inputGroup">
-				<xf:select name="{$name}[tz]" value="{{ $timestampOrDateTimeArr.tz ?: $visitor.timezone }}">
-					<xf:options source="{$timeZones}" />
+				<xf:select name="{$name}[tz]" value="{$selectedTz}">
+					<xf:options source="{{ $xf.app.data('XF:TimeZone').getTimeZoneOptions() }}" />
 				</xf:select>
 			</div>
 		</div>
