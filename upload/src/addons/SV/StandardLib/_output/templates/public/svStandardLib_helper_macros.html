@@ -1,0 +1,47 @@
+<xf:macro name="date_time_input"
+		  arg-name="date_time"
+		  arg-label=""
+		  arg-explain=""
+		  arg-hint=""
+		  arg-timestampOrDateTimeArr="{{ null }}"
+		  arg-readOnly="{{ false }}"
+		  arg-hours="{{ null }}"
+		  arg-minutes="{{ null }}"
+		  arg-seconds="{{ null }}"
+		  arg-timeZones="{{ null }}">
+	<xf:css src="svStandardLib_helper_macros_date_time_input.less" />
+	
+	<xf:formrow label="{$label}" explain="{$explain}" hint="{$hint}" rowtype="input svStandardLibDateTime">
+		<div class="inputGroup-container">
+			<div class="inputGroup">
+				<xf:dateinput name="{$name}[ymd]" value="{$timestampOrDateTimeArr.ymd}" />
+				<span class="inputGroup-text">
+					{{ phrase('svStandardLib_at:') }}
+				</span>
+				<xf:select name="{$name}[hh]" value="{$timestampOrDateTimeArr.hh}" class="input--inline input--autoSize">
+					<xf:foreach loop="$hours" key="$hourVal" value="$hour">
+						<xf:option value="{$hourVal}" label="{$hour}" />
+					</xf:foreach>
+				</xf:select>
+				<span class="inputGroup-text">:</span>
+				<xf:select name="{$name}[mm]" value="{$timestampOrDateTimeArr.mm}" class="input--inline input--autoSize">
+					<xf:foreach loop="$minutes" key="$minuteVal" value="$minute">
+						<xf:option value="{$minuteVal}" label="{$minute}" />
+					</xf:foreach>
+				</xf:select>
+				<span class="inputGroup-text">:</span>
+				<xf:select name="{$name}[ss]" value="{$timestampOrDateTimeArr.ss}" class="input--inline input--autoSize">
+					<xf:foreach loop="$seconds" key="$secondVal" value="$second">
+						<xf:option value="{$secondVal}" label="{$second}" />
+					</xf:foreach>
+				</xf:select>
+			</div>
+
+			<div class="inputGroup">
+				<xf:select name="{$name}[timezone]" value="{{ $timestampOrDateTimeArr.timezone ?: $visitor.timezone }}">
+					<xf:options source="{$timeZones}" />
+				</xf:select>
+			</div>
+		</div>
+	</xf:formrow>
+</xf:macro>
