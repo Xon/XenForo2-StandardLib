@@ -35,8 +35,14 @@ class InputFilterer extends XFCP_InputFilterer
                     )
                 )
                 {
-                    // daily reminder to wash your hands
-                    $intSanitizer = function ($int, int $min, int $max)
+                    /**
+                     * Daily reminder to wash your hands
+                     *
+                     * @param mixed $int
+                     * @param int|null $min
+                     * @param int|null $max
+                     */
+                    $intSanitizer = function ($int, $min, $max) : int
                     {
                         if (!\is_int($int))
                         {
@@ -44,9 +50,13 @@ class InputFilterer extends XFCP_InputFilterer
                         }
 
                         $int = (int) $int;
-                        if ($int < $min || $int > $max)
+                        if (\is_int($min) && $int < $min)
                         {
-                            return $min;
+                            $int = $min;
+                        }
+                        else if (\is_int($max) && $int > $max)
+                        {
+                            $int = $min;
                         }
 
                         return $int;
@@ -58,7 +68,7 @@ class InputFilterer extends XFCP_InputFilterer
                         $ymdParts = \explode('-', $value['ymd'], 3);
                         if (\count($ymdParts) === 3)
                         {
-                            $ymdParts[0] = $intSanitizer($ymdParts[0], 1970, (int) \date('Y', \XF::$time));
+                            $ymdParts[0] = $intSanitizer($ymdParts[0], 1970, null);
                             $ymdParts[1] = $intSanitizer($ymdParts[1], 1, 12);
 
                             // @see https://www.php.net/manual/en/function.cal-days-in-month.php#38666
@@ -75,14 +85,14 @@ class InputFilterer extends XFCP_InputFilterer
                         ];
                     }
 
-                    $timeSanitizer = function (string $key, int $min, int $max) use(&$value, &$intSanitizer)
+                    $timeSanitizer = function (string $key) use(&$value, &$intSanitizer)
                     {
-                        $intSanitizer($value[$key], $min, $max);
+                        $intSanitizer($value[$key], null, null);
                     };
 
-                    $timeSanitizer('hh', 0, 23); // hours
-                    $timeSanitizer('mm', 0, 59); // minutes
-                    $timeSanitizer('ss', 0, 59); // seconds
+                    $timeSanitizer('hh'); // hours
+                    $timeSanitizer('mm'); // minutes
+                    $timeSanitizer('ss'); // seconds
 
                     if (\is_string($value['tz']))
                     {
