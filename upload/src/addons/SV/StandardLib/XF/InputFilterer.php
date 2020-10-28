@@ -24,7 +24,7 @@ class InputFilterer extends XFCP_InputFilterer
     {
         switch ($type)
         {
-            case 'sv-date-time':
+            case 'sv-datetime':
                 if (
                     \is_array($value) && (
                         \array_key_exists('ymd', $value)
