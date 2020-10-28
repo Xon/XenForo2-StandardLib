@@ -44,7 +44,7 @@ class InputFilterer extends XFCP_InputFilterer
                      */
                     $intSanitizer = function ($int, $min, $max) : int
                     {
-                        if (!\is_int($int))
+                        if (!\is_numeric($int))
                         {
                             return $min;
                         }
