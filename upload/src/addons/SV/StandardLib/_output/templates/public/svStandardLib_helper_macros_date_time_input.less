@@ -1,24 +1,23 @@
-.formRow--svStandardLibDateTime
+.inputGroup-container.inputGroup-containerSvStandardLibDateTime
 {
-	.inputGroup-container
+	> .inputGroup:last-child
 	{
-		> .inputGroup:last-child
-		{
-			width: 26.5rem;
-		}
+		width: 26.5rem;
 	}
+}
+
+.inputGroup-containerSvStandardLibDateTime + .inputGroup-containerSvStandardLibDateTime
+{
+	margin-top: @xf-paddingMedium;
 }
 
 @media (max-width: @xf-formResponsive)
 {
-	.formRow--svStandardLibDateTime
+	.inputGroup-container.inputGroup-containerSvStandardLibDateTime
 	{
-		.inputGroup-container
+		> .inputGroup:last-child
 		{
-			> .inputGroup:last-child
-			{
-				width: 25.7rem;
-			}
+			width: 25.7rem;
 		}
 	}
 }
