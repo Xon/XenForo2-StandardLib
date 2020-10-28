@@ -109,7 +109,7 @@ class InputFilterer extends XFCP_InputFilterer
                 {
                     $value = 0;
                 }
-                
+
                 return $value;
         }
 
