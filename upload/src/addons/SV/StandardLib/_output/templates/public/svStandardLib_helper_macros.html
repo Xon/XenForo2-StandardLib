@@ -17,13 +17,13 @@
 	<xf:formrow label="{$label}" explain="{$explain}" hint="{$hint}" rowtype="input svStandardLibDateTime">
 		<div class="inputGroup-container">
 			<div class="inputGroup">
-				<xf:dateinput name="{$name}[ymd]" value="{$selectedYMD}" />
+				<xf:dateinput name="{$name}[ymd]" value="{$selectedYMD}" readonly="{$readOnly}" />
 				
 				<span class="inputGroup-text">
 					{{ phrase('svStandardLib_at:') }}
 				</span>
 				
-				<xf:select name="{$name}[hh]" value="{$timestampOrDateTimeArr.hh}" class="input--inline input--autoSize">
+				<xf:select name="{$name}[hh]" value="{$timestampOrDateTimeArr.hh}" class="input--inline input--autoSize" disabled="{$readOnly}">
 					<xf:foreach loop="{{ range(0, 23, 1) }}" value="$hour">
 						<xf:set var="$readableHour" value="{{ $hour|pad('0', 2) }}" />
 						<xf:option value="{$hour}" label="{$readableHour}" selected="{{ $readableHour === $selectedHour }}" />
@@ -32,7 +32,7 @@
 				
 				<span class="inputGroup-text">:</span>
 				
-				<xf:select name="{$name}[mm]" value="{$timestampOrDateTimeArr.mm}" class="input--inline input--autoSize">
+				<xf:select name="{$name}[mm]" value="{$timestampOrDateTimeArr.mm}" class="input--inline input--autoSize" disabled="{$readOnly}">
 					<xf:foreach loop="{{ range(0, 59, 1) }}" value="$minute">
 						<xf:set var="$readableMinute" value="{{ $minute|pad('0', 2) }}" />
 						<xf:option value="{$minute}" label="{$readableMinute}" selected="{{ $readableMinute === $selectedMinute }}" />
@@ -41,7 +41,7 @@
 				
 				<span class="inputGroup-text">:</span>
 				
-				<xf:select name="{$name}[ss]" value="{$timestampOrDateTimeArr.ss}" class="input--inline input--autoSize">
+				<xf:select name="{$name}[ss]" value="{$timestampOrDateTimeArr.ss}" class="input--inline input--autoSize" disabled="{$readOnly}">
 					<xf:foreach loop="{{ range(0, 59, 1) }}" value="$second">
 						<xf:set var="$readableSecond" value="{{ $second|pad('0', 2) }}" />
 						<xf:option value="{$second}" label="{$readableSecond}" selected="{{ $readableSecond === $selectedSecond }}" />
@@ -50,7 +50,7 @@
 			</div>
 			
 			<div class="inputGroup">
-				<xf:select name="{$name}[tz]" value="{$selectedTz}">
+				<xf:select name="{$name}[tz]" value="{$selectedTz}" disabled="{$readOnly}">
 					<xf:options source="{{ $xf.app.data('XF:TimeZone').getTimeZoneOptions() }}" />
 				</xf:select>
 			</div>
