@@ -63,26 +63,21 @@ class InputFilterer extends XFCP_InputFilterer
                     };
 
                     $ymdParts = null;
-                    if (\is_string($value['ymd']))
+                    if (\is_string($value['ymd']) && $value['ymd'] !== '')
                     {
                         $ymdParts = \explode('-', $value['ymd'], 3);
                         if (\count($ymdParts) === 3)
                         {
+                            // php is somewhat smart and will move the y-m-d around to be valid
                             $ymdParts[0] = $intSanitizer($ymdParts[0], 1970, null);
                             $ymdParts[1] = $intSanitizer($ymdParts[1], 1, 12);
-
-                            // @see https://www.php.net/manual/en/function.cal-days-in-month.php#38666
-                            $ymdParts[2] = $ymdParts[1] === 2 ? ($ymdParts[0] % 4 ? 28 : ($ymdParts[0] % 100 ? 29 : ($ymdParts[0] % 400 ? 28 : 29))) : (($ymdParts[1] - 1) % 7 % 2 ? 30 : 31);
+                            $ymdParts[2] = $intSanitizer($ymdParts[1], 1, 31);
                         }
                     }
 
                     if ($ymdParts === null || \count($ymdParts) !== 3)
                     {
-                        $ymdParts = [
-                            \date('Y', \XF::$time),
-                            \date('m', \XF::$time),
-                            \date('d', \XF::$time)
-                        ];
+                        return 0;
                     }
 
                     $timeSanitizer = function (string $key) use(&$value, &$intSanitizer)
@@ -113,14 +108,10 @@ class InputFilterer extends XFCP_InputFilterer
                     $dateTimeObj->setDate($ymdParts[0], $ymdParts[1], $ymdParts[2]);
                     $dateTimeObj->setTime($value['hh'], $value['mm'], $value['ss']);
 
-                    $value = $dateTimeObj->getTimestamp();
-                }
-                else
-                {
-                    $value = 0;
+                    return $dateTimeObj->getTimestamp();
                 }
 
-                return $value;
+                return 0;
         }
 
         return parent::cleanInternal($value, $type, $options);
