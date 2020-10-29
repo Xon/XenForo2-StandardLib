@@ -6,6 +6,7 @@
 		  arg-timestamp="{{ $xf.time }}"
 		  arg-dateTimeArr="{{ [] }}"
 		  arg-readOnly="{{ false }}"
+		  arg-showSeconds="{{ true }}"
 		  arg-xfInit=""
 		  arg-allInputAttrsHtml=""
 		  arg-ymdInputAttrsHtml=""
@@ -19,6 +20,7 @@
 				  arg-timestamp="{$timestamp}"
 				  arg-dateTimeArr="{$dateTimeArr}"
 				  arg-readOnly="{$readOnly}"
+				  arg-showSeconds="{$showSeconds}"
 				  arg-xfInit="{$xfInit}"
 				  arg-allInputAttrsHtml="{$allInputAttrsHtml}"
 				  arg-ymdInputAttrsHtml="{$ymdInputAttrsHtml}"
@@ -34,6 +36,7 @@
 		  arg-timestamp="{{ $xf.time }}"
 		  arg-dateTimeArr="{{ [] }}"
 		  arg-readOnly="{{ false }}"
+		  arg-showSeconds="{{ true }}"
 		  arg-xfInit=""
 		  arg-allInputAttrsHtml=""
 		  arg-ymdInputAttrsHtml=""
@@ -78,6 +81,7 @@
 				</xf:foreach>
 			</select>
 
+			<xf:if is="$showSeconds">
 			<span class="inputGroup-text">:</span>
 
 			<select class="input input--inline input--autoSize" name="{$name}[ss]" {{ $readOnly ? 'disabled="disabled"' : '' }} {{ $allInputAttrsHtml|raw }}  {{ $ssInputAttrsHtml|raw }}>
@@ -86,6 +90,7 @@
 					<option value="{$second}" {{ $readableSecond === $selectedSecond ? 'selected="selected"' : '' }}>{$readableSecond}</option>
 				</xf:foreach>
 			</select>
+			</xf:if>
 		</div>
 
 		<div class="inputGroup">
