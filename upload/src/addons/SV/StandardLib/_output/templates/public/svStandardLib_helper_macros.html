@@ -51,11 +51,12 @@
 	
 	<div class="inputGroup-container inputGroup-containerSvStandardLibDateTime">
 		<div class="inputGroup">
-			<xf:include template="date_input">
-				<xf:set var="$week_start" value="{{ $xf.language.week_start }}" />
-				<xf:set var="$readOnly" value="{{ $readOnly }}" />
-				<xf:set var="$attrsHtml" value="{{ ' value="' . $selectedYMD . '" ' . $allInputAttrsHtml . $ymdInputAttrsHtml }}" />
-			</xf:include>
+			<xf:macro name="date_time_wrapper" 
+					  arg-name="{$name}[ymd]"
+					  arg-weekStart="{{ $xf.language.week_start }}"
+					  arg-readOnly="{{ $readOnly }}"
+					  arg-attrsHtml="{{ ' value="' . $selectedYMD . '" ' . $allInputAttrsHtml . $ymdInputAttrsHtml }}"
+					  />
 
 			<span class="inputGroup-text">
 				{{ phrase('svStandardLib_at:') }}
@@ -94,5 +95,27 @@
 				</xf:foreach>
 			</select>
 		</div>
+	</div>
+</xf:macro>
+
+<xf:macro name="date_time_wrapper"
+		  arg-name="!"
+		  arg-weekStart="!"
+		  arg-readOnly="{{ false }}"
+		  arg-class=""
+		  arg-xfInit=""
+		  arg-attrsHtml=""
+		  >
+	<xf:if is="$xf.versionId >= 2020000">
+		<xf:js prod="xf/date_input-compiled.js" dev="vendor/pikaday/pikaday.js, xf/date_input.js" />
+	</xf:if>
+
+	<div class="inputGroup inputGroup--date inputGroup--joined inputDate">
+		<input type="text" class="input input--date {$class}" autocomplete="off" data-xf-init="date-input {$xfInit}"
+			data-week-start="{$weekStart}"
+			{{ $readOnly ? 'readonly' : '' }}
+			name="{$name}"
+			{$attrsHtml|raw} />
+		<span class="inputGroup-text inputDate-icon js-dateTrigger"></span>
 	</div>
 </xf:macro>
