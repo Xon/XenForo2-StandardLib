@@ -5,13 +5,27 @@
 		  arg-hint=""
 		  arg-timestamp="{{ $xf.time }}"
 		  arg-dateTimeArr="{{ [] }}"
-		  arg-readOnly="{{ false }}">
+		  arg-readOnly="{{ false }}"
+		  arg-xfInit=""
+		  arg-allInputAttrsHtml=""
+		  arg-ymdInputAttrsHtml=""
+		  arg-hhInputAttrsHtml=""
+		  arg-mmInputAttrsHtml=""
+		  arg-ssInputAttrsHtml=""
+		  arg-tzInputAttrsHtml="">
 	<xf:formrow label="{$label}" explain="{$explain}" hint="{$hint}" rowtype="input">
 		<xf:macro name="date_time_input"
 				  arg-name="{$name}"
 				  arg-timestamp="{$timestamp}"
 				  arg-dateTimeArr="{$dateTimeArr}"
-				  arg-readOnly="{$readOnly}" />
+				  arg-readOnly="{$readOnly}"
+				  arg-xfInit="{$xfInit}"
+				  arg-allInputAttrsHtml="{$allInputAttrsHtml}"
+				  arg-ymdInputAttrsHtml="{$ymdInputAttrsHtml}"
+				  arg-hhInputAttrsHtml="{$hhInputAttrsHtml}"
+				  arg-mmInputAttrsHtml="{$mmInputAttrsHtml}"
+				  arg-ssInputAttrsHtml="{$ssInputAttrsHtml}"
+				  arg-tzInputAttrsHtml="{$tzInputAttrsHtml}" />
 	</xf:formrow>
 </xf:macro>
 
@@ -19,7 +33,14 @@
 		  arg-name="date_time"
 		  arg-timestamp="{{ $xf.time }}"
 		  arg-dateTimeArr="{{ [] }}"
-		  arg-readOnly="{{ false }}">
+		  arg-readOnly="{{ false }}"
+		  arg-xfInit=""
+		  arg-allInputAttrsHtml=""
+		  arg-ymdInputAttrsHtml=""
+		  arg-hhInputAttrsHtml=""
+		  arg-mmInputAttrsHtml=""
+		  arg-ssInputAttrsHtml=""
+		  arg-tzInputAttrsHtml="">
 	<xf:css src="svStandardLib_helper_macros_date_time_input.less" />
 	
 	<xf:set var="$selectedYMD" value="{{ $dateTimeArr.ymd ?: ($timestamp ? date($timestamp, 'picker') : '') }}" />
@@ -30,42 +51,48 @@
 	
 	<div class="inputGroup-container inputGroup-containerSvStandardLibDateTime">
 		<div class="inputGroup">
-			<xf:dateinput name="{$name}[ymd]" value="{$selectedYMD}" readonly="{$readOnly}" />
+			<xf:include template="date_input">
+				<xf:set var="$week_start" value="{{ $xf.language.week_start }}" />
+				<xf:set var="$readOnly" value="{{ $readOnly }}" />
+				<xf:set var="$attrsHtml" value="{{ ' value="' . $selectedYMD . '" ' . $allInputAttrsHtml . $ymdInputAttrsHtml }}" />
+			</xf:include>
 
 			<span class="inputGroup-text">
 				{{ phrase('svStandardLib_at:') }}
 			</span>
 
-			<xf:select name="{$name}[hh]" value="{$timestampOrDateTimeArr.hh}" class="input--inline input--autoSize" disabled="{$readOnly}">
+			<select class="input input--inline input--autoSize" name="{$name}[hh]" {{ $readOnly ? 'disabled="disabled"' : '' }} {{ $allInputAttrsHtml|raw }} {{ $hhInputAttrsHtml|raw }}>
 				<xf:foreach loop="{{ range(0, 23, 1) }}" value="$hour">
 					<xf:set var="$readableHour" value="{{ $hour|pad('0', 2) }}" />
-					<xf:option value="{$hour}" label="{$readableHour}" selected="{{ $readableHour === $selectedHour }}" />
+					<option value="{$hour}" {{ $readableHour === $selectedHour ? 'selected="selected"' : '' }}>{$readableHour}</option>
 				</xf:foreach>
-			</xf:select>
+			</select>
 
 			<span class="inputGroup-text">:</span>
 
-			<xf:select name="{$name}[mm]" value="{$timestampOrDateTimeArr.mm}" class="input--inline input--autoSize" disabled="{$readOnly}">
+			<select class="input input--inline input--autoSize" name="{$name}[mm]" {{ $readOnly ? 'disabled="disabled"' : '' }} {{ $allInputAttrsHtml|raw }} {{ $mmInputAttrsHtml|raw }}>
 				<xf:foreach loop="{{ range(0, 59, 1) }}" value="$minute">
 					<xf:set var="$readableMinute" value="{{ $minute|pad('0', 2) }}" />
-					<xf:option value="{$minute}" label="{$readableMinute}" selected="{{ $readableMinute === $selectedMinute }}" />
+					<option value="{$minute}" {{ $readableSecond === $selectedSecond ? 'selected="selected"' : '' }}>{$readableMinute}</option>
 				</xf:foreach>
-			</xf:select>
+			</select>
 
 			<span class="inputGroup-text">:</span>
 
-			<xf:select name="{$name}[ss]" value="{$timestampOrDateTimeArr.ss}" class="input--inline input--autoSize" disabled="{$readOnly}">
+			<select class="input input--inline input--autoSize" name="{$name}[ss]" {{ $readOnly ? 'disabled="disabled"' : '' }} {{ $allInputAttrsHtml|raw }}  {{ $ssInputAttrsHtml|raw }}>
 				<xf:foreach loop="{{ range(0, 59, 1) }}" value="$second">
 					<xf:set var="$readableSecond" value="{{ $second|pad('0', 2) }}" />
-					<xf:option value="{$second}" label="{$readableSecond}" selected="{{ $readableSecond === $selectedSecond }}" />
+					<option value="{$second}" {{ $readableSecond === $selectedSecond ? 'selected="selected"' : '' }}>{$readableSecond}</option>
 				</xf:foreach>
-			</xf:select>
+			</select>
 		</div>
 
 		<div class="inputGroup">
-			<xf:select name="{$name}[tz]" value="{$selectedTz}" disabled="{$readOnly}">
-				<xf:options source="{{ $xf.app.data('XF:TimeZone').getTimeZoneOptions() }}" />
-			</xf:select>
+			<select class="input" name="{$name}[tz]" {{ $readOnly ? 'disabled="disabled"' : '' }} {{ $allInputAttrsHtml|raw }} {{ $tzInputAttrsHtml|raw }}>
+				<xf:foreach loop="{{ $xf.app.data('XF:TimeZone').getTimeZoneOptions() }}" key="$value" value="$readableTz">
+					<option value="{$value}"{{ $value === $selectedTz ? 'selected="selected"' : '' }}>{$readableTz}</option>
+				</xf:foreach>
+			</select>
 		</div>
 	</div>
 </xf:macro>
