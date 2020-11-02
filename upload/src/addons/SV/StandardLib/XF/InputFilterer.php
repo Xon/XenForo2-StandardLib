@@ -71,7 +71,7 @@ class InputFilterer extends XFCP_InputFilterer
                             // php is somewhat smart and will move the y-m-d around to be valid
                             $ymdParts[0] = $intSanitizer($ymdParts[0], 1970, null);
                             $ymdParts[1] = $intSanitizer($ymdParts[1], 1, 12);
-                            $ymdParts[2] = $intSanitizer($ymdParts[1], 1, 31);
+                            $ymdParts[2] = $intSanitizer($ymdParts[2], 1, 31);
                         }
                     }
 
