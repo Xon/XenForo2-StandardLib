@@ -7,8 +7,9 @@ use \XF\Mvc\Entity\Repository;
 class Helper extends Repository
 {
     /**
-     * @param \XF\Mvc\Entity\Entity|null $entity
-     *
+     * @param mixed|\XF\Mvc\Entity\Entity|null $entity
+     * @param string                           $relationOrGetter
+     * @param string                           $backupColumn
      * @return \XF\Entity\User|null
      */
     public function getUserEntity($entity, string $relationOrGetter = 'User', string $backupColumn = 'user_id')

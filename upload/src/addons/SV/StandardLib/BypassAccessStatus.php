@@ -42,6 +42,7 @@ class BypassAccessStatus
      * @param string|object $obj
      * @param string $attribute
      * @return \Closure
+     * @noinspection PhpMissingParamTypeInspection
      */
     public function getStaticPrivate($obj, string $attribute) : \Closure
     {
@@ -56,6 +57,7 @@ class BypassAccessStatus
      * @param string|object $obj
      * @param string $attribute
      * @return \Closure
+     * @noinspection PhpMissingParamTypeInspection
      */
     public function setStaticPrivate($obj, string $attribute) : \Closure
     {
