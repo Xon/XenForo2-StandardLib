@@ -12,7 +12,7 @@ class Helper extends Repository
      * @param string              $phraseContext
      * @return array
      */
-    public function buildRelativeDateString($interval, int $continuousDateParts, string $phraseContext = 'raw'): array
+    public function buildRelativeDateString($interval, int $continuousDateParts = 0, string $phraseContext = 'raw'): array
     {
         if ($interval instanceof \DateInterval)
         {

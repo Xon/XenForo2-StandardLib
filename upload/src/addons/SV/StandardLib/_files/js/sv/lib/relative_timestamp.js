@@ -18,7 +18,7 @@ SV.StandardLib = SV.StandardLib || {};
              * http://www.php.net/manual/en/function.date.php
              * http://momentjs.com/docs/#/displaying/format/
              */
-            var formatMap = {
+            let formatMap = {
                     d: 'DD',
                     D: 'ddd',
                     j: 'D',
@@ -108,7 +108,8 @@ SV.StandardLib = SV.StandardLib || {};
             dateFormat: null,
             timeFormat: null,
             triggerEvent: null,
-            triggerEventOnSelector: null
+            triggerEventOnSelector: null,
+            maximumDateParts: 0
         },
 
         timer: null,
@@ -214,10 +215,16 @@ SV.StandardLib = SV.StandardLib || {};
         getTimeStr: function (momentObj)
         {
             let self = this,
-                timeArr = [];
+                timeArr = [],
+                maximumDateParts = this.options.maximumDateParts
 
             $.each(['year', 'month', 'day', 'hour', 'minute', 'second'], function(index, type)
             {
+                if (maximumDateParts && timeArr.length === maximumDateParts)
+                {
+                    return;
+                }
+
                 let timePartStr = self.getDatePart(momentObj, type);
                 if (typeof timePartStr !== 'string')
                 {

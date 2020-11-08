@@ -4,6 +4,7 @@ namespace SV\StandardLib\XF\Template;
 
 use XF\Mvc\Entity\AbstractCollection;
 use SV\StandardLib\Helper as StandardLibHelper;
+use XF\Template\Templater as BaseTemplater;
 
 /**
  * Extends \XF\Template\Templater
@@ -83,14 +84,15 @@ class Templater extends XFCP_Templater
     }
 
     /**
-     * @param $templater
-     * @param $escape
+     * @param BaseTemplater $templater
+     * @param bool $escape
      * @param $nowDateTimeObj
      * @param $otherDateTimeObj
      * @param bool $countUp
      * @param string $class
      * @param string $triggerEvent
      * @param string $triggerEventOnSelector
+     * @param int $maximumDateParts
      *
      * @return string
      *
@@ -98,7 +100,8 @@ class Templater extends XFCP_Templater
      */
     public function fnSvRelativeTimestamp(
         $templater, &$escape, $nowDateTimeObj, $otherDateTimeObj,
-        bool $countUp = false, string $class = '', string $triggerEvent = '', string $triggerEventOnSelector = ''
+        int $maximumDateParts = 0, bool $countUp = false, string $class = '', string $triggerEvent = '',
+        string $triggerEventOnSelector = ''
     )
     {
         $escape = false;
@@ -143,7 +146,8 @@ class Templater extends XFCP_Templater
             'triggerEvent' => $triggerEvent,
             'triggerEventOnSelector' => $triggerEventOnSelector,
             'timeStr' => $timeStr,
-            'otherTimestamp' => $otherTimestamp
+            'otherTimestamp' => $otherTimestamp,
+            'maximumDateParts' => $maximumDateParts
         ]);
     }
 }
