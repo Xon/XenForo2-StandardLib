@@ -86,13 +86,13 @@ class Templater extends XFCP_Templater
     /**
      * @param BaseTemplater $templater
      * @param bool $escape
-     * @param $nowDateTimeObj
-     * @param $otherDateTimeObj
+     * @param \DateTime $nowDateTimeObj
+     * @param \DateTime $otherDateTimeObj
+     * @param int $maximumDateParts
      * @param bool $countUp
      * @param string $class
      * @param string $triggerEvent
      * @param string $triggerEventOnSelector
-     * @param int $maximumDateParts
      *
      * @return string
      *
