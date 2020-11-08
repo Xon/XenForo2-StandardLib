@@ -3,6 +3,7 @@
 namespace SV\StandardLib\XF\Template;
 
 use XF\Mvc\Entity\AbstractCollection;
+use SV\StandardLib\Helper as StandardLibHelper;
 
 /**
  * Extends \XF\Template\Templater
@@ -27,6 +28,7 @@ class Templater extends XFCP_Templater
         }
 
         $this->addFunction('sv_array_reverse', 'fnSvArrayReverse');
+        $this->addFunction('sv_relative_timestamp', 'fnSvRelativeTimestamp');
     }
 
     /**
@@ -78,5 +80,70 @@ class Templater extends XFCP_Templater
         }
 
         return $array;
+    }
+
+    /**
+     * @param $templater
+     * @param $escape
+     * @param $nowDateTimeObj
+     * @param $otherDateTimeObj
+     * @param bool $countUp
+     * @param string $class
+     * @param string $triggerEvent
+     * @param string $triggerEventOnSelector
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    public function fnSvRelativeTimestamp(
+        $templater, &$escape, $nowDateTimeObj, $otherDateTimeObj,
+        bool $countUp = false, string $class = '', string $triggerEvent = '', string $triggerEventOnSelector = ''
+    )
+    {
+        $escape = false;
+
+        /**
+         * @param int|\DateTime $dateTimeObj
+         *
+         * @return \DateTime
+         */
+        $convertToDateTimeObjIfNeeded = function ($dateTimeObj)
+        {
+            if ($dateTimeObj instanceof \DateTime)
+            {
+                return $dateTimeObj;
+            }
+
+            return new \DateTime('@' . $dateTimeObj, new \DateTimeZone(\XF::visitor()->timezone));
+        };
+
+        $nowDateTimeObj = $convertToDateTimeObjIfNeeded($nowDateTimeObj);
+        $nowTimestamp = $nowDateTimeObj->getTimestamp();
+
+        $otherDateTimeObj = $convertToDateTimeObjIfNeeded($otherDateTimeObj);
+        $otherTimestamp = $otherDateTimeObj->getTimestamp();
+
+        $repo = StandardLibHelper::repo();
+        $interval = $repo->momentJsCompatibleTimeDiff($nowTimestamp, $otherTimestamp);
+
+        if (isset($interval['invert']) && (!$countUp && !$interval['invert'] || $countUp && $interval['invert']))
+        {
+            $dateArr = $repo->buildRelativeDateString($interval, 0);
+            $timeStr = \trim(\implode(', ', $dateArr));
+        }
+        else
+        {
+            $timeStr = \XF::language()->dateTime($otherTimestamp);
+        }
+
+        return $this->renderMacro('public:svStandardLib_helper_macros', 'relative_timestamp', [
+            'class' => $class,
+            'countUp' => $countUp,
+            'triggerEvent' => $triggerEvent,
+            'triggerEventOnSelector' => $triggerEventOnSelector,
+            'timeStr' => $timeStr,
+            'otherTimestamp' => $otherTimestamp
+        ]);
     }
 }

@@ -129,3 +129,16 @@
 	<xf:js src="sv/vendor/moment/moment.js" addon="SV/StandardLib" min="1" />
 	<xf:js src="sv/standard_lib/relative_timestamp.js" addon="SV/StandardLib" min="1" />
 </xf:macro>
+
+<xf:macro name="relative_timestamp" arg-timeStr="!" arg-otherTimestamp="!" arg-triggerEvent="{{ null }}" arg-triggerEventOnSelector="{{ null }}"><xf:trim>
+	<xf:macro name="relative_timestamp_prerequisites" />
+	
+	<span {{ $class is not empty ? 'class="' . $class|for_attr . '" ' : ''}}data-xf-init="sv-standard-lib--relative-timestamp"
+		  data-count-up="{{ $countUp ? 'true' : 'false' }}"
+		  data-timestamp="{$otherTimestamp}"
+		  data-date-format="{$xf.language.date_format}"
+		  data-time-format="{$xf.language.time_format}"
+		  {{ $triggerEvent is not empty ? 'data-trigger-event="' . $triggerEvent|for_attr . '" ' . ($triggerEventOnSelector is not empty ? ' data-trigger-event-on-selector="' . $triggerEventOnSelector|for_attr . '" ' : '') : '' }}><xf:trim>
+		{$timeStr}
+	</xf:trim></span>
+</xf:trim></xf:macro>
