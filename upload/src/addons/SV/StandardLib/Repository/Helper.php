@@ -8,11 +8,11 @@ class Helper extends Repository
 {
     /**
      * @param \DateInterval|array $interval
-     * @param int                 $continuousDateParts
+     * @param int                 $maximumDateParts
      * @param string              $phraseContext
      * @return array
      */
-    public function buildRelativeDateString($interval, int $continuousDateParts = 0, string $phraseContext = 'raw'): array
+    public function buildRelativeDateString($interval, int $maximumDateParts = 0, string $phraseContext = 'raw'): array
     {
         if ($interval instanceof \DateInterval)
         {
@@ -37,17 +37,14 @@ class Helper extends Repository
         ];
 
         $dateArr = [];
-        $truncatingDate = $continuousDateParts > 0;
         foreach ($formatMaps AS $format => $phrase)
         {
-            if ($truncatingDate && \count($dateArr) === $continuousDateParts)
+            if ($maximumDateParts && \count($dateArr) === $maximumDateParts)
             {
                 break;
             }
 
             $value = $interval[$format];
-            $len = count($dateArr);
-
             if ($value === 1)
             {
                 $dateArr[] = \XF::phrase('time.' . $phrase[0], [
@@ -59,12 +56,6 @@ class Helper extends Repository
                 $dateArr[] = \XF::phrase('time.' . $phrase[0] . 's', [
                     'count' => $value
                 ])->render($phraseContext);
-            }
-
-            if ($truncatingDate && $len > 0 &&
-                ($len === count($dateArr) || count($dateArr) > $continuousDateParts))
-            {
-                break;
             }
         }
 
