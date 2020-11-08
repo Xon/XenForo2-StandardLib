@@ -115,8 +115,6 @@ SV.StandardLib = SV.StandardLib || {};
 
         init: function()
         {
-            console.log(this.options);
-
             if (!this.options.timestamp)
             {
                 console.error('Timestamp is missing.');
