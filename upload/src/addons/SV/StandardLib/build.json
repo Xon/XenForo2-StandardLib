@@ -4,6 +4,6 @@
         "js/sv/vendor"
     ],
     "minify": [
-        "js/sv/standard_lib/relative_timestamp.js"
+        "js/sv/lib/relative_timestamp.js"
     ]
 }
