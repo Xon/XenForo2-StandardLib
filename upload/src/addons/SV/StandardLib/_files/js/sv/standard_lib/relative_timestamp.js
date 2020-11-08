@@ -151,18 +151,16 @@ SV.StandardLib = SV.StandardLib || {};
 
             if (now <= end)
             {
-                //this.handleCountDown(now, end);
+                this.handleCountDown(now, end);
             }
             else if (this.options.countUp)
             {
-                //this.handleCoupUp(end, now);
+                this.handleCoupUp(end, now);
             }
             else
             {
-                //this.handleCountDownEnd(end);
+                this.handleCountDownEnd(end);
             }
-
-            this.handleCountDownEnd(end);
         },
 
         handleCountDown: function (nowTimestamp, endTimestamp)
