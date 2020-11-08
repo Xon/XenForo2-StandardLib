@@ -111,7 +111,7 @@ class Templater extends XFCP_Templater
 
         if (isset($interval['invert']) && (!$countUp && !$interval['invert'] || $countUp && $interval['invert']))
         {
-            $dateArr = $repo->buildRelativeDateString($interval, 0);
+            $dateArr = $repo->buildRelativeDateString($interval, $maximumDateParts);
             $timeStr = \trim(\implode(', ', $dateArr));
         }
         else
