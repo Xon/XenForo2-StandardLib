@@ -328,7 +328,7 @@ SV.StandardLib = SV.StandardLib || {};
             let eventTargetSelector = this.options.triggerEventOnSelector;
             if (!eventTargetSelector.length)
             {
-                return this.$target;
+                return null; // eg: if dismiss button is not found, we do not want to click on the span itself
             }
 
             return XF.findRelativeIf(eventTargetSelector, this.$target);
