@@ -18,7 +18,7 @@ SV.StandardLib = SV.StandardLib || {};
              * http://www.php.net/manual/en/function.date.php
              * http://momentjs.com/docs/#/displaying/format/
              */
-            let formatMap = {
+            var formatMap = {
                     d: 'DD',
                     D: 'ddd',
                     j: 'D',
@@ -53,7 +53,7 @@ SV.StandardLib = SV.StandardLib || {};
                     A: 'A',
                     B: function ()
                     {
-                        let thisUTC = this.clone().utc(),
+                        var thisUTC = this.clone().utc(),
                             // Shamelessly stolen from http://javascript.about.com/library/blswatch.htm
                             swatch = ((thisUTC.hours() + 1) % 24) + (thisUTC.minutes() / 60) + (thisUTC.seconds() / 3600);
 
@@ -86,7 +86,7 @@ SV.StandardLib = SV.StandardLib || {};
 
             moment.fn.formatPHP = function (format)
             {
-                let self = this;
+                var self = this;
 
                 return this.format(format.replace(formatEx, function (phpStr)
                 {
@@ -145,7 +145,7 @@ SV.StandardLib = SV.StandardLib || {};
 
         updateTime: function ()
         {
-            let now = Math.floor(Date.now() / 1000) * 1000,
+            var now = Math.floor(Date.now() / 1000) * 1000,
                 end = this.options.timestamp * 1000;
 
             if (now <= end)
@@ -176,7 +176,7 @@ SV.StandardLib = SV.StandardLib || {};
         {
             this.clearTimer();
 
-            let momentObj = moment.unix(endTimestamp / 1000),
+            var momentObj = moment.unix(endTimestamp / 1000),
                 fullEnd = this.getPhrase('date_x_at_time_y', {
                     '{date}': momentObj.formatPHP(this.options.dateFormat),
                     '{time}': momentObj.formatPHP(this.options.timeFormat),
@@ -214,7 +214,7 @@ SV.StandardLib = SV.StandardLib || {};
          */
         getTimeStr: function (momentObj)
         {
-            let self = this,
+            var self = this,
                 timeArr = [],
                 maximumDateParts = this.options.maximumDateParts
 
@@ -225,7 +225,7 @@ SV.StandardLib = SV.StandardLib || {};
                     return;
                 }
 
-                let timePartStr = self.getDatePart(momentObj, type);
+                var timePartStr = self.getDatePart(momentObj, type);
                 if (typeof timePartStr !== 'string')
                 {
                     return;
@@ -254,14 +254,14 @@ SV.StandardLib = SV.StandardLib || {};
                 return false;
             }
 
-            let methodName = type + 's';
+            var methodName = type + 's';
             if (typeof momentObj[methodName] !== 'function')
             {
                 console.error('Invalid date type provided.', type);
                 return false;
             }
 
-            let value = parseInt(momentObj[methodName]()),
+            var value = parseInt(momentObj[methodName]()),
                 phrase = 'svStandardLib_time.' + type + (value > 1 ? 's' : '');
 
             // skip zero items
@@ -301,7 +301,7 @@ SV.StandardLib = SV.StandardLib || {};
                 return false;
             }
 
-            let translatedValue = XF.phrase(phrase, args, null);
+            var translatedValue = XF.phrase(phrase, args, null);
             if (translatedValue === null)
             {
                 this.clearTimer();
@@ -325,7 +325,7 @@ SV.StandardLib = SV.StandardLib || {};
 
         getEventTarget: function ()
         {
-            let eventTargetSelector = this.options.triggerEventOnSelector;
+            var eventTargetSelector = this.options.triggerEventOnSelector;
             if (!eventTargetSelector.length)
             {
                 return null; // eg: if dismiss button is not found, we do not want to click on the span itself
@@ -336,7 +336,7 @@ SV.StandardLib = SV.StandardLib || {};
 
         triggerEventIfNeeded: function ()
         {
-            let $evenToTriggerOn = this.getEventTarget(),
+            var $evenToTriggerOn = this.getEventTarget(),
                 eventName = this.options.triggerEvent;
 
             if (!$evenToTriggerOn.length || !eventName)
