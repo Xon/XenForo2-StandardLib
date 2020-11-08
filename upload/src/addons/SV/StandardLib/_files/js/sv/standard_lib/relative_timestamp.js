@@ -106,13 +106,17 @@ SV.StandardLib = SV.StandardLib || {};
             countUp: false,
             timestamp: null,
             dateFormat: null,
-            timeFormat: null
+            timeFormat: null,
+            triggerEvent: null,
+            triggerEventOnSelector: null
         },
 
         timer: null,
 
         init: function()
         {
+            console.log(this.options);
+
             if (!this.options.timestamp)
             {
                 console.error('Timestamp is missing.');
@@ -142,52 +146,83 @@ SV.StandardLib = SV.StandardLib || {};
 
         updateTime: function ()
         {
-            var self = this,
-                now = Math.floor(Date.now() / 1000) * 1000,
-                end = this.options.timestamp * 1000,
-                momentObj,
-                timeArr = [];
+            let now = Math.floor(Date.now() / 1000) * 1000,
+                end = this.options.timestamp * 1000;
 
             if (now <= end)
             {
-                momentObj = moment.duration(end - now, 'milliseconds');
+                //this.handleCountDown(now, end);
             }
             else if (this.options.countUp)
             {
-                momentObj = moment.duration(now - end, 'milliseconds');
+                //this.handleCoupUp(end, now);
+            }
+            else
+            {
+                //this.handleCountDownEnd(end);
+            }
+
+            this.handleCountDownEnd(end);
+        },
+
+        handleCountDown: function (nowTimestamp, endTimestamp)
+        {
+            this.handleTimeStrOutput(this.getTimeStr(moment.duration(endTimestamp - nowTimestamp, 'milliseconds')));
+        },
+
+        handleCoupUp: function (endTimestamp, nowTimestamp)
+        {
+            this.handleTimeStrOutput(this.getTimeStr(moment.duration(nowTimestamp - endTimestamp, 'milliseconds')))
+        },
+
+        handleCountDownEnd: function (endTimestamp)
+        {
+            this.clearTimer();
+
+            let momentObj = moment.unix(endTimestamp / 1000),
+                fullEnd = this.getPhrase('date_x_at_time_y', {
+                    '{date}': momentObj.formatPHP(this.options.dateFormat),
+                    '{time}': momentObj.formatPHP(this.options.timeFormat),
+                });
+
+            if (!fullEnd)
+            {
+                console.error('Unable to get full end date.');
+                return;
+            }
+
+            this.$target.text(fullEnd);
+        },
+
+        /**
+         *
+         * @param {string|null} timeStr
+         */
+        handleTimeStrOutput: function (timeStr)
+        {
+            if (typeof timeStr === "string")
+            {
+                this.$target.text(timeStr);
             }
             else
             {
                 this.clearTimer();
-
-                var $noticeContent = this.$target.closest('.notice-content'),
-                    $noticeDismissButton = $noticeContent.length ? $noticeContent.find('.notice-dismiss') : null;
-
-                if ($noticeDismissButton.length)
-                {
-                    $noticeDismissButton.trigger('click');
-                }
-
-                momentObj = moment.unix(end / 1000);
-                var fullEnd = this.getPhrase('svNoticeTimeReplacables_date_x_at_time_y', {
-                    '{date}': momentObj.formatPHP(this.options.dateFormat),
-                    '{time}': momentObj.formatPHP(this.options.timeFormat),
-                });
-                if (!fullEnd)
-                {
-                    console.error('Unable to get full end date.');
-                    return;
-                }
-
-                this.$target.text(fullEnd);
-
-                return;
             }
+        },
 
-            var timePartStr;
+        /**
+         * @param {moment} momentObj
+         *
+         * @returns {string|null}
+         */
+        getTimeStr: function (momentObj)
+        {
+            let self = this,
+                timeArr = [];
+
             $.each(['year', 'month', 'day', 'hour', 'minute', 'second'], function(index, type)
             {
-                timePartStr = self.getDatePart(momentObj, type);
+                let timePartStr = self.getDatePart(momentObj, type);
                 if (typeof timePartStr !== 'string')
                 {
                     return;
@@ -198,11 +233,10 @@ SV.StandardLib = SV.StandardLib || {};
 
             if (!timeArr.length)
             {
-                this.clearTimer();
-                return;
+                return null;
             }
 
-            this.$target.text(timeArr.join(', '));
+            return timeArr.join(', ');
         },
 
         /**
@@ -217,15 +251,15 @@ SV.StandardLib = SV.StandardLib || {};
                 return false;
             }
 
-            var methodName = type + 's';
+            let methodName = type + 's';
             if (typeof momentObj[methodName] !== 'function')
             {
                 console.error('Invalid date type provided.', type);
                 return false;
             }
 
-            var value = parseInt(momentObj[methodName]()),
-                phrase = 'svNoticeTimeReplacables_' + type + (value > 1 ? 's' : '');
+            let value = parseInt(momentObj[methodName]()),
+                phrase = 'svStandardLib_time.' + type + (value > 1 ? 's' : '');
 
             // skip zero items
             if (!value)
@@ -264,7 +298,7 @@ SV.StandardLib = SV.StandardLib || {};
                 return false;
             }
 
-            var translatedValue = XF.phrase(phrase, args, null);
+            let translatedValue = XF.phrase(phrase, args, null);
             if (translatedValue === null)
             {
                 this.clearTimer();
@@ -282,8 +316,33 @@ SV.StandardLib = SV.StandardLib || {};
             {
                 clearInterval(this.timer);
                 this.timer = null;
+                this.triggerEventIfNeeded();
             }
-        }
+        },
+
+        getEventTarget: function ()
+        {
+            let eventTargetSelector = this.options.triggerEventOnSelector;
+            if (!eventTargetSelector.length)
+            {
+                return this.$target;
+            }
+
+            return XF.findRelativeIf(eventTargetSelector, this.$target);
+        },
+
+        triggerEventIfNeeded: function ()
+        {
+            let $evenToTriggerOn = this.getEventTarget(),
+                eventName = this.options.triggerEvent;
+
+            if (!$evenToTriggerOn.length || !eventName)
+            {
+                return;
+            }
+
+            $evenToTriggerOn.trigger($.Event(eventName));
+        },
     });
 
     XF.Element.register('sv-standard-lib--relative-timestamp', 'SV.StandardLib.RelativeTimestamp');
