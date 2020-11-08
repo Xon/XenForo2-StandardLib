@@ -131,11 +131,13 @@
 </xf:macro>
 
 <xf:macro name="relative_timestamp"
+		  arg-class=""
 		  arg-timeStr="!"
 		  arg-otherTimestamp="!"
 		  arg-triggerEvent="{{ null }}"
 		  arg-triggerEventOnSelector="{{ null }}"
-		  arg-maximumDateParts="{{ 0 }}"><xf:trim>
+		  arg-maximumDateParts="{{ 0 }}"
+		  arg-countUp="{{ false }}"><xf:trim>
 	<xf:macro name="relative_timestamp_prerequisites" />
 	
 	<span {{ $class is not empty ? 'class="' . $class|for_attr . '" ' : ''}}data-xf-init="sv-standard-lib--relative-timestamp"
