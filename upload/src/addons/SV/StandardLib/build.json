@@ -1,6 +1,6 @@
 {
     "additional_files": [
-        "js/sv/standard_lib",
+        "js/sv/lib",
         "js/sv/vendor"
     ],
     "minify": [
