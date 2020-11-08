@@ -1,0 +1,11 @@
+{
+    "additional_files": [
+        "js/sv/standard_lib",
+        "js/sv/vendor/moment/LICENSE",
+        "js/sv/vendor/moment/moment.js",
+        "js/sv/vendor/moment/moment.min.js"
+    ],
+    "minify": [
+        "js/sv/standard_lib/relative_timestamp.js"
+    ]
+}
