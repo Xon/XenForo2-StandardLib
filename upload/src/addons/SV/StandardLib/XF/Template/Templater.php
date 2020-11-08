@@ -86,8 +86,8 @@ class Templater extends XFCP_Templater
     /**
      * @param BaseTemplater $templater
      * @param bool $escape
-     * @param \DateTime $nowDateTimeObj
-     * @param \DateTime $otherDateTimeObj
+     * @param int $nowTimestamp
+     * @param int $otherTimestamp
      * @param int $maximumDateParts
      * @param bool $countUp
      * @param string $class
@@ -99,33 +99,12 @@ class Templater extends XFCP_Templater
      * @throws \Exception
      */
     public function fnSvRelativeTimestamp(
-        $templater, &$escape, $nowDateTimeObj, $otherDateTimeObj,
+        $templater, &$escape, int $nowTimestamp, int $otherTimestamp,
         int $maximumDateParts = 0, bool $countUp = false, string $class = '', string $triggerEvent = '',
         string $triggerEventOnSelector = ''
     )
     {
         $escape = false;
-
-        /**
-         * @param int|\DateTime $dateTimeObj
-         *
-         * @return \DateTime
-         */
-        $convertToDateTimeObjIfNeeded = function ($dateTimeObj)
-        {
-            if ($dateTimeObj instanceof \DateTime)
-            {
-                return $dateTimeObj;
-            }
-
-            return new \DateTime('@' . $dateTimeObj, new \DateTimeZone(\XF::visitor()->timezone));
-        };
-
-        $nowDateTimeObj = $convertToDateTimeObjIfNeeded($nowDateTimeObj);
-        $nowTimestamp = $nowDateTimeObj->getTimestamp();
-
-        $otherDateTimeObj = $convertToDateTimeObjIfNeeded($otherDateTimeObj);
-        $otherTimestamp = $otherDateTimeObj->getTimestamp();
 
         $repo = StandardLibHelper::repo();
         $interval = $repo->momentJsCompatibleTimeDiff($nowTimestamp, $otherTimestamp);
