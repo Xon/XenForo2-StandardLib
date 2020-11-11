@@ -57,6 +57,10 @@ class Helper extends Repository
                     'count' => $value
                 ])->render($phraseContext);
             }
+            else if ($maximumDateParts > 0 && \count($dateArr) > 0)
+            {
+                break;
+            }
         }
 
         return $dateArr;

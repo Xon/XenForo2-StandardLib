@@ -106,15 +106,19 @@ class Templater extends XFCP_Templater
     {
         $escape = false;
 
+        $timeStr = '';
         $repo = StandardLibHelper::repo();
         $interval = $repo->momentJsCompatibleTimeDiff($nowTimestamp, $otherTimestamp);
 
         if (isset($interval['invert']) && (!$countUp && !$interval['invert'] || $countUp && $interval['invert']))
         {
             $dateArr = $repo->buildRelativeDateString($interval, $maximumDateParts);
-            $timeStr = \trim(\implode(', ', $dateArr));
+            if ($dateArr)
+            {
+                $timeStr = \trim(\implode(', ', $dateArr));
+            }
         }
-        else
+        if (!$timeStr)
         {
             $timeStr = \XF::language()->dateTime($otherTimestamp);
         }

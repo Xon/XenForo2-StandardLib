@@ -205,7 +205,7 @@ SV.StandardLib = SV.StandardLib || {};
             }
             else
             {
-                this.clearTimer();
+                this.handleCountDownEnd(this.options.timestamp * 1000);
             }
         },
 
@@ -222,7 +222,7 @@ SV.StandardLib = SV.StandardLib || {};
 
             $.each(['year', 'month', 'day', 'hour', 'minute', 'second'], function(index, type)
             {
-                if (maximumDateParts && timeArr.length === maximumDateParts)
+                if (maximumDateParts && timeArr.length >= maximumDateParts)
                 {
                     return;
                 }
@@ -230,6 +230,9 @@ SV.StandardLib = SV.StandardLib || {};
                 var timePartStr = self.getDatePart(momentObj, type);
                 if (typeof timePartStr !== 'string')
                 {
+                    if (maximumDateParts > 0 && timeArr.length > 0) {
+                        maximumDateParts = timeArr.length;
+                    }
                     return;
                 }
 
