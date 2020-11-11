@@ -28,18 +28,18 @@ class Helper extends Repository
         }
 
         $formatMaps = [
-            'y' => ['year', '%y '],
-            'm' => ['month', '%m '],
-            'd' => ['day', '%d '],
-            'h' => ['hour', '%h '],
-            'i' => ['minute', '%i '],
-            's' => ['second', '%s '],
+            'y' => 'year',
+            'm' => 'month',
+            'd' => 'day',
+            'h' => 'hour',
+            'i' => 'minute',
+            's' => 'second',
         ];
 
         $dateArr = [];
         foreach ($formatMaps AS $format => $phrase)
         {
-            if ($maximumDateParts && \count($dateArr) === $maximumDateParts)
+            if ($maximumDateParts && \count($dateArr) >= $maximumDateParts)
             {
                 break;
             }
@@ -47,13 +47,13 @@ class Helper extends Repository
             $value = $interval[$format];
             if ($value === 1)
             {
-                $dateArr[] = \XF::phrase('time.' . $phrase[0], [
+                $dateArr[] = \XF::phrase('time.' . $phrase, [
                     'count' => $value
                 ])->render($phraseContext);
             }
             else if ($value > 1)
             {
-                $dateArr[] = \XF::phrase('time.' . $phrase[0] . 's', [
+                $dateArr[] = \XF::phrase('time.' . $phrase . 's', [
                     'count' => $value
                 ])->render($phraseContext);
             }
