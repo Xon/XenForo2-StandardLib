@@ -199,7 +199,9 @@ SV.StandardLib = SV.StandardLib || {};
         {
             if (typeof timeStr === "string")
             {
-                this.$target.text(timeStr);
+                if (this.$target.text() !== timeStr) {
+                    this.$target.text(timeStr);
+                }
             }
             else
             {
