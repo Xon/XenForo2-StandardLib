@@ -93,6 +93,9 @@ class Template extends XFCP_Template
             return $status;
         }, $statuses);
 
+        $diff = new Diff();
+        $diffs = $diff->findDifferences($template->template, $templateStr);
+
         $viewParams = [
             'style' => $style,
             'template' => $template,
@@ -101,6 +104,7 @@ class Template extends XFCP_Template
             'status' => $statuses,
             '_xfWithData' => $this->filter('_xfWithData', 'bool'),
 
+            'diffs' => $diffs,
             'templateStr' => $templateStr,
             'compiledTemplate' => null,
             'compilerErrors' => null,
