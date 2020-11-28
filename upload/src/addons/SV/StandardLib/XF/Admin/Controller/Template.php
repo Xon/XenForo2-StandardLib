@@ -35,7 +35,11 @@ class Template extends XFCP_Template
     public function actionViewModifications(ParameterBag $parameterBag) : ViewReply
     {
         $masterTemplate = $this->assertTemplateExists($parameterBag->template_id);
-        $style = $this->assertStyleExists($this->filter('style_id', 'uint'));
+        $style = $this->assertStyleExists(
+            $this->filter('style_id', '?uint'), // if this is not nullable then it will revert to master style which we do not want
+            null,
+            'svStandardLib_requested_style_not_found'
+        );
 
         $templateRepo = $this->getTemplateRepo();
 
