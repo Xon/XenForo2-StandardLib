@@ -98,11 +98,13 @@ class Template extends XFCP_Template
         $viewParams = [
             'style' => $style,
             'template' => $template,
-            'diffs' => $diffs,
             'mods' => $modifications->toArray(),
             'activeMods' => $filtered,
             'status' => $statuses,
             '_xfWithData' => $this->filter('_xfWithData', 'bool'),
+
+            'diffs' => $diffs,
+            'compiledTemplate' => $this->app()->templateCompiler()->compile($templateText)
         ];
         return $this->view(
             'SV\StandardLib\XF:Template\ViewModifications',
