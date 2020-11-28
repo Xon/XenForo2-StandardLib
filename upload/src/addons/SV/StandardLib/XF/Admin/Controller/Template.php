@@ -24,7 +24,7 @@ class Template extends XFCP_Template
             {
                 $reply->setParam(
                     'svModificationCount',
-                    $this->getTemplateModificationFinderForSvStandardLib($template->type, $template->title)
+                    $this->getTemplateModificationFinderForSvStandardLib($template->type, $template->title)->total()
                 );
             }
         }
