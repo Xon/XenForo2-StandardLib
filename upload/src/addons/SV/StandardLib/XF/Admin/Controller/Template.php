@@ -102,8 +102,18 @@ class Template extends XFCP_Template
             '_xfWithData' => $this->filter('_xfWithData', 'bool'),
 
             'templateStr' => $templateStr,
-            'compiledTemplate' => $this->app()->templateCompiler()->compile($templateStr)
+            'compiledTemplate' => null,
+            'compilerErrors' => null,
         ];
+
+        try
+        {
+            $viewParams['compiledTemplate'] = $this->app()->templateCompiler()->compile($templateStr);
+        }
+        catch (TemplateCompilerException $exception)
+        {
+            $viewParams['compilerErrors'] = $exception->getMessages();
+        }
         return $this->view(
             'SV\StandardLib\XF:Template\ViewModifications',
             'svStandardLib_template_view_modifications',

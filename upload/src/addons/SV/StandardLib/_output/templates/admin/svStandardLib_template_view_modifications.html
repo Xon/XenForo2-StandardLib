@@ -6,6 +6,7 @@
 <xf:breadcrumb href="{{ link('templates/edit', $template, {'type': $template.type, 'style_id': $style.style_id}) }}">{$template.title}</xf:breadcrumb>
 
 <xf:css src="public:diff.less" />
+<xf:macro template="public:prism_macros" name="setup" />
 
 <xf:form action="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id}) }}"
 		 class="block"
@@ -52,6 +53,17 @@
 			</li>
 			<li role="tabpanel" aria-labelledby="compiled-template-code">
 				<div class="block-body block-row block-body--contained"><pre>{$compiledTemplate}</pre></div>
+				
+				<xf:if contentcheck="true">
+					<h3 class="block-minorHeader">{{ phrase('svStandardLib_compiler_errors:') }}</h3>
+					<ol class="block-body block-body--contained">
+						<xf:contentcheck><xf:trim>
+							<xf:foreach loop="$compilerErrors" value="$compilerError">
+								<li class="block-row block-row--separated">{$compilerError}</li>
+							</xf:foreach>
+						</xf:trim></xf:contentcheck>
+					</ol>
+				</xf:if>
 			</li>
 			<!--[SV/StandardLib:tab_panes:end]-->
 		</ul>
