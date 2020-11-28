@@ -10,7 +10,8 @@ use XF\Mvc\ParameterBag;
 use XF\Mvc\Reply\View as ViewReply;
 use XF\Entity\Template as TemplateEntity;
 use XF\Repository\TemplateModification as TemplateModificationRepo;
-use \XF\Template\Compiler\Exception as TemplateCompilerException;
+use XF\Mvc\Reply\Exception as ExceptionReply;
+use XF\Template\Compiler\Exception as TemplateCompilerException;
 
 class Template extends XFCP_Template
 {
@@ -33,6 +34,13 @@ class Template extends XFCP_Template
         return $reply;
     }
 
+    /**
+     * @param ParameterBag $parameterBag
+     *
+     * @return ViewReply
+     *
+     * @throws ExceptionReply
+     */
     public function actionViewModifications(ParameterBag $parameterBag) : ViewReply
     {
         $masterTemplate = $this->assertTemplateExists($parameterBag->template_id);
@@ -93,9 +101,6 @@ class Template extends XFCP_Template
             return $status;
         }, $statuses);
 
-        $diff = new Diff();
-        $diffs = $diff->findDifferences($template->template, $templateStr);
-
         $viewParams = [
             'style' => $style,
             'template' => $template,
@@ -104,20 +109,38 @@ class Template extends XFCP_Template
             'status' => $statuses,
             '_xfWithData' => $this->filter('_xfWithData', 'bool'),
 
-            'diffs' => $diffs,
             'templateStr' => $templateStr,
-            'compiledTemplate' => null,
-            'compilerErrors' => null,
+
+            'tab' => $this->filter('tab', 'str', 'diffs')
         ];
 
-        try
+        switch ($viewParams['tab'])
         {
-            $viewParams['compiledTemplate'] = $this->app()->templateCompiler()->compile($templateStr);
+            case 'diffs':
+                $diff = new Diff();
+                $diffs = $diff->findDifferences($template->template, $templateStr);
+
+                $viewParams['diffs'] = $diffs;
+                break;
+
+            case 'compiled':
+                $viewParams['compiledTemplate'] = null;
+                $viewParams['compilerErrors'] = null;
+
+                try
+                {
+                    $viewParams['compiledTemplate'] = $this->app()->templateCompiler()->compile($templateStr);
+                }
+                catch (TemplateCompilerException $exception)
+                {
+                    $viewParams['compilerErrors'] = $exception->getMessages();
+                }
+                break;
+
+            default:
+                throw $this->exception($this->notFound());
         }
-        catch (TemplateCompilerException $exception)
-        {
-            $viewParams['compilerErrors'] = $exception->getMessages();
-        }
+
         return $this->view(
             'SV\StandardLib\XF:Template\ViewModifications',
             'svStandardLib_template_view_modifications',

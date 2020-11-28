@@ -32,23 +32,23 @@
 
 <div class="block">
 	<div class="block-container">
-		<h2 class="block-tabHeader tabs hScroller" data-xf-init="tabs h-scroller" data-state="replace" role="tablist">
+		<h2 class="block-tabHeader tabs hScroller" data-xf-init="h-scroller" role="tablist">
 			<span class="hScroller-scroll">
 				<!--[XF:SV/StandardLib:tabs:start]-->
-				<span class="tabs-tab is-active" role="tab"
-				   id="template-contents"
-				   aria-controls="template-contents">{{ phrase('svStandardLib_template_contents') }}</span>
+				<a class="tabs-tab {{ $tab === 'diffs' ? 'is-active' : '' }}" role="tab" tabindex="0"
+				   href="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': 'diffs'}) }}"
+				   aria-controls="template-contents">{{ phrase('svStandardLib_template_contents') }}</a>
 				
-				<span class="tabs-tab" role="tab"
-				   id="compiled-template-code"
-				   aria-controls="compiled-template-code">{{ phrase('svStandardLib_compiled_template_code') }}</span>
+				<a class="tabs-tab {{ $tab === 'compiled' ? 'is-active' : '' }}" role="tab" tabindex="0"
+				   href="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': 'compiled'}) }}"
+				   aria-controls="compiled-template-code">{{ phrase('svStandardLib_compiled_template_code') }}</a>
 				<!--[XF:SV/StandardLib:tabs:end]-->
 			</span>
 		</h2>
 		
 		<ul class="tabPanes">
 			<!--[XF:SV/StandardLib:tab_panes:start]-->
-			<li class="is-active" role="tabpanel" aria-labelledby="template-contents">
+			<li class="{{ $tab === 'diffs' ? 'is-active' : '' }}" role="tabpanel" aria-labelledby="template-contents">
 				<div class="block-body block-row block-body--contained">
 					<ol class="diffList diffList--code">
 						<xf:foreach loop="$diffs" value="$diff">
@@ -58,7 +58,7 @@
 					</ol>
 				</div>
 			</li>
-			<li role="tabpanel" aria-labelledby="compiled-template-code">
+			<li class="{{ $tab === 'compiled' ? 'is-active' : '' }}" role="tabpanel" aria-labelledby="compiled-template-code">
 				<div class="block-body block-row block-body--contained"><pre class="bbCodeCode" dir="ltr" data-xf-init="code-block" data-lang="php"><code>{$compiledTemplate}</code></pre></div>
 				
 				<xf:if contentcheck="true">
