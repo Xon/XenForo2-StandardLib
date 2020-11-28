@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Admin\\Controller\\Template",
+    "to_class": "SV\\StandardLib\\XF\\Admin\\Controller\\Template",
+    "execute_order": 7915,
+    "active": true
+}
