@@ -10,6 +10,7 @@ use XF\Mvc\ParameterBag;
 use XF\Mvc\Reply\View as ViewReply;
 use XF\Entity\Template as TemplateEntity;
 use XF\Repository\TemplateModification as TemplateModificationRepo;
+use \XF\Template\Compiler\Exception as TemplateCompilerException;
 
 class Template extends XFCP_Template
 {
@@ -75,14 +76,11 @@ class Template extends XFCP_Template
 
         /** @var TemplateModificationRepo $templateModRepo */
         $templateModRepo = $this->repository('XF:TemplateModification');
-        $templateText = $templateModRepo->applyTemplateModifications(
+        $templateStr = $templateModRepo->applyTemplateModifications(
             $template->template,
             $filtered,
             $statuses
         );
-
-        $diff = new Diff();
-        $diffs = $diff->findDifferences($template->template, $templateText);
 
         $statuses = \array_map(function ($status)
         {
@@ -103,8 +101,8 @@ class Template extends XFCP_Template
             'status' => $statuses,
             '_xfWithData' => $this->filter('_xfWithData', 'bool'),
 
-            'diffs' => $diffs,
-            'compiledTemplate' => $this->app()->templateCompiler()->compile($templateText)
+            'templateStr' => $templateStr,
+            'compiledTemplate' => $this->app()->templateCompiler()->compile($templateStr)
         ];
         return $this->view(
             'SV\StandardLib\XF:Template\ViewModifications',

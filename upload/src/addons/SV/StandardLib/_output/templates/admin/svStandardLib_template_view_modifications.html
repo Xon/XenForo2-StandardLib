@@ -48,14 +48,7 @@
 		<ul class="tabPanes">
 			<!--[SV/StandardLib:tab_panes:start]-->
 			<li class="is-active" role="tabpanel" aria-labelledby="template-contents">
-				<div class="block-body block-row block-body--contained">
-					<ol class="diffList diffList--code">
-						<xf:foreach loop="$diffs" value="$diff">
-							<xf:set var="$diffHtml">{{ $diff.1|join('<br />') }}</xf:set>
-							<li class="diffList-line diffList-line--{$diff.0}">{{ trim($diffHtml) !== '' ? $diffHtml : '&nbsp;' }}</li>
-						</xf:foreach>
-					</ol>
-				</div>
+				<div class="block-body block-row block-body--contained"><pre>{$templateStr}</pre></div>
 			</li>
 			<li role="tabpanel" aria-labelledby="compiled-template-code">
 				<div class="block-body block-row block-body--contained"><pre>{$compiledTemplate}</pre></div>
