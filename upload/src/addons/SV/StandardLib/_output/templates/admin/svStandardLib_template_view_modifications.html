@@ -8,7 +8,7 @@
 <xf:css src="public:diff.less" />
 <xf:macro template="public:prism_macros" name="setup" />
 
-<xf:form action="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id}) }}"
+<xf:form action="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': $tab}) }}"
 		 class="block"
 		 ajax="{$_xfWithData}" >
 	<div class="block-container">
