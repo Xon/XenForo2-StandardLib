@@ -17,8 +17,10 @@
 				<xf:foreach loop="$mods" value="$mod">
 					<xf:option name="id[]"
 							   value="{$mod.modification_id}"
-							   checked="{{ $activeMods.{$mod.modification_id} ? 'checked' : '' }}"
-							   label="{{ $mod.addon_id ? $mod.addon_id . ' - ' : '' }}{{ $mod.modification_key }} - {{ $mod.description }} (<a href='{{ link('template-modifications/edit', $mod) }}'>Edit</a>)" >
+							   checked="{{ $activeMods.{$mod.modification_id} ? 'checked' : '' }}">
+						<xf:label><xf:trim>
+							{{ $mod.addon_id ? $mod.addon_id . ' - ' : '' }}{{ $mod.modification_key }} - {{ $mod.description }} (<a href='{{ link('template-modifications/edit', $mod) }}'>{{ phrase('edit') }}</a>)
+						</xf:trim></xf:label>
 						<xf:hint>{$status.{$mod->modification_id}}</xf:hint>
 					</xf:option>
 				</xf:foreach>
