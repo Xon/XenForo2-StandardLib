@@ -59,26 +59,18 @@ class Template extends XFCP_Template
             $masterTemplate->type
         )->fetchOne();
 
-        $reload = $this->filter('reload', 'bool');
-        $ids = null;
-        if ($reload)
-        {
-            $ids = $this->filter('id', 'array-uint', []);
-            $ids = \array_fill_keys($ids, true);
-        }
-
-        $status = null;
+        $activeModIds = $this->filter('active_mod_ids', '?array-uint', []);
 
         /** @var TemplateModification[]|ArrayCollection $modifications */
         $modifications = $this->getTemplateModificationFinderForSvStandardLib($template->type, $template->title)->fetch();
-        $filtered = $modifications->filter(function (TemplateModification $mod) use ($ids)
+        $filtered = $modifications->filter(function (TemplateModification $mod) use ($activeModIds)
         {
-            if ($ids === null)
+            if ($activeModIds === null)
             {
                 return $mod->enabled;
             }
 
-            return isset($ids[$mod->modification_id]);
+            return \in_array($mod->modification_id, $activeModIds, true);
         });
         $filtered = $filtered->toArray();
 
@@ -104,13 +96,14 @@ class Template extends XFCP_Template
         $viewParams = [
             'style' => $style,
             'template' => $template,
+
             'mods' => $modifications->toArray(),
             'activeMods' => $filtered,
-            'status' => $statuses,
-            '_xfWithData' => $this->filter('_xfWithData', 'bool'),
 
             'templateStr' => $templateStr,
-
+            'activeModIds' => $activeModIds,
+            'status' => $statuses,
+            '_xfWithData' => $this->filter('_xfWithData', 'bool'),
             'tab' => $this->filter('tab', 'str', 'diffs')
         ];
 

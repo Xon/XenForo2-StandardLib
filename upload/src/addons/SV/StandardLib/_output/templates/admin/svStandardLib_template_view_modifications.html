@@ -13,10 +13,9 @@
 		 ajax="{$_xfWithData}" >
 	<div class="block-container">
 		<div class="block-body">
-			<xf:checkboxrow rowtype="fullWidth noLabel">
+			<xf:checkboxrow rowtype="fullWidth noLabel" name="active_mod_ids[]">
 				<xf:foreach loop="$mods" value="$mod">
-					<xf:option name="id[]"
-							   value="{$mod.modification_id}"
+					<xf:option value="{$mod.modification_id}"
 							   checked="{{ $activeMods.{$mod.modification_id} ? 'checked' : '' }}">
 						<xf:label><xf:trim>
 							{{ $mod.addon_id ? $mod.addon_id . ' - ' : '' }}{{ $mod.modification_key }} - {{ $mod.description }} (<a href='{{ link('template-modifications/edit', $mod) }}'>{{ phrase('edit') }}</a>)
@@ -38,11 +37,11 @@
 			<span class="hScroller-scroll">
 				<!--[XF:SV/StandardLib:tabs:start]-->
 				<a class="tabs-tab {{ $tab === 'diffs' ? 'is-active' : '' }}" role="tab" tabindex="0"
-				   href="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': 'diffs'}) }}"
+				   href="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': 'diffs', 'active_mod_ids': $activeModIds}) }}"
 				   aria-controls="template-contents">{{ phrase('svStandardLib_template_contents') }}</a>
 				
 				<a class="tabs-tab {{ $tab === 'compiled' ? 'is-active' : '' }}" role="tab" tabindex="0"
-				   href="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': 'compiled'}) }}"
+				   href="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': 'compiled', 'active_mod_ids': $activeModIds}) }}"
 				   aria-controls="compiled-template-code">{{ phrase('svStandardLib_compiled_template_code') }}</a>
 				<!--[XF:SV/StandardLib:tabs:end]-->
 			</span>
@@ -60,6 +59,7 @@
 					</ol>
 				</div>
 			</li>
+
 			<li class="{{ $tab === 'compiled' ? 'is-active' : '' }}" role="tabpanel" aria-labelledby="compiled-template-code">
 				<div class="block-body block-row block-body--contained"><pre class="bbCodeCode" dir="ltr" data-xf-init="code-block" data-lang="php"><code>{$compiledTemplate}</code></pre></div>
 				
