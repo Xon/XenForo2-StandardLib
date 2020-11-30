@@ -59,7 +59,7 @@ class Template extends XFCP_Template
             $masterTemplate->type
         )->fetchOne();
 
-        $activeModIds = $this->filter('active_mod_ids', '?array-uint', []);
+        $activeModIds = $this->filter('active_mod_ids', '?array-uint');
 
         /** @var TemplateModification[]|ArrayCollection $modifications */
         $modifications = $this->getTemplateModificationFinderForSvStandardLib($template->type, $template->title)->fetch();
