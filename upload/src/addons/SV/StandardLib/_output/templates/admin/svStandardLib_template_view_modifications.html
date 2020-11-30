@@ -6,33 +6,75 @@
 <xf:breadcrumb href="{{ link('templates/edit', $template, {'type': $template.type, 'style_id': $style.style_id}) }}">{$template.title}</xf:breadcrumb>
 
 <xf:css src="public:diff.less" />
+<xf:macro template="public:prism_macros" name="setup" />
+
+<xf:form action="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': $tab}) }}"
+		 class="block"
+		 ajax="{$_xfWithData}" >
+	<div class="block-container">
+		<div class="block-body">
+			<xf:checkboxrow rowtype="fullWidth noLabel" name="active_mod_ids[]">
+				<xf:foreach loop="$mods" value="$mod">
+					<xf:option value="{$mod.modification_id}"
+							   checked="{{ $activeMods.{$mod.modification_id} ? 'checked' : '' }}">
+						<xf:label><xf:trim>
+							{{ $mod.addon_id ? $mod.addon_id . ' - ' : '' }}{{ $mod.modification_key }} - {{ $mod.description }} (<a href='{{ link('template-modifications/edit', $mod) }}'>{{ phrase('edit') }}</a>)
+						</xf:trim></xf:label>
+						<xf:hint>{$status.{$mod->modification_id}}</xf:hint>
+					</xf:option>
+				</xf:foreach>
+			</xf:checkboxrow>
+		</div>
+		
+		<xf:hiddenval name="reload">1</xf:hiddenval>
+		<xf:submitrow rowtype="simple" submit="{{ phrase('svStandardLib_reload') }}" />
+	</div>
+</xf:form>
 
 <div class="block">
 	<div class="block-container">
-		<div class="block-body block-row block-body--contained">
-			<xf:form action="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id}) }}"
-					 class="block"
-					 ajax="{{ $_xfWithData ? 'true' : '' }}" >
-				<xf:checkboxrow rowtype="fullWidth noLabel">
-					<xf:foreach loop="$mods" value="$mod">
-						<xf:option name="id[]"
-								   value="{$mod.modification_id}"
-								   checked="{{ $activeMods.{$mod.modification_id} ? 'checked' : '' }}"
-								   label="{{ $mod.addon_id ? $mod.addon_id . ' - ' : '' }}{{ $mod.modification_key }} - {{ $mod.description }} (<a href='{{ link('template-modifications/edit', $mod) }}'>Edit</a>)" >
-							<xf:hint>{$status.{$mod->modification_id}}</xf:hint>
-						</xf:option>
-					</xf:foreach>
-				</xf:checkboxrow>
-				<xf:hiddenval name="reload">1</xf:hiddenval>
-				<xf:submitrow rowtype="simple" submit="Reload" />
-			</xf:form>
-			
-			<ol class="diffList diffList--code">
-				<xf:foreach loop="$diffs" value="$diff">
-					<xf:set var="$diffHtml">{{ $diff.1|join('<br />') }}</xf:set>
-					<li class="diffList-line diffList-line--{$diff.0}">{{ trim($diffHtml) !== '' ? $diffHtml : '&nbsp;' }}</li>
-				</xf:foreach>
-			</ol>
-		</div>
+		<h2 class="block-tabHeader tabs hScroller" data-xf-init="h-scroller" role="tablist">
+			<span class="hScroller-scroll">
+				<!--[XF:SV/StandardLib:tabs:start]-->
+				<a class="tabs-tab {{ $tab === 'diffs' ? 'is-active' : '' }}" role="tab" tabindex="0"
+				   href="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': 'diffs', 'active_mod_ids': $activeModIds}) }}"
+				   aria-controls="template-contents">{{ phrase('svStandardLib_template_contents') }}</a>
+				
+				<a class="tabs-tab {{ $tab === 'compiled' ? 'is-active' : '' }}" role="tab" tabindex="0"
+				   href="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': 'compiled', 'active_mod_ids': $activeModIds}) }}"
+				   aria-controls="compiled-template-code">{{ phrase('svStandardLib_compiled_template_code') }}</a>
+				<!--[XF:SV/StandardLib:tabs:end]-->
+			</span>
+		</h2>
+		
+		<ul class="tabPanes">
+			<!--[XF:SV/StandardLib:tab_panes:start]-->
+			<li class="{{ $tab === 'diffs' ? 'is-active' : '' }}" role="tabpanel" aria-labelledby="template-contents">
+				<div class="block-body block-row block-body--contained">
+					<ol class="diffList diffList--code">
+						<xf:foreach loop="$diffs" value="$diff">
+							<xf:set var="$diffHtml">{{ $diff.1|join('<br />') }}</xf:set>
+							<li class="diffList-line diffList-line--{$diff.0}">{{ trim($diffHtml) !== '' ? $diffHtml : '&nbsp;' }}</li>
+						</xf:foreach>
+					</ol>
+				</div>
+			</li>
+
+			<li class="{{ $tab === 'compiled' ? 'is-active' : '' }}" role="tabpanel" aria-labelledby="compiled-template-code">
+				<div class="block-body block-row block-body--contained"><pre class="bbCodeCode" dir="ltr" data-xf-init="code-block" data-lang="php"><code>{$compiledTemplate}</code></pre></div>
+				
+				<xf:if contentcheck="true">
+					<h3 class="block-minorHeader">{{ phrase('svStandardLib_compiler_errors:') }}</h3>
+					<ol class="block-body block-body--contained">
+						<xf:contentcheck><xf:trim>
+							<xf:foreach loop="$compilerErrors" value="$compilerError">
+								<li class="block-row block-row--separated">{$compilerError}</li>
+							</xf:foreach>
+						</xf:trim></xf:contentcheck>
+					</ol>
+				</xf:if>
+			</li>
+			<!--[XF:SV/StandardLib:tab_panes:end]-->
+		</ul>
 	</div>
 </div>

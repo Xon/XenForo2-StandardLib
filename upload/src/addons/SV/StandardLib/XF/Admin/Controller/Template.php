@@ -10,6 +10,8 @@ use XF\Mvc\ParameterBag;
 use XF\Mvc\Reply\View as ViewReply;
 use XF\Entity\Template as TemplateEntity;
 use XF\Repository\TemplateModification as TemplateModificationRepo;
+use XF\Mvc\Reply\Exception as ExceptionReply;
+use XF\Template\Compiler\Exception as TemplateCompilerException;
 
 class Template extends XFCP_Template
 {
@@ -32,6 +34,13 @@ class Template extends XFCP_Template
         return $reply;
     }
 
+    /**
+     * @param ParameterBag $parameterBag
+     *
+     * @return ViewReply
+     *
+     * @throws ExceptionReply
+     */
     public function actionViewModifications(ParameterBag $parameterBag) : ViewReply
     {
         $masterTemplate = $this->assertTemplateExists($parameterBag->template_id);
@@ -50,39 +59,28 @@ class Template extends XFCP_Template
             $masterTemplate->type
         )->fetchOne();
 
-        $reload = $this->filter('reload', 'bool');
-        $ids = null;
-        if ($reload)
-        {
-            $ids = $this->filter('id', 'array-uint', []);
-            $ids = \array_fill_keys($ids, true);
-        }
-
-        $status = null;
+        $activeModIds = $this->filter('active_mod_ids', '?array-uint');
 
         /** @var TemplateModification[]|ArrayCollection $modifications */
         $modifications = $this->getTemplateModificationFinderForSvStandardLib($template->type, $template->title)->fetch();
-        $filtered = $modifications->filter(function (TemplateModification $mod) use ($ids)
+        $filtered = $modifications->filter(function (TemplateModification $mod) use ($activeModIds)
         {
-            if ($ids === null)
+            if ($activeModIds === null)
             {
                 return $mod->enabled;
             }
 
-            return isset($ids[$mod->modification_id]);
+            return \in_array($mod->modification_id, $activeModIds, true);
         });
         $filtered = $filtered->toArray();
 
         /** @var TemplateModificationRepo $templateModRepo */
         $templateModRepo = $this->repository('XF:TemplateModification');
-        $templateText = $templateModRepo->applyTemplateModifications(
+        $templateStr = $templateModRepo->applyTemplateModifications(
             $template->template,
             $filtered,
             $statuses
         );
-
-        $diff = new Diff();
-        $diffs = $diff->findDifferences($template->template, $templateText);
 
         $statuses = \array_map(function ($status)
         {
@@ -98,12 +96,44 @@ class Template extends XFCP_Template
         $viewParams = [
             'style' => $style,
             'template' => $template,
-            'diffs' => $diffs,
+
             'mods' => $modifications->toArray(),
             'activeMods' => $filtered,
+
+            'templateStr' => $templateStr,
+            'activeModIds' => $activeModIds,
             'status' => $statuses,
             '_xfWithData' => $this->filter('_xfWithData', 'bool'),
+            'tab' => $this->filter('tab', 'str', 'diffs')
         ];
+
+        switch ($viewParams['tab'])
+        {
+            case 'diffs':
+                $diff = new Diff();
+                $diffs = $diff->findDifferences($template->template, $templateStr);
+
+                $viewParams['diffs'] = $diffs;
+                break;
+
+            case 'compiled':
+                $viewParams['compiledTemplate'] = null;
+                $viewParams['compilerErrors'] = null;
+
+                try
+                {
+                    $viewParams['compiledTemplate'] = $this->app()->templateCompiler()->compile($templateStr);
+                }
+                catch (TemplateCompilerException $exception)
+                {
+                    $viewParams['compilerErrors'] = $exception->getMessages();
+                }
+                break;
+
+            default:
+                throw $this->exception($this->notFound());
+        }
+
         return $this->view(
             'SV\StandardLib\XF:Template\ViewModifications',
             'svStandardLib_template_view_modifications',
