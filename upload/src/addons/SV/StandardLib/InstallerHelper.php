@@ -2,6 +2,8 @@
 
 namespace SV\StandardLib;
 
+use SV\StandardLib\Db\AlterColumnUnwrapper;
+use SV\StandardLib\Db\AlterTableUnwrapper;
 use XF\Db\Schema\AbstractDdl;
 use XF\Db\Schema\Alter;
 use XF\Db\Schema\Column as DbColumnSchema;
@@ -353,9 +355,10 @@ trait InstallerHelper
      * @param string            $name
      * @param string|null       $type
      * @param int|string[]|null $length
+     * @param string[]          $oldNames
      * @return DbColumnSchema
      */
-    protected function addOrChangeColumn(AbstractDdl $table, string $name, string $type = null, $length = null) : DbColumnSchema
+    protected function addOrChangeColumn(AbstractDdl $table, string $name, string $type = null, $length = null, array $oldNames = []) : DbColumnSchema
     {
         if ($table instanceof Create)
         {
@@ -368,6 +371,43 @@ trait InstallerHelper
             if ($table->getColumnDefinition($name))
             {
                 return $table->changeColumn($name, $type, $length);
+            }
+
+            // check for pending renames
+            $hasOldNames = (bool)$oldNames;
+            $changeColumns = AlterTableUnwrapper::getChangeColumns($table);
+            foreach($changeColumns as $changeColumn)
+            {
+
+                $newName = AlterColumnUnwrapper::getRename($changeColumn);
+                if ($newName)
+                {
+                    if ($newName === $name)
+                    {
+                        return $changeColumn->type($type)->length($length);
+                    }
+                }
+                else if ($hasOldNames)
+                {
+                    $colName = $changeColumn->getName();
+                    if (\in_array($colName, $oldNames, true))
+                    {
+                        return $changeColumn->renameTo($name);
+                    }
+                    else if ($colName === $name)
+                    {
+                        return $changeColumn;
+                    }
+                }
+            }
+            // check for renames to be done
+            foreach($oldNames as $oldName)
+            {
+                if ($table->getColumnDefinition($oldName))
+                {
+                    return $table->changeColumn($oldName, $type, $length)
+                                 ->renameTo($name);
+                }
             }
 
             return $table->addColumn($name, $type, $length);
@@ -491,7 +531,7 @@ trait InstallerHelper
             {
                 continue;
             }
-            list ($version, $product) = $requirement;
+            [$version, $product] = $requirement;
             $errorType = count($requirement) >= 3 ? $requirement[2] : null;
 
             // advisory
