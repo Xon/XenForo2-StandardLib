@@ -224,7 +224,7 @@ trait InstallerHelper
         {
             $mySqlRegex = '^' . str_replace('*', '[a-zA-Z0-9_]+', $from) . '$';
             $phpRegex = '/^' . str_replace('*', '([a-zA-Z0-9_]+)', $from) . '$/';
-            $replace = str_replace('*', '$1', $to);
+            $replacePhrase = str_replace('*', '$1', $to);
 
             $results = $db->fetchPairs("
 				SELECT phrase_id, title
@@ -242,7 +242,7 @@ trait InstallerHelper
                 {
                     if (isset($phrases[$phraseId]))
                     {
-                        $newTitle = preg_replace($phpRegex, $replace, $oldTitle);
+                        $newTitle = preg_replace($phpRegex, $replacePhrase, $oldTitle);
                         $phrase = $phrases[$phraseId];
 
                         $db->beginTransaction();
