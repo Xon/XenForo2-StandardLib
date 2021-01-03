@@ -1,4 +1,9 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpUndefinedClassInspection
+ */
 
 namespace SV\StandardLib\Finder;
 
@@ -49,7 +54,6 @@ trait SqlJoinTrait
         }
         try
         {
-            /** @noinspection PhpUndefinedClassInspection */
             return parent::getQuery($options);
         }
         finally
@@ -188,7 +192,6 @@ trait SqlJoinTrait
             }
         }
 
-        /** @noinspection PhpUndefinedClassInspection */
         return parent::resolveFieldToTableAndColumn($field, $markJoinFundamental);
     }
 }

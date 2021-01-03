@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingParamTypeInspection
+ */
 
 namespace SV\StandardLib\Repository;
 
@@ -87,7 +91,7 @@ class Helper extends Repository
 
         //$milliseconds = abs($diffInSeconds);
         $seconds = abs($diffInSeconds);
-        $days = $months = $minutes = $hours = $years = $monthsFromDays = 0;
+        $months = $minutes = $hours = $years = $monthsFromDays = 0;
         $absCeil = function ($number) {
             if ($number < 0)
             {

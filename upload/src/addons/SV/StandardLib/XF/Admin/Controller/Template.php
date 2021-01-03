@@ -43,6 +43,7 @@ class Template extends XFCP_Template
      */
     public function actionViewModifications(ParameterBag $parameterBag) : ViewReply
     {
+        /** @noinspection PhpUndefinedFieldInspection */
         $masterTemplate = $this->assertTemplateExists($parameterBag->template_id);
         $style = $this->assertStyleExists(
             $this->filter('style_id', '?uint'), // if this is not nullable then it will revert to master style which we do not want
@@ -124,6 +125,7 @@ class Template extends XFCP_Template
                 {
                     $viewParams['compiledTemplate'] = $this->app()->templateCompiler()->compile($templateStr);
                 }
+                /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (TemplateCompilerException $exception)
                 {
                     $viewParams['compilerErrors'] = $exception->getMessages();

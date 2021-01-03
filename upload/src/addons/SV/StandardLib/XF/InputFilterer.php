@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingParamTypeInspection
+ */
 
 namespace SV\StandardLib\XF;
 
@@ -11,7 +15,6 @@ class InputFilterer extends XFCP_InputFilterer
      * @param string $type
      * @param array $options
      * @return mixed
-     * @noinspection PhpMissingParamTypeInspection
      */
     protected function cleanInternal($value, $type, array $options)
     {

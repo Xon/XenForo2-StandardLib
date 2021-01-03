@@ -1,4 +1,9 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpUnusedParameterInspection
+ */
 
 namespace SV\StandardLib\XF\Template;
 
@@ -39,7 +44,6 @@ class Templater extends XFCP_Templater
      * @param int|string      $toReplace
      * @param int|string|null $replaceWith
      * @return int[]|string[]
-     * @noinspection PhpUnusedParameterInspection
      */
     public function fnSvReplaceValue($templater, $value, &$escape, $toReplace, $replaceWith)
     {

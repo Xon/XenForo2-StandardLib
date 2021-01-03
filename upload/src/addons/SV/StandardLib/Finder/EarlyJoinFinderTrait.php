@@ -1,7 +1,14 @@
 <?php
+/**
+ * @noinspection PhpRedundantOptionalArgumentInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpUndefinedClassInspection
+ */
 
 namespace SV\StandardLib\Finder;
 
+use XF\Mvc\Entity\Finder;
 use XF\Mvc\Entity\FinderExpression;
 use XF\Mvc\Entity\Structure;
 
@@ -9,6 +16,17 @@ use XF\Mvc\Entity\Structure;
  * Note; this avoids in-place updating of EarlyJoinFinderTrait as the Utils folder is distributed entirely with dependant add-ons
  *
  * @method int getEarlyJoinThreshold
+ * @method string columnSqlName(string $column, bool $markFundamental = true)
+ *
+ * @property int aliasCounter
+ * @property Finder parentFinder
+ *
+ * @property array order
+ * @property array defaultOrder
+ * @property array joins
+ * @property int limit
+ * @property int offset
+ *
  * @property \XF\Db\AbstractAdapter $db
  * @property Structure $structure
  */
@@ -34,7 +52,6 @@ trait EarlyJoinFinderTrait
 
         if ($countOnly || is_array($primaryKey))
         {
-            /** @noinspection PhpUndefinedClassInspection */
             return parent::getQuery($options);
         }
 
@@ -57,7 +74,6 @@ trait EarlyJoinFinderTrait
             !$limit ||
             $threshold && (($offset / $limit) < $threshold) )
         {
-            /** @noinspection PhpUndefinedClassInspection */
             return parent::getQuery($options);
         }
 
@@ -75,7 +91,6 @@ trait EarlyJoinFinderTrait
         try
         {
             // do this before the outer-joins
-            /** @noinspection PhpUndefinedClassInspection */
             $innerSql = parent::getQuery($subQueryOptions);
         }
         finally
@@ -162,6 +177,7 @@ trait EarlyJoinFinderTrait
 
         $innerTable = "earlyJoinQuery_". $this->aliasCounter++;
 
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $q = $this->db->limit("
 			SELECT " . implode(', ', $fetch) . "
 			FROM (
@@ -199,7 +215,6 @@ trait EarlyJoinFinderTrait
             }
         }
 
-        /** @noinspection PhpUndefinedClassInspection */
         return parent::resolveFieldToTableAndColumn($field, $markJoinFundamental);
     }
 }
