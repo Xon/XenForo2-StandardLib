@@ -531,7 +531,7 @@ trait InstallerHelper
             {
                 continue;
             }
-            [$version, $product] = $requirement;
+            list($version, $product) = $requirement;
             $errorType = count($requirement) >= 3 ? $requirement[2] : null;
 
             // advisory
