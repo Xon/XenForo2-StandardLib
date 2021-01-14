@@ -47,11 +47,11 @@ class InputFilterer extends XFCP_InputFilterer
                         }
 
                         $int = (int) $int;
-                        if (\is_int($min) && $int < $min)
+                        if ($int < $min)
                         {
                             $int = $min;
                         }
-                        else if (\is_int($max) && $int > $max)
+                        else if ($int > $max)
                         {
                             $int = $min;
                         }
