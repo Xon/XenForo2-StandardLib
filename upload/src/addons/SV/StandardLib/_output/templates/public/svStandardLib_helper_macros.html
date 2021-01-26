@@ -45,13 +45,13 @@
 		  arg-ssInputAttrsHtml=""
 		  arg-tzInputAttrsHtml="">
 	<xf:css src="svStandardLib_helper_macros_date_time_input.less" />
-	
+
 	<xf:set var="$selectedYMD" value="{{ $dateTimeArr.ymd ?: ($timestamp ? date($timestamp, 'picker') : '') }}" />
 	<xf:set var="$selectedHour" value="{{ $dateTimeArr.hh ?: ($timestamp ? time($timestamp, 'H') : 0) }}" />
 	<xf:set var="$selectedMinute" value="{{ $dateTimeArr.mm ?: ($timestamp ? time($timestamp, 'i') : 0) }}" />
 	<xf:set var="$selectedSecond" value="{{ $dateTimeArr.ss ?: ($timestamp ? time($timestamp, 's') : 0) }}" />
 	<xf:set var="$selectedTz" value="{{ $dateTimeArr.tz ?: $xf.visitor.timezone }}" />
-	
+
 	<div class="inputGroup-container inputGroup-containerSvStandardLibDateTime">
 		<div class="inputGroup">
 			<xf:macro name="date_time_wrapper" 
@@ -77,7 +77,7 @@
 			<select class="input input--inline input--autoSize" name="{$name}[mm]" {{ $readOnly ? 'disabled="disabled"' : '' }} {{ $allInputAttrsHtml|raw }} {{ $mmInputAttrsHtml|raw }}>
 				<xf:foreach loop="{{ range(0, 59, 1) }}" value="$minute">
 					<xf:set var="$readableMinute" value="{{ $minute|pad('0', 2) }}" />
-					<option value="{$minute}" {{ $readableSecond === $selectedSecond ? 'selected="selected"' : '' }}>{$readableMinute}</option>
+					<option value="{$minute}" {{ $readableMinute === $selectedMinute ? 'selected="selected"' : '' }}>{$readableMinute}</option>
 				</xf:foreach>
 			</select>
 
