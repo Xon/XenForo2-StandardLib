@@ -39,7 +39,7 @@ class InputFilterer extends XFCP_InputFilterer
                      * @param int|null $max
                      * @return int
                      */
-                    $intSanitizer = function ($int, $min, $max) : int
+                    $intSanitizer = function ($int, $min, $max)
                     {
                         if (!\is_numeric($int))
                         {
