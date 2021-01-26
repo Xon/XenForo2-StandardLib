@@ -53,7 +53,7 @@ class InputFilterer extends XFCP_InputFilterer
                         }
                         else if (\is_int($max) && $int > $max)
                         {
-                            $int = $min;
+                            $int = $max;
                         }
 
                         return $int;
