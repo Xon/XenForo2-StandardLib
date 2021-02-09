@@ -4,6 +4,7 @@
         "js/sv/vendor"
     ],
     "minify": [
-        "js/sv/lib/relative_timestamp.js"
+        "js/sv/lib/relative_timestamp.js",
+        "js/sv/lib/xf/core/structure.js"
     ]
 }
