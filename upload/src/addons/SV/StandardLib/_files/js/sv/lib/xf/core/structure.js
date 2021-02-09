@@ -9,7 +9,6 @@
         },
 
         options: $.extend({}, XF.Tabs.prototype.options, {
-            svStoreSelectedTab: false,
             svStoreSelectedTabInputName: null
         }),
 
@@ -43,7 +42,7 @@
          */
         handleStoringOfSelectedTabIfNeeded: function (offset)
         {
-            if (!this.options.svStoreSelectedTab || !this.options.svStoreSelectedTabInputName)
+            if (!this.options.svStoreSelectedTabInputName)
             {
                 return;
             }
