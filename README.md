@@ -86,7 +86,7 @@ Reverse an array/collection (ie `array_reverse`)
 
 ### Template Function: sv_relative_timestamp
 Provide a dynamic count up/down timestamp
-```xml
+```html
 <abbr title="{$title|for_attr}" class="bbc-abbr">{{ sv_relative_timestamp($nowTimestamp, $otherTimestamp, $maximumDateParts, $countUp, 'bbc-time-counter') }}</abbr>
 ```
 
@@ -104,7 +104,7 @@ Field name is set via `data-sv-store-selected-tab-input-name` added to the `data
 
 ### date_time_input macro
 Support for date/time/timezone input, returned as a unix timestamp
-```xml
+```html
 <xf:macro template="svStandardLib_helper_macros" 
           name="date_time_input{{ $asRow ? '_row' : '' }}" 
           arg-name="scheduled_start_date" 
