@@ -50,7 +50,7 @@ trait EarlyJoinFinderTrait
         $fetchOnly = $options['fetchOnly'];
         $primaryKey = $this->structure->primaryKey;
 
-        if ($countOnly || is_array($primaryKey))
+        if ($countOnly || \is_array($primaryKey))
         {
             return parent::getQuery($options);
         }
@@ -123,7 +123,7 @@ trait EarlyJoinFinderTrait
         $coreTable = $this->structure->table;
         $joins = [];
 
-        if (is_array($fetchOnly))
+        if (\is_array($fetchOnly))
         {
             if (!$fetchOnly)
             {
@@ -132,8 +132,8 @@ trait EarlyJoinFinderTrait
 
             foreach ($fetchOnly AS $key => $fetchValue)
             {
-                $fetchSql = $this->columnSqlName(is_int($key) ? $fetchValue : $key);
-                $fetch[] = $fetchSql . (!is_int($key) ? " AS '$fetchValue'" : '');
+                $fetchSql = $this->columnSqlName(\is_int($key) ? $fetchValue : $key);
+                $fetch[] = $fetchSql . (!\is_int($key) ? " AS '$fetchValue'" : '');
             }
         }
         else
@@ -156,7 +156,7 @@ trait EarlyJoinFinderTrait
             }
 
             $joins[] = "$joinType JOIN `$join[table]` AS `$join[alias]` ON ($join[condition])";
-            if ($join['fetch'] && !is_array($fetchOnly))
+            if ($join['fetch'] && !\is_array($fetchOnly))
             {
                 $fetch[] = "`$join[alias]`.*";
             }
@@ -200,7 +200,7 @@ trait EarlyJoinFinderTrait
     public function resolveFieldToTableAndColumn($field, $markJoinFundamental = true)
     {
         $parts = explode('.', $field);
-        if (count($parts) === 2)
+        if (\count($parts) === 2)
         {
             list($alias, $column) = $parts;
             if (!empty($this->joins[$alias]['rawJoin']) && isset($this->rawJoins[$alias][$column]))

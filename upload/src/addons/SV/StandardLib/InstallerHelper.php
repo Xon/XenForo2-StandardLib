@@ -527,12 +527,12 @@ trait InstallerHelper
         $addOns = \XF::app()->container('addon.cache');
         foreach ((array)$json['require-soft'] as $productKey => $requirement)
         {
-            if (!is_array($requirement))
+            if (!\is_array($requirement))
             {
                 continue;
             }
             list($version, $product) = $requirement;
-            $errorType = count($requirement) >= 3 ? $requirement[2] : null;
+            $errorType = \count($requirement) >= 3 ? $requirement[2] : null;
 
             // advisory
             if ($errorType === null)
@@ -579,7 +579,7 @@ trait InstallerHelper
 
             if (!$versionValid)
             {
-                $reason = count($requirement) >= 4 ? (' ' . $requirement[3]) : '';
+                $reason = \count($requirement) >= 4 ? (' ' . $requirement[3]) : '';
 
                 if ($errorType)
                 {

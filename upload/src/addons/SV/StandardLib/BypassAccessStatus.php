@@ -15,7 +15,7 @@ class BypassAccessStatus
         $getter = function () use ($attribute) { return $this->$attribute; };
         if (!$context)
         {
-            $context = get_class($obj);
+            $context = \get_class($obj);
         }
 
         return \Closure::bind($getter, $obj, $context);
@@ -32,7 +32,7 @@ class BypassAccessStatus
         $setter = function ($value) use ($attribute) { $this->$attribute = $value; };
         if (!$context)
         {
-            $context = get_class($obj);
+            $context = \get_class($obj);
         }
 
         return \Closure::bind($setter, $obj, $context);

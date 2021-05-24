@@ -121,7 +121,7 @@ trait SqlJoinTrait
 
         foreach ($conditions AS $condition)
         {
-            if (is_string($condition))
+            if (\is_string($condition))
             {
                 $joinConditions[] = "`$alias`.`$condition` = " . $this->columnSqlName($condition);
             }
@@ -129,10 +129,10 @@ trait SqlJoinTrait
             {
                 list($field, $operator, $value) = $condition;
 
-                if (count($condition) > 3)
+                if (\count($condition) > 3)
                 {
                     $readValue = [];
-                    foreach (array_slice($condition, 2) AS $v)
+                    foreach (\array_slice($condition, 2) AS $v)
                     {
                         if ($v && $v[0] === '$')
                         {
@@ -146,7 +146,7 @@ trait SqlJoinTrait
 
                     $value = 'CONCAT(' . implode(', ', $readValue) . ')';
                 }
-                else if (is_string($value) && $value && $value[0] === '$')
+                else if (\is_string($value) && $value && $value[0] === '$')
                 {
                     $value = $this->columnSqlName(substr($value, 1));
                 }
@@ -181,7 +181,7 @@ trait SqlJoinTrait
     public function resolveFieldToTableAndColumn($field, $markJoinFundamental = true)
     {
         $parts = explode('.', $field);
-        if (count($parts) === 2)
+        if (\count($parts) === 2)
         {
             list($alias, $column) = $parts;
             if (isset($this->rawJoins[$alias][$column]))
