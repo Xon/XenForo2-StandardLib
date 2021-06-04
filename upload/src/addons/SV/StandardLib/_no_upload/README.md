@@ -105,9 +105,9 @@ Field name is set via `data-sv-store-selected-tab-input-name` added to the `data
 ### date_time_input macro
 Support for date/time/timezone input, returned as a unix timestamp
 ```html
-<xf:macro template="svStandardLib_helper_macros"
-          name="date_time_input{{ $asRow ? '_row' : '' }}"
-          arg-name="scheduled_start_date"
+<xf:macro template="svStandardLib_helper_macros" 
+          name="date_time_input{{ $asRow ? '_row' : '' }}" 
+          arg-name="scheduled_start_date" 
           arg-timestamp="{$xf.time}" />
 ```
 
