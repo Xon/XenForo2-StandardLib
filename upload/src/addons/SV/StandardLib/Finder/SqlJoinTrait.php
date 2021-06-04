@@ -50,7 +50,7 @@ trait SqlJoinTrait
                     unset($this->joins[$alias]);
                 }
             }
-            $this->indexHints[] = "\n". implode('', $complexJoins);
+            $this->indexHints[] = "\n". \implode('', $complexJoins);
         }
         try
         {
@@ -144,7 +144,7 @@ trait SqlJoinTrait
                         }
                     }
 
-                    $value = 'CONCAT(' . implode(', ', $readValue) . ')';
+                    $value = 'CONCAT(' . \implode(', ', $readValue) . ')';
                 }
                 else if (\is_string($value) && $value && $value[0] === '$')
                 {
@@ -169,7 +169,7 @@ trait SqlJoinTrait
         }
 
         $this->joins[$alias]['fundamental'] = (bool)$joinConditions;
-        $this->joins[$alias]['condition'] = implode(' AND ', $joinConditions);
+        $this->joins[$alias]['condition'] = \implode(' AND ', $joinConditions);
     }
 
     /**
@@ -180,7 +180,7 @@ trait SqlJoinTrait
      */
     public function resolveFieldToTableAndColumn($field, $markJoinFundamental = true)
     {
-        $parts = explode('.', $field);
+        $parts = \explode('.', $field);
         if (\count($parts) === 2)
         {
             list($alias, $column) = $parts;

@@ -39,7 +39,7 @@ trait EarlyJoinFinderTrait
      */
     public function getQuery(array $options = [])
     {
-        $options = array_merge([
+        $options = \array_merge([
             'limit' => null,
             'offset' => null,
             'countOnly' => false,
@@ -164,11 +164,11 @@ trait EarlyJoinFinderTrait
 
         if ($this->order)
         {
-            $orderBy = 'ORDER BY ' . implode(', ', $this->order);
+            $orderBy = 'ORDER BY ' . \implode(', ', $this->order);
         }
         else if ($defaultOrderSql)
         {
-            $orderBy = 'ORDER BY ' . implode(', ', $defaultOrderSql);
+            $orderBy = 'ORDER BY ' . \implode(', ', $defaultOrderSql);
         }
         else
         {
@@ -179,12 +179,12 @@ trait EarlyJoinFinderTrait
 
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $q = $this->db->limit("
-			SELECT " . implode(', ', $fetch) . "
+			SELECT " . \implode(', ', $fetch) . "
 			FROM (
 			$innerSql
 			) as `$innerTable`
 			JOIN `$coreTable` ON (`$coreTable`.`$primaryKey` = `$innerTable`.`$primaryKey`)
-			" . implode("\n", $joins) . "
+			" . \implode("\n", $joins) . "
 			$orderBy
         ", $limit);
 
@@ -199,7 +199,7 @@ trait EarlyJoinFinderTrait
      */
     public function resolveFieldToTableAndColumn($field, $markJoinFundamental = true)
     {
-        $parts = explode('.', $field);
+        $parts = \explode('.', $field);
         if (\count($parts) === 2)
         {
             list($alias, $column) = $parts;

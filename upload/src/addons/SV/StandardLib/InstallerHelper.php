@@ -222,9 +222,9 @@ trait InstallerHelper
 
         foreach ($map AS $from => $to)
         {
-            $mySqlRegex = '^' . str_replace('*', '[a-zA-Z0-9_]+', $from) . '$';
-            $phpRegex = '/^' . str_replace('*', '([a-zA-Z0-9_]+)', $from) . '$/';
-            $replacePhrase = str_replace('*', '$1', $to);
+            $mySqlRegex = '^' . \str_replace('*', '[a-zA-Z0-9_]+', $from) . '$';
+            $phpRegex = '/^' . \str_replace('*', '([a-zA-Z0-9_]+)', $from) . '$/';
+            $replacePhrase = \str_replace('*', '$1', $to);
 
             $results = $db->fetchPairs("
 				SELECT phrase_id, title
@@ -237,12 +237,12 @@ trait InstallerHelper
             {
                 $em = \XF::em();
                 /** @var \XF\Entity\Phrase[] $phrases */
-                $phrases = \XF::em()->findByIds('XF:Phrase', array_keys($results));
+                $phrases = \XF::em()->findByIds('XF:Phrase', \array_keys($results));
                 foreach ($results AS $phraseId => $oldTitle)
                 {
                     if (isset($phrases[$phraseId]))
                     {
-                        $newTitle = preg_replace($phpRegex, $replacePhrase, $oldTitle);
+                        $newTitle = \preg_replace($phpRegex, $replacePhrase, $oldTitle);
                         $phrase = $phrases[$phraseId];
 
                         $db->beginTransaction();
@@ -543,27 +543,27 @@ trait InstallerHelper
             $enabled = false;
             $versionValid = false;
 
-            if (strpos($productKey, 'php-ext') === 0)
+            if (\strpos($productKey, 'php-ext') === 0)
             {
-                $parts = explode('/', $productKey, 2);
+                $parts = \explode('/', $productKey, 2);
                 if (isset($parts[1]))
                 {
-                    $enabled = phpversion($parts[1]) !== false;
-                    $versionValid = ($version === '*') || (version_compare(phpversion($parts[1]), $version, 'ge'));
+                    $enabled = \phpversion($parts[1]) !== false;
+                    $versionValid = ($version === '*') || (\version_compare(\phpversion($parts[1]), $version, 'ge'));
                 }
             }
-            else if (strpos($productKey, 'php') === 0)
+            else if (\strpos($productKey, 'php') === 0)
             {
                 $enabled = true;
-                $versionValid = version_compare(phpversion(), $version, 'ge');
+                $versionValid = \version_compare(\phpversion(), $version, 'ge');
             }
-            else if (strpos($productKey, 'mysql') === 0)
+            else if (\strpos($productKey, 'mysql') === 0)
             {
                 $mySqlVersion = \XF::db()->getServerVersion();
                 if ($mySqlVersion)
                 {
                     $enabled = true;
-                    $versionValid = version_compare(strtolower($mySqlVersion), $version, 'ge');
+                    $versionValid = \version_compare(\strtolower($mySqlVersion), $version, 'ge');
                 }
             }
             else
@@ -609,11 +609,8 @@ trait InstallerHelper
 
         /** @var \XFES\Service\Configurer $configurer */
         $configurer = \XF::service('XFES:Configurer', $es);
-        $version = null;
         $testError = null;
-        $stats = null;
         $isOptimizable = false;
-        $analyzerConfig = null;
 
         if ($configurer->hasActiveConfig())
         {
