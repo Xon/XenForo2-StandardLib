@@ -67,7 +67,7 @@ trait EarlyJoinFinderTrait
             $offset = $this->offset;
         }
 
-        $threshold = $this->getEarlyJoinThreshold();
+        $threshold = \is_callable([$this, 'getEarlyJoinThreshold']) ? $this->getEarlyJoinThreshold() : -1;
 
         if ($this->parentFinder ||
             $threshold < 0 ||
