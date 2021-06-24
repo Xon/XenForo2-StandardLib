@@ -91,7 +91,7 @@ trait EarlyJoinFinderTrait
         try
         {
             // do this before the outer-joins
-            $innerSql = parent::getQuery($subQueryOptions);
+            $innerSql = $this->rewriteEarlyJoinQuery($subQueryOptions, $oldJoins);
         }
         finally
         {
@@ -189,6 +189,12 @@ trait EarlyJoinFinderTrait
         ", $limit);
 
         return $q;
+    }
+
+    /** @noinspection PhpUnusedParameterInspection */
+    protected function rewriteEarlyJoinQuery(array $subQueryOptions, array $oldJoins)
+    {
+        return parent::getQuery($subQueryOptions);
     }
 
     /**
