@@ -41,30 +41,22 @@ trait EarlyJoinFinderTrait
      */
     public function getQuery(array $options = [])
     {
-        $options = \array_merge([
-            'skipEarlyJoin' => false,
-            'limit' => null,
-            'offset' => null,
-            'countOnly' => false,
-            'fetchOnly' => null
-        ], $options);
-
-        $countOnly = $options['countOnly'];
-        $fetchOnly = $options['fetchOnly'];
+        $skipEarlyJoin = $options['skipEarlyJoin'] ?? false;
+        $countOnly = $options['countOnly'] ?? false;
         $primaryKey = $this->structure->primaryKey;
 
-        if ($options['skipEarlyJoin'] || $countOnly || \is_array($primaryKey))
+        if ($skipEarlyJoin || $countOnly || \is_array($primaryKey))
         {
             return parent::getQuery($options);
         }
 
-        $limit = $options['limit'];
+        $limit = $options['limit'] ?? null;
         if ($limit === null)
         {
             $limit = $this->limit;
         }
 
-        $offset = $options['offset'];
+        $offset = $options['offset'] ?? null;
         if ($offset === null)
         {
             $offset = $this->offset;
@@ -127,6 +119,7 @@ trait EarlyJoinFinderTrait
         $coreTable = $this->structure->table;
         $joins = [];
 
+        $fetchOnly = $options['fetchOnly'] ?? null;
         if (\is_array($fetchOnly))
         {
             if (!$fetchOnly)
