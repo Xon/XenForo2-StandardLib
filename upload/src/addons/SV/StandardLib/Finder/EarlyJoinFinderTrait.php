@@ -32,6 +32,8 @@ use XF\Mvc\Entity\Structure;
  */
 trait EarlyJoinFinderTrait
 {
+    //abstract protected function getEarlyJoinThreshold(int? $offset, int? $limit, array? $options): int
+
     /**
      * @param array $options
      *
@@ -40,6 +42,7 @@ trait EarlyJoinFinderTrait
     public function getQuery(array $options = [])
     {
         $options = \array_merge([
+            'skipEarlyJoin' => false,
             'limit' => null,
             'offset' => null,
             'countOnly' => false,
@@ -50,7 +53,7 @@ trait EarlyJoinFinderTrait
         $fetchOnly = $options['fetchOnly'];
         $primaryKey = $this->structure->primaryKey;
 
-        if ($countOnly || \is_array($primaryKey))
+        if ($options['skipEarlyJoin'] || $countOnly || \is_array($primaryKey))
         {
             return parent::getQuery($options);
         }
@@ -79,6 +82,7 @@ trait EarlyJoinFinderTrait
 
         $subQueryOptions = $options;
         $subQueryOptions['fetchOnly'] = [$primaryKey];
+        $subQueryOptions['skipEarlyJoin'] = true;
 
         $oldJoins = $this->joins;
         foreach($this->joins as $key => $join)
