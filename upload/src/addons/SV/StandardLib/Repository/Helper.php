@@ -91,11 +91,11 @@ class Helper extends Repository
         $absCeil = function ($number) {
             if ($number < 0)
             {
-                return floor($number);
+                return \floor($number);
             }
             else
             {
-                return ceil($number);
+                return \ceil($number);
             }
         };
 
@@ -103,11 +103,11 @@ class Helper extends Repository
             if ($number < 0)
             {
                 // -0 -> 0
-                return ceil($number) || 0;
+                return \ceil($number) || 0;
             }
             else
             {
-                return floor($number);
+                return \floor($number);
             }
         };
 
@@ -197,19 +197,19 @@ class Helper extends Repository
     {
         \class_alias($srcClass, $destClass);
 
-        $nsEnd = strrpos($srcClass, '\\');
+        $nsEnd = \strrpos($srcClass, '\\');
         if ($nsEnd)
         {
-            $srcAlias = substr($srcClass, 0, $nsEnd) . '\\XFCP_' . substr($srcClass, $nsEnd + 1);
+            $srcAlias = \substr($srcClass, 0, $nsEnd) . '\\XFCP_' . \substr($srcClass, $nsEnd + 1);
         }
         else
         {
             $srcAlias = "XFCP_$srcClass";
         }
-        $nsEnd = strrpos($destClass, '\\');
+        $nsEnd = \strrpos($destClass, '\\');
         if ($nsEnd)
         {
-            $destAlias = substr($destClass, 0, $nsEnd) . '\\XFCP_' . substr($destClass, $nsEnd + 1);
+            $destAlias = \substr($destClass, 0, $nsEnd) . '\\XFCP_' . \substr($destClass, $nsEnd + 1);
         }
         else
         {

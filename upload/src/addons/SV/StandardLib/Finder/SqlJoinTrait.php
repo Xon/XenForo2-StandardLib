@@ -136,7 +136,7 @@ trait SqlJoinTrait
                     {
                         if ($v && $v[0] === '$')
                         {
-                            $readValue[] = $this->columnSqlName(substr($v, 1));
+                            $readValue[] = $this->columnSqlName(\substr($v, 1));
                         }
                         else
                         {
@@ -148,7 +148,7 @@ trait SqlJoinTrait
                 }
                 else if (\is_string($value) && $value && $value[0] === '$')
                 {
-                    $value = $this->columnSqlName(substr($value, 1));
+                    $value = $this->columnSqlName(\substr($value, 1));
                 }
                 else
                 {
@@ -157,7 +157,7 @@ trait SqlJoinTrait
 
                 if ($field[0] === '$')
                 {
-                    $fromJoinAlias = $this->columnSqlName(substr($field, 1));
+                    $fromJoinAlias = $this->columnSqlName(\substr($field, 1));
                 }
                 else
                 {

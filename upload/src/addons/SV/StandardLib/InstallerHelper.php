@@ -430,7 +430,7 @@ trait InstallerHelper
             return false;
         }
 
-        $totals = @unserialize($totals);
+        $totals = @\unserialize($totals);
         if (!$totals)
         {
             return false;
@@ -584,7 +584,7 @@ trait InstallerHelper
 
                 if ($errorType)
                 {
-                    $errors[] = new \XF\PreEscaped(sprintf(
+                    $errors[] = new \XF\PreEscaped(\sprintf(
                         '%s requires %s.%s',
                         $json['title'],
                         $product,
@@ -593,7 +593,7 @@ trait InstallerHelper
                 }
                 else
                 {
-                    $warnings[] = new \XF\PreEscaped(sprintf(
+                    $warnings[] = new \XF\PreEscaped(\sprintf(
                         '%s recommends %s.%s',
                         $json['title'],
                         $product,

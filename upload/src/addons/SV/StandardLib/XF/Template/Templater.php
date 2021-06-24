@@ -20,7 +20,7 @@ class Templater extends XFCP_Templater
     {
         parent::addDefaultHandlers();
 
-        $hasFromCallable = is_callable('\Closure::fromCallable');
+        $hasFromCallable = \is_callable('\Closure::fromCallable');
 
         if (empty($this->filters['replacevalue']))
         {
