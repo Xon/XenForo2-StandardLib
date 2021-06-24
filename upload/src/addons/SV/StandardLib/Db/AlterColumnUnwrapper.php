@@ -9,7 +9,6 @@ class AlterColumnUnwrapper extends Column
     /**
      * @param Column $column
      * @return string|null
-     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function getRename(Column $column)
     {

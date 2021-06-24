@@ -1,12 +1,8 @@
 <?php
-/**
- * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingParamTypeInspection
- */
 
 namespace SV\StandardLib\Repository;
 
-use \XF\Mvc\Entity\Repository;
+use XF\Mvc\Entity\Repository;
 
 class Helper extends Repository
 {
@@ -91,7 +87,7 @@ class Helper extends Repository
 
         //$milliseconds = abs($diffInSeconds);
         $seconds = abs($diffInSeconds);
-        $months = $minutes = $hours = $years = $monthsFromDays = 0;
+        $months = 0;
         $absCeil = function ($number) {
             if ($number < 0)
             {
@@ -131,13 +127,13 @@ class Helper extends Repository
 //        $data['f'] = (int)($milliseconds % 1000);
 
 //        $seconds = $absFloor($milliseconds / 1000);
-        $data['s'] = (int)($seconds % 60);
+        $data['s'] = $seconds % 60;
 
         $minutes = $absFloor($seconds / 60);
-        $data['i'] = (int)($minutes % 60);
+        $data['i'] = $minutes % 60;
 
         $hours = $absFloor($minutes / 60);
-        $data['h'] = (int)($hours % 24);
+        $data['h'] = $hours % 24;
 
         $days = $absFloor($hours / 24);
 
@@ -188,6 +184,7 @@ class Helper extends Repository
 
         if ($entity->isValidColumn($backupColumn) || $entity->isValidGetter($backupColumn))
         {
+            /** @noinspection PhpUnnecessaryLocalVariableInspection */
             /** @var \XF\Entity\User $user */
             $user = \XF::app()->find('XF:User', $entity->get($backupColumn));
             return $user;

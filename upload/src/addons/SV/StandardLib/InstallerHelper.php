@@ -64,6 +64,7 @@ trait InstallerHelper
                      ->fetchOne();
         if (!$phrase)
         {
+            /** @var \XF\Entity\Phrase $phrase */
             $phrase = \XF::em()->create('XF:Phrase');
             $phrase->language_id = 0;
             $phrase->title = $title;

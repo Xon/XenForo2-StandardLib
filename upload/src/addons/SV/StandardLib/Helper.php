@@ -9,11 +9,12 @@ class Helper
      */
     private function __construct() { }
 
-    public static function repo() : \SV\StandardLib\Repository\Helper
+    public static function repo(): \SV\StandardLib\Repository\Helper
     {
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         /** @var \SV\StandardLib\Repository\Helper $repo */
-       $repo = \XF::repository('SV\StandardLib:Helper');
+        $repo = \XF::repository('SV\StandardLib:Helper');
 
-       return $repo;
+        return $repo;
     }
 }
