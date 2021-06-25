@@ -15,7 +15,7 @@ use XF\Mvc\Entity\Structure;
 /**
  * Note; this avoids in-place updating of EarlyJoinFinderTrait as the Utils folder is distributed entirely with dependant add-ons
  *
- * @method int getEarlyJoinThreshold
+ * @method int getEarlyJoinThreshold(int $offset = null, int $limit = null, array $options = [])
  * @method string columnSqlName(string $column, bool $markFundamental = true)
  *
  * @property int aliasCounter
@@ -32,7 +32,7 @@ use XF\Mvc\Entity\Structure;
  */
 trait EarlyJoinFinderTrait
 {
-    //abstract protected function getEarlyJoinThreshold(int? $offset, int? $limit, array? $options): int
+    //abstract protected function getEarlyJoinThreshold(int $offset = null, int $limit = null, array $options = []): int
 
     /**
      * @param array $options
@@ -62,7 +62,7 @@ trait EarlyJoinFinderTrait
             $offset = $this->offset;
         }
 
-        $threshold = \is_callable([$this, 'getEarlyJoinThreshold']) ? $this->getEarlyJoinThreshold() : -1;
+        $threshold = \is_callable([$this, 'getEarlyJoinThreshold']) ? $this->getEarlyJoinThreshold($offset, $limit, $options) : -1;
 
         if ($this->parentFinder ||
             $threshold < 0 ||
