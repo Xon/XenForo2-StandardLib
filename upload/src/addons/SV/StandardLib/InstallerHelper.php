@@ -25,6 +25,7 @@ trait InstallerHelper
      */
     public function checkRequirements(&$errors = [], &$warnings = [])
     {
+        $this->checkComposer($errors);
         $this->checkSoftRequires($errors, $warnings);
         $this->isCliRecommended($warnings);
     }
@@ -415,6 +416,21 @@ trait InstallerHelper
         }
 
         throw new \LogicException('Unknown schema DDL type ' . \get_class($table));
+    }
+
+
+    protected function checkComposer(array &$errors)
+    {
+        $json = $this->addOn->getJson();
+        $composerPath = $json['composer_autoload'] ?? '';
+        if (\strlen($composerPath))
+        {
+            $vendorDirectory = $this->addOn->getAddOnDirectory() . \XF::$DS . $composerPath;
+            if (!\file_exists($vendorDirectory))
+            {
+                $errors[] = "Composer vendor folder does not exist";
+            }
+        }
     }
 
     protected function isCliRecommendedCheck(int $minAddonVersion, int $maxThreads, int $maxPosts, int $maxUsers) : bool
