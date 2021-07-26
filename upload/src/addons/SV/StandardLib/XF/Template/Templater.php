@@ -9,6 +9,7 @@ namespace SV\StandardLib\XF\Template;
 
 use XF\Mvc\Entity\AbstractCollection;
 use SV\StandardLib\Helper as StandardLibHelper;
+use XF\Mvc\Entity\ArrayCollection;
 use XF\Template\Templater as BaseTemplater;
 
 /**
@@ -33,19 +34,68 @@ class Templater extends XFCP_Templater
             $this->addFilter('replacevalue', $callable);
         }
 
+        if (empty($this->filters['addvalue']))
+        {
+            $callable = [$this, 'fnSvAddValue'];
+            if ($hasFromCallable)
+            {
+                /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
+                $callable = \Closure::fromCallable($callable);
+            }
+            $this->addFilter('addvalue', $callable);
+        }
+
         $this->addFunction('sv_array_reverse', 'fnSvArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnSvRelativeTimestamp');
     }
 
+
     /**
-     * @param Templater       $templater
+     * @param BaseTemplater             $templater
+     * @param array|AbstractCollection  $value
+     * @param bool                      $escape
+     * @param mixed                     $toAdd
+     * @return array|AbstractCollection
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function fnSvAddValue(BaseTemplater $templater, $value, bool &$escape, $toAdd)
+    {
+        $wasCollection = false;
+        if ($value === null)
+        {
+            $value = [];
+        }
+        else if ($value instanceof AbstractCollection)
+        {
+            $wasCollection = true;
+            $value = $value->toArray();
+        }
+        else if (!\is_array($value))
+        {
+            $error = "addValue should be called on an array or an AbstractCollection";
+            if (\XF::$debugMode)
+            {
+                \trigger_error($error, E_USER_WARNING);
+            }
+            \XF::logError($error);
+
+            return $value;
+        }
+
+        $value[] = $toAdd;
+
+        return $wasCollection ? new ArrayCollection([$value]) : $value;
+    }
+
+    /**
+     * @param BaseTemplater   $templater
      * @param int[]|string[]  $value
-     * @param string          $escape
+     * @param bool            $escape
      * @param int|string      $toReplace
      * @param int|string|null $replaceWith
      * @return int[]|string[]
      */
-    public function fnSvReplaceValue($templater, $value, &$escape, $toReplace, $replaceWith)
+    public function fnSvReplaceValue(BaseTemplater $templater, $value, bool &$escape, $toReplace, $replaceWith)
     {
         foreach ($value as $key => $_val)
         {
@@ -73,7 +123,7 @@ class Templater extends XFCP_Templater
      *
      * @return array|AbstractCollection
      */
-    public function fnSvArrayReverse($templater, &$escape, $array, bool $preserveKeys = true)
+    public function fnSvArrayReverse(BaseTemplater $templater, bool &$escape, $array, bool $preserveKeys = true)
     {
         if ($array instanceof AbstractCollection)
         {
@@ -103,7 +153,7 @@ class Templater extends XFCP_Templater
      * @throws \Exception
      */
     public function fnSvRelativeTimestamp(
-        $templater, &$escape, int $nowTimestamp, int $otherTimestamp,
+        BaseTemplater $templater, bool &$escape, int $nowTimestamp, int $otherTimestamp,
         int $maximumDateParts = 0, bool $countUp = false, string $class = '', string $triggerEvent = '',
         string $triggerEventOnSelector = ''
     )

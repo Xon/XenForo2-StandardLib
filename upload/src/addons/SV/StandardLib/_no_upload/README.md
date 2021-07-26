@@ -75,6 +75,13 @@ namespace SV\ElasticSearchEssentials\XF\Repository;
 
 ## Template additions
 
+### Template Filter: addvalue
+Append a value `$newElementValue` in an array/collection. If the array is null, then a new array is returned.
+If `$array` is a collection, then the return value is a collection.
+```
+$array|addvalue($newElementValue)
+```
+
 ### Template Filter: replacevalue
 Replaces a value `$elementValue` in an array/collection with `$newElementValue`. If `$newElementValue` is null, then that element is removed.
 ```
@@ -105,9 +112,9 @@ Field name is set via `data-sv-store-selected-tab-input-name` added to the `data
 ### date_time_input macro
 Support for date/time/timezone input, returned as a unix timestamp
 ```html
-<xf:macro template="svStandardLib_helper_macros" 
-          name="date_time_input{{ $asRow ? '_row' : '' }}" 
-          arg-name="scheduled_start_date" 
+<xf:macro template="svStandardLib_helper_macros"
+          name="date_time_input{{ $asRow ? '_row' : '' }}"
+          arg-name="scheduled_start_date"
           arg-timestamp="{$xf.time}" />
 ```
 
