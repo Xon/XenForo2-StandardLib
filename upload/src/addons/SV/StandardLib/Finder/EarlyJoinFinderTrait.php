@@ -17,6 +17,7 @@ use XF\Mvc\Entity\Structure;
  *
  * @method int getEarlyJoinThreshold(int $offset = null, int $limit = null, array $options = [])
  * @method string columnSqlName(string $column, bool $markFundamental = true)
+ * @method void whereImpossible()
  *
  * @property int aliasCounter
  * @property Finder parentFinder
@@ -50,17 +51,30 @@ trait EarlyJoinFinderTrait
             return parent::getQuery($options);
         }
 
+        $offset = $options['offset'] ?? null;
+        if ($offset === null)
+        {
+            $offset = $this->offset;
+        }
+
+        // offset is computed as page*page-size, which can be user-controlled which can make it appear as a float
+        // Do not trigger a possible type error because of the url; /forums/1/page-9223372036854775807
+        if (\is_float($offset) && $offset > \PHP_INT_MAX)
+        {
+            $this->whereImpossible();
+
+            return parent::getQuery($options);
+        }
+
         $limit = $options['limit'] ?? null;
         if ($limit === null)
         {
             $limit = $this->limit;
         }
 
-        $offset = $options['offset'] ?? null;
-        if ($offset === null)
-        {
-            $offset = $this->offset;
-        }
+        // sanity check on types
+        $offset = (int)$offset;
+        $limit = (int)$limit;
 
         $threshold = \is_callable([$this, 'getEarlyJoinThreshold']) ? $this->getEarlyJoinThreshold($offset, $limit, $options) : -1;
 
