@@ -60,7 +60,7 @@ trait EarlyJoinFinderTrait
         // offset is computed as page*page-size, which can be user-controlled which can make it appear as a float
         // Do not trigger a possible type error because of the url; /forums/1/page-9223372036854775807
         // Support 32bit builds where floats only have 23 bits of precision which is less than PHP_INT_MAX
-        if (\is_float($offset) && $offset > (1 << (\PHP_INT_SIZE >= 8 ? 52 : 23)))
+        if (\is_float($offset) && $offset >= (1 << (\PHP_INT_SIZE >= 8 ? 52 : 23)))
         {
             $this->whereImpossible();
 
