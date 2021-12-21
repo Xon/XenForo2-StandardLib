@@ -37,7 +37,7 @@
 	<xf:set var="$filterRoute" value="{{ $__globals.filterRoute !== null ? $__globals.filterRoute : 'forums' }}" />
 	<xf:set var="$filterContainer" value="{{ ($filterRoute === 'forums' && $__globals.filterContainer !== null) ? $__globals.filterContainer : $forum }}" />
 	
-	<xf:set var="$removeFilter" value="{{ in_array($nodeId, $filters.nodes, true) }}" />
+	<xf:set var="$removeFilter" value="{{ in_array($nodeId, $filters.nodes ?: [], true) }}" />
 	<xf:set var="$filters.nodes" value="{{ $removeFilter 
 											   ? ($filters.nodes|replaceValue($nodeId, null) ?: $noFilterValue)
 											   : $filters.nodes|addValue($nodeId) 
