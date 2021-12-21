@@ -1,0 +1,50 @@
+<xf:macro name="render_prefix_filter"
+		  arg-filters="!"
+		  arg-prefixId="!"
+		  ><xf:trim>
+	
+	<xf:if is="!is_scalar($prefixId)">
+		<xf:set var="$prefixId" value="{{ $prefixId.prefix_id is not empty ? $prefixId.prefix_id : 0 }}" />
+	</xf:if>
+	
+	<xf:set var="$filterRoute" value="{{ $__globals.filterRoute !== null ? $__globals.filterRoute : 'forums' }}" />
+	<xf:set var="$filterContainer" value="{{ ($filterRoute === 'forums' && $__globals.filterContainer !== null) ? $__globals.filterContainer : null }}" />
+
+	<xf:set var="$removeFilter" value="{{ $prefixId === $filters.prefix_id }}" />
+	<xf:set var="$filters" value="{{ $removeFilter 
+									? $filters|replace('prefix_id', null) 
+									: $filters|replace('prefix_id', $prefixId) 
+								}}" />
+	<xf:if contentcheck="true">
+		<a href="{{ link($filterRoute, $filterContainer, $filters) }}" class="labelLink" rel="nofollow" data-xf-init="tooltip" title="{{
+			($removeFilter
+			? phrase('svStandardLib_remove_from_filters')
+			: phrase('svStandardLib_add_to_filters')
+			)|for_attr }}"  rel="nofollow">
+			<xf:contentcheck><xf:trim>{{ prefix('thread', $prefixId) }}</xf:trim></xf:contentcheck>
+		</a>
+	</xf:if>
+</xf:trim></xf:macro>
+
+<xf:macro name="render_forum_filter"
+		  arg-filters="!"
+		  arg-nodeId="!"
+		  arg-forum="!"
+		  ><xf:trim>
+	
+	<xf:set var="$filterRoute" value="{{ $__globals.filterRoute !== null ? $__globals.filterRoute : 'forums' }}" />
+	<xf:set var="$filterContainer" value="{{ ($filterRoute === 'forums' && $__globals.filterContainer !== null) ? $__globals.filterContainer : $forum }}" />
+	
+	<xf:set var="$removeFilter" value="{{ in_array($nodeId, $filters.nodes, true) }}" />
+	<xf:set var="$filters.nodes" value="{{ $removeFilter 
+											   ? $filters.nodes|replaceValue($nodeId, null) 
+											   : $filters.nodes|addValue($nodeId) 
+											   }}" />	
+	<a href="{{ link($filterRoute, $filterContainer, $filters) }}" class="labelLink" rel="nofollow" data-xf-init="tooltip" title="{{
+		($removeFilter
+		? phrase('svStandardLib_remove_from_filters')
+		: phrase('svStandardLib_add_to_filters')
+		)|for_attr }}"  rel="nofollow">
+		{$forum.title}
+	</a>
+</xf:trim></xf:macro>

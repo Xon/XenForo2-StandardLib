@@ -1,0 +1,46 @@
+<?php
+/**
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ */
+
+namespace SV\StandardLib\XF\Pub\Controller;
+
+use SV\StandardLib\ControllerPlugin\Filter as FilterPlugin;
+use XF\Mvc\ParameterBag;
+use XF\Mvc\Reply\View;
+
+/**
+ * Extends \XF\Pub\Controller\Watched
+ */
+class Watched extends XFCP_Watched
+{
+    public function actionThreads()
+    {
+        $reply = parent::actionThreads();
+
+        if ($reply instanceof View)
+        {
+            $this->getSvFilterPlugin()->injectIntoReply($reply, 'watched/threads');
+        }
+
+        return $reply;
+    }
+
+
+    /** @var \XF\ControllerPlugin\AbstractPlugin|FilterPlugin */
+    protected $svFilterPlugin = null;
+
+    /**
+     * @return \XF\ControllerPlugin\AbstractPlugin|FilterPlugin
+     */
+    protected function getSvFilterPlugin()
+    {
+        if ($this->svFilterPlugin === null)
+        {
+            $this->svFilterPlugin = $this->plugin('SV\StandardLib:Filter');
+        }
+
+        return $this->svFilterPlugin;
+    }
+}
