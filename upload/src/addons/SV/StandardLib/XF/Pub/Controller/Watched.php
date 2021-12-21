@@ -27,14 +27,10 @@ class Watched extends XFCP_Watched
         return $reply;
     }
 
-
-    /** @var \XF\ControllerPlugin\AbstractPlugin|FilterPlugin */
+    /** @var FilterPlugin|null */
     protected $svFilterPlugin = null;
 
-    /**
-     * @return \XF\ControllerPlugin\AbstractPlugin|FilterPlugin
-     */
-    protected function getSvFilterPlugin()
+    protected function getSvFilterPlugin(): FilterPlugin
     {
         if ($this->svFilterPlugin === null)
         {
