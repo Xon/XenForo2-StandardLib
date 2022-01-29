@@ -10,6 +10,8 @@ use XF\Db\Schema\Column as DbColumnSchema;
 use XF\Db\Schema\Create;
 
 /**
+ * @version 1.10.0
+ *
  * @property \XF\AddOn\AddOn addOn
  *
  * @method \XF\Db\AbstractAdapter db()
@@ -418,6 +420,55 @@ trait InstallerHelper
         throw new \LogicException('Unknown schema DDL type ' . \get_class($table));
     }
 
+    /**
+     * @since 1.10.0
+     *
+     * @param AbstractDdl $table
+     *
+     * @return void
+     */
+    protected function revertTableAlters(AbstractDdl $table)
+    {
+        if (!($table instanceof Alter))
+        {
+            throw new \LogicException('Only alter schema DDL type is supported for dropping table alters.');
+        }
+
+        $addIndexes = AlterTableUnwrapper::getAddIndexes($table);
+        AlterTableUnwrapper::resetAddIndexes($table);
+
+        $addColumns = AlterTableUnwrapper::getAddColumns($table);
+        AlterTableUnwrapper::resetAddColumns($table);
+
+        $changeColumns = AlterTableUnwrapper::getChangeColumns($table);
+        AlterTableUnwrapper::resetChangeColumns($table);
+
+        foreach ($addIndexes AS $addIndex)
+        {
+            $table->dropIndexes($addIndex->getIndexName());
+        }
+
+        foreach ($addColumns AS $addColumn)
+        {
+            $table->dropColumns($addColumn->getName());
+        }
+
+        foreach ($changeColumns AS $changeColumn)
+        {
+            if (!$changeColumn->isRename())
+            {
+                continue;
+            }
+
+            $newName = AlterColumnUnwrapper::getRename($changeColumn);
+            if (!$table->getColumnDefinition($newName))
+            {
+                continue;
+            }
+
+            $table->renameColumn($newName, $changeColumn->getName());
+        }
+    }
 
     protected function checkComposer(array &$errors)
     {
