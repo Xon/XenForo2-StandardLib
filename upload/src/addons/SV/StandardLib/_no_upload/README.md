@@ -10,7 +10,7 @@ During use, Add the requires section to `addon.json` to document the dependancy
     "require": {
         "XF": [2010070, "XenForo 2.1.0+"],
         "php": ["7.0.0", "PHP 7.0.0+"],
-        "SV/StandardLib": [1060000,"Standard Library by Xon v1.6.0+"]
+        "SV/StandardLib": [1100000,"Standard Library by Xon v1.10.0+"]
     }
 }
 ```
@@ -136,7 +136,93 @@ class Setup extends AbstractSetup
     use StepRunnerInstallTrait;
     use StepRunnerUpgradeTrait;
     use StepRunnerUninstallTrait;
+
+    public function installStep1(): void
+    {
+        $sm = $this->schemaManager();
+
+        foreach ($this->getTables() as $tableName => $callback)
+        {
+            $sm->createTable($tableName, $callback);
+            $sm->alterTable($tableName, $callback);
+        }
+    }
+    
+    public function installStep2(): void
+    {
+        $sm = $this->schemaManager();
+
+        foreach ($this->getAlterTables() as $tableName => $callback)
+        {
+            if ($sm->tableExists($tableName))
+            {
+                $sm->alterTable($tableName, $callback);
+            }
+        }
+    }
+    
+    public function upgrade2000000Step1(): void
+    {
+        $this->installStep1();    
+    }
+
+    public function upgrade2000000Step2(): void
+    {
+        $this->installStep2();    
+    }
+    
+    public function uninstallStep1(): void
+    {
+        $sm = $this->schemaManager();
+
+        foreach ($this->getTables() as $tableName => $callback)
+        {
+            $sm->dropTable($tableName);
+        }
+    }
+
+    public function uninstallStep2(): void
+    {
+        $sm = $this->schemaManager();
+
+        foreach ($this->getRemoveAlterTables() as $tableName => $callback)
+        {
+            if ($sm->tableExists($tableName))
+            {
+                $sm->alterTable($tableName, $callback);
+            }
+        }
+    }
+    
+    protected function getTables(): array
+    {
+        return [
+            'xf_sv_mytable' => function ($table) {
+                /** @var Create|Alter $table */
+                $this->addOrChangeColumn($table, 'id', 'int')->primaryKey();
+            },
+        ];
+    }
+
+    protected function getAlterTables(): array
+    {
+        return [
+            'xf_user' => function (Alter $table) {
+                $this->addOrChangeColumn($table, 'sv_my_column', 'int')->setDefault(0);
+            },
+        ];
+    }
+
+    protected function getRemoveAlterTables(): array
+    {
+        return [
+            'xf_user' => function (Alter $table) {
+                $table->dropColumns(['sv_my_column']);
+            },
+        ];
+    }
 ```
+
 
 ### BypassAccessStatus - Helper code
 
