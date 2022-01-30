@@ -44,9 +44,8 @@ trait EarlyJoinFinderTrait
     {
         $skipEarlyJoin = $options['skipEarlyJoin'] ?? false;
         $countOnly = $options['countOnly'] ?? false;
-        $primaryKey = $this->structure->primaryKey;
 
-        if ($skipEarlyJoin || $countOnly || \is_array($primaryKey))
+        if ($skipEarlyJoin || $countOnly)
         {
             return parent::getQuery($options);
         }
@@ -87,8 +86,10 @@ trait EarlyJoinFinderTrait
             return parent::getQuery($options);
         }
 
+        $primaryKey = $this->structure->primaryKey;
+        $primaryKeys = \is_array($primaryKey) ? $primaryKey : [$primaryKey];
         $subQueryOptions = $options;
-        $subQueryOptions['fetchOnly'] = [$primaryKey];
+        $subQueryOptions['fetchOnly'] = $primaryKeys;
         $subQueryOptions['skipEarlyJoin'] = true;
 
         $oldJoins = $this->joins;
@@ -188,6 +189,12 @@ trait EarlyJoinFinderTrait
         }
 
         $innerTable = "earlyJoinQuery_". $this->aliasCounter++;
+        $primaryJoin = [];
+        foreach($primaryKeys as $primaryKey)
+        {
+            $primaryJoin[] = "(`$coreTable`.`$primaryKey` = `$innerTable`.`$primaryKey`)";
+        }
+        $primaryJoinSql = implode(' AND ', $primaryJoin);
 
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $q = $this->db->limit("
@@ -195,7 +202,7 @@ trait EarlyJoinFinderTrait
 			FROM (
 			$innerSql
 			) as `$innerTable`
-			JOIN `$coreTable` ON (`$coreTable`.`$primaryKey` = `$innerTable`.`$primaryKey`)
+			JOIN `$coreTable` ON ($primaryJoinSql)
 			" . \implode("\n", $joins) . "
 			$orderBy
         ", $limit);
