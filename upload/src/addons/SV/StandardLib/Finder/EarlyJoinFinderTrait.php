@@ -194,7 +194,7 @@ trait EarlyJoinFinderTrait
         {
             $primaryJoin[] = "(`$coreTable`.`$primaryKey` = `$innerTable`.`$primaryKey`)";
         }
-        $primaryJoinSql = implode(' AND ', $primaryJoin);
+        $primaryJoinSql = \implode(' AND ', $primaryJoin);
 
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $q = $this->db->limit("
