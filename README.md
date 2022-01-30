@@ -147,7 +147,7 @@ class Setup extends AbstractSetup
             $sm->alterTable($tableName, $callback);
         }
     }
-    
+
     public function installStep2(): void
     {
         $sm = $this->schemaManager();
@@ -160,17 +160,17 @@ class Setup extends AbstractSetup
             }
         }
     }
-    
+
     public function upgrade2000000Step1(): void
     {
-        $this->installStep1();    
+        $this->installStep1();
     }
 
     public function upgrade2000000Step2(): void
     {
-        $this->installStep2();    
+        $this->installStep2();
     }
-    
+
     public function uninstallStep1(): void
     {
         $sm = $this->schemaManager();
@@ -193,7 +193,7 @@ class Setup extends AbstractSetup
             }
         }
     }
-    
+
     protected function getTables(): array
     {
         return [
@@ -222,7 +222,39 @@ class Setup extends AbstractSetup
         ];
     }
 ```
+#### Simplified uninstaller
+For simply table alters, the following can be used instead of defining `getRemoveAlterTables`
+```php
+    public function uninstallStep2(): void
+    {
+        $sm = $this->schemaManager();
 
+        foreach ($this->getAlterTables(true) as $tableName => $callback)
+        {
+            if ($sm->tableExists($tableName))
+            {
+                $sm->alterTable($tableName, $callback);
+            }
+        }
+    }
+
+    public function getAlterTables(bool $forUninstall = false) : array
+    {
+        $tables['xf_user'] = function ($table) use ($forUninstall)
+        {
+            /** @var Create|Alter $table */
+            $this->addOrChangeColumn($table, 'sv_my_column', 'int')->setDefault(0);
+
+            if ($forUninstall)
+            {
+                $this->revertTableAlters($table);
+            }
+        };
+
+        return $tables;
+    }
+```
+For more information see https://github.com/Xon/XenForo2-StandardLib/pull/12
 
 ### BypassAccessStatus - Helper code
 
