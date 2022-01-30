@@ -438,6 +438,12 @@ trait InstallerHelper
         $changeColumns = AlterTableUnwrapper::getChangeColumns($table);
         AlterTableUnwrapper::resetChangeColumns($table);
 
+        $autoIncrementIndex = AlterTableUnwrapper::getAutoIncrementIndex($table);
+        if ($autoIncrementIndex !== null)
+        {
+            AlterTableUnwrapper::resetAutoIncrementIndex($table);
+        }
+
         foreach ($addIndexes AS $addIndex)
         {
             $table->dropIndexes($addIndex->getIndexName());

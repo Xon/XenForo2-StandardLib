@@ -66,6 +66,32 @@ abstract class AlterTableUnwrapper extends DbAlterSchema
      *
      * @param DbAlterSchema $table
      *
+     * @return int|null
+     */
+    public static function getAutoIncrementIndex(DbAlterSchema $table)
+    {
+        return $table->autoIncrementIndex;
+    }
+
+    /**
+     * @since 1.10.0
+     *
+     * @param DbAlterSchema $table
+     *
+     * @return bool
+     */
+    public static function resetAutoIncrementIndex(DbAlterSchema $table) : bool
+    {
+        $table->autoIncrementIndex = null;
+
+        return true;
+    }
+
+    /**
+     * @since 1.10.0
+     *
+     * @param DbAlterSchema $table
+     *
      * @return DbColumnSchema[]
      */
     public static function getAddColumns(DbAlterSchema $table) : array
