@@ -229,7 +229,7 @@ For simply table alters, the following can be used instead of defining `getRemov
     {
         $sm = $this->schemaManager();
 
-        foreach ($this->getAlterTables(true) as $tableName => $callback)
+        foreach ($this->getReversedAlterTables($this->getAlterTables()) as $tableName => $callback)
         {
             if ($sm->tableExists($tableName))
             {

@@ -425,9 +425,9 @@ trait InstallerHelper
      *
      * @param Alter $table
      *
-     * @return void
+     * @return Alter
      */
-    protected function revertTableAlters(Alter &$table)
+    protected function reverseTableAlter(Alter $table) : Alter
     {
         $newTable = $this->schemaManager()->newAlter($table->getTableName());
 
@@ -472,7 +472,29 @@ trait InstallerHelper
             $newTable->renameColumn($newName, $changeColumn->getName());
         }
 
-        $table = $newTable;
+        return $newTable;
+    }
+
+    /**
+     * @since 1.10.0
+     *
+     * @param array<string, Alter> $tables
+     *
+     * @return array<string, Alter>
+     */
+    protected function getReversedAlterTables(array $tables) : array
+    {
+        $sm = $this->schemaManager();
+
+        foreach ($tables AS $tableName => $toApply)
+        {
+            $alter = $sm->newAlter($tableName);
+            $toApply($alter);
+
+            $tables[$tableName] = $this->reverseTableAlter($alter);
+        }
+
+        return $tables;
     }
 
     protected function checkComposer(array &$errors)
