@@ -423,17 +423,12 @@ trait InstallerHelper
     /**
      * @since 1.10.0
      *
-     * @param AbstractDdl $table
+     * @param Alter $table
      *
      * @return void
      */
-    protected function revertTableAlters(AbstractDdl $table)
+    protected function revertTableAlters(Alter $table)
     {
-        if (!($table instanceof Alter))
-        {
-            throw new \LogicException('Only alter schema DDL type is supported for dropping table alters.');
-        }
-
         $addIndexes = AlterTableUnwrapper::getAddIndexes($table);
         AlterTableUnwrapper::resetAddIndexes($table);
 
