@@ -427,8 +427,10 @@ trait InstallerHelper
      *
      * @return void
      */
-    protected function revertTableAlters(Alter $table)
+    protected function revertTableAlters(Alter &$table)
     {
+        $newTable = $this->schemaManager()->newAlter($table->getTableName());
+
         $addIndexes = AlterTableUnwrapper::getAddIndexes($table);
         AlterTableUnwrapper::resetAddIndexes($table);
 
@@ -446,12 +448,12 @@ trait InstallerHelper
 
         foreach ($addIndexes AS $addIndex)
         {
-            $table->dropIndexes($addIndex->getIndexName());
+            $newTable->dropIndexes($addIndex->getIndexName());
         }
 
         foreach ($addColumns AS $addColumn)
         {
-            $table->dropColumns($addColumn->getName());
+            $newTable->dropColumns($addColumn->getName());
         }
 
         foreach ($changeColumns AS $changeColumn)
@@ -467,8 +469,10 @@ trait InstallerHelper
                 continue;
             }
 
-            $table->renameColumn($newName, $changeColumn->getName());
+            $newTable->renameColumn($newName, $changeColumn->getName());
         }
+
+        $table = $newTable;
     }
 
     protected function checkComposer(array &$errors)
