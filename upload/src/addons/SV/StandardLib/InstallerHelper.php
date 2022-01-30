@@ -430,21 +430,9 @@ trait InstallerHelper
     protected function reverseTableAlter(Alter $table) : Alter
     {
         $newTable = $this->schemaManager()->newAlter($table->getTableName());
-
         $addIndexes = AlterTableUnwrapper::getAddIndexes($table);
-        AlterTableUnwrapper::resetAddIndexes($table);
-
         $addColumns = AlterTableUnwrapper::getAddColumns($table);
-        AlterTableUnwrapper::resetAddColumns($table);
-
         $changeColumns = AlterTableUnwrapper::getChangeColumns($table);
-        AlterTableUnwrapper::resetChangeColumns($table);
-
-        $autoIncrementIndex = AlterTableUnwrapper::getAutoIncrementIndex($table);
-        if ($autoIncrementIndex !== null)
-        {
-            AlterTableUnwrapper::resetAutoIncrementIndex($table);
-        }
 
         foreach ($addIndexes AS $addIndex)
         {
