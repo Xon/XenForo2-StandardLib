@@ -147,7 +147,7 @@ class Setup extends AbstractSetup
             $sm->alterTable($tableName, $callback);
         }
     }
-    
+
     public function installStep2(): void
     {
         $sm = $this->schemaManager();
@@ -160,17 +160,17 @@ class Setup extends AbstractSetup
             }
         }
     }
-    
+
     public function upgrade2000000Step1(): void
     {
-        $this->installStep1();    
+        $this->installStep1();
     }
 
     public function upgrade2000000Step2(): void
     {
-        $this->installStep2();    
+        $this->installStep2();
     }
-    
+
     public function uninstallStep1(): void
     {
         $sm = $this->schemaManager();
@@ -193,7 +193,7 @@ class Setup extends AbstractSetup
             }
         }
     }
-    
+
     protected function getTables(): array
     {
         return [
@@ -240,8 +240,6 @@ For simply table alters, the following can be used instead of defining `getRemov
 
     public function getAlterTables(bool $forUninstall = false) : array
     {
-        $tables = [];
-
         $tables['xf_user'] = function ($table) use ($forUninstall)
         {
             /** @var Create|Alter $table */
