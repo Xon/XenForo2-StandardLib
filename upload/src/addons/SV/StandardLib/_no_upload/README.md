@@ -223,13 +223,14 @@ class Setup extends AbstractSetup
     }
 ```
 #### Simplified uninstaller
-For simply table alters, the following can be used instead of defining `getRemoveAlterTables`
+For simply table alters (add column/index, with column renames), the following can be used instead of defining `getRemoveAlterTables`;
+
 ```php
     public function uninstallStep2(): void
     {
         $sm = $this->schemaManager();
 
-        foreach ($this->getAlterTables(true) as $tableName => $callback)
+        foreach ($this->getReversedAlterTables($this->getAlterTables()) as $tableName => $callback)
         {
             if ($sm->tableExists($tableName))
             {
@@ -237,24 +238,8 @@ For simply table alters, the following can be used instead of defining `getRemov
             }
         }
     }
-
-    public function getAlterTables(bool $forUninstall = false) : array
-    {
-        $tables['xf_user'] = function ($table) use ($forUninstall)
-        {
-            /** @var Create|Alter $table */
-            $this->addOrChangeColumn($table, 'sv_my_column', 'int')->setDefault(0);
-
-            if ($forUninstall)
-            {
-                $this->revertTableAlters($table);
-            }
-        };
-
-        return $tables;
-    }
 ```
-For more information see https://github.com/Xon/XenForo2-StandardLib/pull/12
+This does not reverse column schema changes, which can be very complex to reverse.
 
 ### BypassAccessStatus - Helper code
 

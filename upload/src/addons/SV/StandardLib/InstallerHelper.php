@@ -423,34 +423,25 @@ trait InstallerHelper
     /**
      * @since 1.10.0
      *
-     * @param AbstractDdl $table
+     * @param Alter $table
      *
-     * @return void
+     * @return Alter
      */
-    protected function revertTableAlters(AbstractDdl $table)
+    protected function reverseTableAlter(Alter $table) : Alter
     {
-        if (!($table instanceof Alter))
-        {
-            throw new \LogicException('Only alter schema DDL type is supported for dropping table alters.');
-        }
-
+        $newTable = $this->schemaManager()->newAlter($table->getTableName());
         $addIndexes = AlterTableUnwrapper::getAddIndexes($table);
-        AlterTableUnwrapper::resetAddIndexes($table);
-
         $addColumns = AlterTableUnwrapper::getAddColumns($table);
-        AlterTableUnwrapper::resetAddColumns($table);
-
         $changeColumns = AlterTableUnwrapper::getChangeColumns($table);
-        AlterTableUnwrapper::resetChangeColumns($table);
 
         foreach ($addIndexes AS $addIndex)
         {
-            $table->dropIndexes($addIndex->getIndexName());
+            $newTable->dropIndexes($addIndex->getIndexName());
         }
 
         foreach ($addColumns AS $addColumn)
         {
-            $table->dropColumns($addColumn->getName());
+            $newTable->dropColumns($addColumn->getName());
         }
 
         foreach ($changeColumns AS $changeColumn)
@@ -466,8 +457,32 @@ trait InstallerHelper
                 continue;
             }
 
-            $table->renameColumn($newName, $changeColumn->getName());
+            $newTable->renameColumn($newName, $changeColumn->getName());
         }
+
+        return $newTable;
+    }
+
+    /**
+     * @since 1.10.0
+     *
+     * @param array<string, Alter> $tables
+     *
+     * @return array<string, Alter>
+     */
+    protected function getReversedAlterTables(array $tables) : array
+    {
+        $sm = $this->schemaManager();
+
+        foreach ($tables AS $tableName => $toApply)
+        {
+            $alter = $sm->newAlter($tableName);
+            $toApply($alter);
+
+            $tables[$tableName] = $this->reverseTableAlter($alter);
+        }
+
+        return $tables;
     }
 
     protected function checkComposer(array &$errors)
