@@ -423,25 +423,25 @@ trait InstallerHelper
     /**
      * @since 1.10.0
      *
+     * @param Alter $alter
      * @param Alter $table
      *
-     * @return Alter
+     * @return void
      */
-    protected function reverseTableAlter(Alter $table) : Alter
+    protected function reverseTableAlter(Alter $alter, Alter $table)
     {
-        $newTable = $this->schemaManager()->newAlter($table->getTableName());
-        $addIndexes = AlterTableUnwrapper::getAddIndexes($table);
-        $addColumns = AlterTableUnwrapper::getAddColumns($table);
-        $changeColumns = AlterTableUnwrapper::getChangeColumns($table);
+        $addIndexes = AlterTableUnwrapper::getAddIndexes($alter);
+        $addColumns = AlterTableUnwrapper::getAddColumns($alter);
+        $changeColumns = AlterTableUnwrapper::getChangeColumns($alter);
 
         foreach ($addIndexes AS $addIndex)
         {
-            $newTable->dropIndexes($addIndex->getIndexName());
+            $table->dropIndexes($addIndex->getIndexName());
         }
 
         foreach ($addColumns AS $addColumn)
         {
-            $newTable->dropColumns($addColumn->getName());
+            $table->dropColumns($addColumn->getName());
         }
 
         foreach ($changeColumns AS $changeColumn)
@@ -452,15 +452,13 @@ trait InstallerHelper
             }
 
             $newName = AlterColumnUnwrapper::getRename($changeColumn);
-            if (!$table->getColumnDefinition($newName))
+            if (!$alter->getColumnDefinition($newName))
             {
                 continue;
             }
 
-            $newTable->renameColumn($newName, $changeColumn->getName());
+            $table->renameColumn($newName, $changeColumn->getName());
         }
-
-        return $newTable;
     }
 
     /**
@@ -476,10 +474,13 @@ trait InstallerHelper
 
         foreach ($tables AS $tableName => $toApply)
         {
-            $alter = $sm->newAlter($tableName);
-            $toApply($alter);
+            $tables[$tableName] = function (Alter $table) use ($sm, $tableName, $toApply)
+            {
+                $alter = $sm->newAlter($tableName);
+                $toApply($alter);
 
-            $tables[$tableName] = $this->reverseTableAlter($alter);
+                $this->reverseTableAlter($alter, $table);
+            };
         }
 
         return $tables;
