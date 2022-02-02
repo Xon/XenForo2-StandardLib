@@ -101,7 +101,8 @@ trait EarlyJoinFinderTrait
             }
         }
 
-        $allJoins = $this->allJoins ?? null;
+        // Use property_exists and not ?? as Finder does magic _get lookups which don't like it
+        $allJoins = \property_exists($this, 'allJoins') ? $this->allJoins : null;
         try
         {
             // do this before the outer-joins
