@@ -100,6 +100,8 @@ trait EarlyJoinFinderTrait
                 unset($this->joins[$key]);
             }
         }
+
+        $allJoins = $this->allJoins ?? null;
         try
         {
             // do this before the outer-joins
@@ -154,21 +156,16 @@ trait EarlyJoinFinderTrait
             $fetch[] = '`' . $coreTable . '`.*';
         }
 
-        foreach ($this->joins AS $join)
+        $srcJoins = $allJoins ?? $this->joins;
+        foreach ($srcJoins AS $join)
         {
             $joinType = $join['exists'] ? 'INNER' : 'LEFT';
-
-            if (!empty($join['rawJoin']))
+            $table = $join['table'];
+            if (!($join['hasTableExpr'] ?? false))
             {
-                if (!empty($join['reallyFundamental']))
-                {
-                    $joins[] = "{$joinType} JOIN {$join['table']} AS `{$join['alias']}` ON ({$join['condition']})";
-                }
-
-                continue;
+                $table = '`'.$table.'`';
             }
-
-            $joins[] = "$joinType JOIN `$join[table]` AS `$join[alias]` ON ($join[condition])";
+            $joins[] = "$joinType JOIN $table AS `$join[alias]` ON ($join[condition])";
             if ($join['fetch'] && !\is_array($fetchOnly))
             {
                 $fetch[] = "`$join[alias]`.*";
@@ -214,32 +211,5 @@ trait EarlyJoinFinderTrait
     protected function rewriteEarlyJoinQuery(array $subQueryOptions, array $oldJoins)
     {
         return parent::getQuery($subQueryOptions);
-    }
-
-    /**
-     * @param string $field
-     * @param bool   $markJoinFundamental
-     *
-     * @return array
-     */
-    public function resolveFieldToTableAndColumn($field, $markJoinFundamental = true)
-    {
-        $parts = \explode('.', $field);
-        if (\count($parts) === 2)
-        {
-            list($alias, $column) = $parts;
-            if (!empty($this->joins[$alias]['rawJoin']) && isset($this->rawJoins[$alias][$column]))
-            {
-                if ($markJoinFundamental)
-                {
-                    $this->joins[$alias]['reallyFundamental'] = true;
-                    $this->joins[$alias]['fundamental'] = true;
-                }
-
-                return [$alias, $column];
-            }
-        }
-
-        return parent::resolveFieldToTableAndColumn($field, $markJoinFundamental);
     }
 }

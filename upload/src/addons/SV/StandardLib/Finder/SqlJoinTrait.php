@@ -18,6 +18,8 @@ trait SqlJoinTrait
 {
     /** @var array */
     protected $rawJoins = [];
+    /** @var ?array */
+    protected $allJoins = null;
     /** @var bool */
     protected $hasTableExpr = false;
 
@@ -32,11 +34,12 @@ trait SqlJoinTrait
             $this->hasTableExpr = false;
             $countOnly = !empty($options['countOnly']);
 
+            $this->allJoins = $this->joins;
             $complexJoins = [];
             foreach($this->rawJoins as $alias => $columns)
             {
-                $join = $this->joins[$alias];
-                if ($join['hasTableExpr'])
+                $join = $this->joins[$alias] ?? [];
+                if ($join['hasTableExpr'] ?? false)
                 {
                     if ($countOnly && !$join['fundamental'])
                     {
@@ -58,9 +61,13 @@ trait SqlJoinTrait
         }
         finally
         {
-            $this->joins = $joins;
-            $this->indexHints = $indexHints;
-            $this->hasTableExpr = $hasTableExpr;
+            if ($hasTableExpr)
+            {
+                $this->joins = $joins;
+                $this->allJoins = null;
+                $this->indexHints = $indexHints;
+                $this->hasTableExpr = $hasTableExpr;
+            }
         }
     }
 
