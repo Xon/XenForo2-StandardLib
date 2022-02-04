@@ -13,8 +13,6 @@ use XF\Mvc\Entity\FinderExpression;
 use XF\Mvc\Entity\Structure;
 
 /**
- * Note; this avoids in-place updating of EarlyJoinFinderTrait as the Utils folder is distributed entirely with dependant add-ons
- *
  * @method int getEarlyJoinThreshold(int $offset = null, int $limit = null, array $options = [])
  * @method string columnSqlName(string $column, bool $markFundamental = true)
  * @method void whereImpossible()
