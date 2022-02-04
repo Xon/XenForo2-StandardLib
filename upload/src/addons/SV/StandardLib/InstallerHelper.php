@@ -724,4 +724,37 @@ trait InstallerHelper
             \XF::logError('Elasticsearch index must be rebuilt to include custom mappings.', true);
         }
     }
+
+    /**
+     * Determine whether a permission is currently in use by another add-on.  Installers can use this to determine
+     * whether a permission that was formerly associated with a different add-on should receive default settings or
+     * should be left alone.
+     *
+     * For example, if SV/FooBar is split into two add-ons, SV/Foo and SV/Bar, the two new add-ons will need to avoid
+     * overwriting permissions that have already been configured as part of SV/FooBar.
+     *
+     * @param string $permissionGroupId
+     * @param string $permissionId
+     * @return bool
+     * @since 1.10.3
+     */
+    public function isPermissionInUse(string $permissionGroupId, string $permissionId): bool
+    {
+        return (bool)\XF::db()->fetchOne(
+            "
+                SELECT
+                    EXISTS(SELECT * FROM xf_permission WHERE permission_group_id = ? AND permission_id = ?)
+                    OR EXISTS(SELECT * FROM xf_permission_entry WHERE permission_group_id = ? AND permission_id = ?)
+                    OR EXISTS(SELECT * FROM xf_permission_entry_content WHERE permission_group_id = ? AND permission_id = ?)
+            ",
+            [
+                $permissionGroupId,
+                $permissionId,
+                $permissionGroupId,
+                $permissionId,
+                $permissionGroupId,
+                $permissionId,
+            ]
+        );
+    }
 }
