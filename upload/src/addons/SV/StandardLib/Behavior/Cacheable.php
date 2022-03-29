@@ -25,10 +25,7 @@ class Cacheable extends Behavior
 
 	public function postDelete()
 	{
-        if ($this->shouldRebuild())
-        {
-            $this->rebuildCache();
-        }
+        $this->rebuildCache();
 	}
 
     protected function shouldRebuild(): bool
