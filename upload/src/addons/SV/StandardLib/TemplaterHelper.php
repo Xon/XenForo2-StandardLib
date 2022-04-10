@@ -109,7 +109,7 @@ class TemplaterHelper
     {
         $this->addFilter('replacevalue', 'filterReplaceValue');
         $this->addFilter('addvalue', 'filterAddValue');
-        $this->addFilter('array_diff', 'fnArrayDiff');
+        $this->addFunction('array_diff', 'fnArrayDiff');
         $this->addFunction('dynamicphrase', 'fnDynamicPhrase');
         $this->addFunction('sv_array_reverse', 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
