@@ -1,0 +1,9 @@
+{
+    "event_id": "templater_setup",
+    "execute_order": 2147483647,
+    "callback_class": "SV\\StandardLib\\TemplaterHelper",
+    "callback_method": "templaterSetup",
+    "active": true,
+    "hint": "",
+    "description": "Provide a stable class to extend for various templater objects"
+}
