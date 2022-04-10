@@ -8,7 +8,7 @@ namespace SV\StandardLib;
 use SV\StandardLib\Helper as StandardLibHelper;
 use XF\Mvc\Entity\AbstractCollection;
 use XF\Template\Templater as BaseTemplater;
-use function is_string;
+use function is_string, count, array_filter;
 
 class TemplaterHelper
 {
@@ -93,6 +93,7 @@ class TemplaterHelper
     {
         $this->addFilter('replacevalue', 'filterReplaceValue');
         $this->addFilter('addvalue', 'filterAddValue');
+        $this->addFilter('array_diff', 'fnArrayDiff');
         $this->addFunction('dynamicphrase', 'fnDynamicPhrase');
         $this->addFunction('sv_array_reverse', 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
@@ -171,6 +172,25 @@ class TemplaterHelper
         return \XF::phrase($value);
     }
 
+    /**
+     * @param BaseTemplater $templater
+     * @param bool          $escape
+     * @param array $array1
+     * @param array ...$arrays
+     * @return array
+     */
+    public function fnArrayDiff(BaseTemplater $templater, bool &$escape, array $array1 = null, ...$arrays): array
+    {
+        $array1 = $array1 ?? [];
+        $arrays = array_filter($arrays);
+
+        if (count($arrays) === 0)
+        {
+            return $array1;
+        }
+
+        return \array_diff($array1, ...$arrays);
+    }
     /**
      * @param BaseTemplater $templater
      * @param bool $escape
