@@ -66,36 +66,35 @@ class TemplaterHelper
             /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
             $filter = \Closure::fromCallable($filter);
         }
+
         return $filter;
     }
 
-    protected function addFilter(string $name, callable $filter)
+    protected function addFilter(string $name, callable $filter, bool $replace = false)
     {
+        if (!$replace && $this->hasFilter($name))
+        {
+            return;
+        }
+
         $this->templater->addFilter($name, $this->mangleCallable($filter));
     }
 
-    protected function addFunction(string $name, callable $filter)
+    protected function addFunction(string $name, callable $filter, bool $replace = false)
     {
+        if (!$replace && $this->hasFunction($name))
+        {
+            return;
+        }
+
         $this->templater->addFunction($name, $this->mangleCallable($filter));
     }
 
     public function addDefaultHandlers()
     {
-        if ($this->hasFilter('replacevalue'))
-        {
-            $this->addFilter('replacevalue', 'fnReplaceValue');
-        }
-
-        if ($this->hasFilter('addvalue'))
-        {
-            $this->addFilter('addvalue', 'fnAddValue');
-        }
-
-        if ($this->hasFunction('dynamicphrase'))
-        {
-            $this->addFunction('dynamicphrase', 'fnDynamicPhrase');
-        }
-
+        $this->addFilter('replacevalue', 'fnReplaceValue');
+        $this->addFilter('addvalue', 'fnAddValue');
+        $this->addFunction('dynamicphrase', 'fnDynamicPhrase');
         $this->addFunction('sv_array_reverse', 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
     }
