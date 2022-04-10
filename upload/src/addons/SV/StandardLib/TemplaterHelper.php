@@ -6,7 +6,6 @@
 namespace SV\StandardLib;
 
 use SV\StandardLib\Helper as StandardLibHelper;
-use SV\StandardLib\XF\Template\Templater;
 use XF\Mvc\Entity\AbstractCollection;
 use XF\Template\Templater as BaseTemplater;
 use function is_string;
@@ -92,8 +91,8 @@ class TemplaterHelper
 
     public function addDefaultHandlers()
     {
-        $this->addFilter('replacevalue', 'fnReplaceValue');
-        $this->addFilter('addvalue', 'fnAddValue');
+        $this->addFilter('replacevalue', 'filterReplaceValue');
+        $this->addFilter('addvalue', 'filterAddValue');
         $this->addFunction('dynamicphrase', 'fnDynamicPhrase');
         $this->addFunction('sv_array_reverse', 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
@@ -107,7 +106,7 @@ class TemplaterHelper
      * @param mixed                     $toAdd
      * @return array|AbstractCollection
      */
-    public function fnAddValue(BaseTemplater $templater, $value, bool &$escape, $toAdd)
+    public function filterAddValue(BaseTemplater $templater, $value, bool &$escape, $toAdd)
     {
         $wasCollection = false;
         if ($value === null)
@@ -144,7 +143,7 @@ class TemplaterHelper
      * @param int|string|null $replaceWith
      * @return int[]|string[]
      */
-    public function fnReplaceValue(BaseTemplater $templater, $value, bool &$escape, $toReplace, $replaceWith): array
+    public function filterReplaceValue(BaseTemplater $templater, $value, bool &$escape, $toReplace, $replaceWith): array
     {
         foreach ($value as $key => $_val)
         {
@@ -173,7 +172,7 @@ class TemplaterHelper
     }
 
     /**
-     * @param Templater $templater
+     * @param BaseTemplater $templater
      * @param bool $escape
      * @param AbstractCollection|array $array
      * @param bool $preserveKeys
