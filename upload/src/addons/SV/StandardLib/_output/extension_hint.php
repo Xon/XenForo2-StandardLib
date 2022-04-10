@@ -18,8 +18,3 @@ namespace SV\StandardLib\XF\Pub\Controller
 	class XFCP_Forum extends \XF\Pub\Controller\Forum {}
 	class XFCP_Watched extends \XF\Pub\Controller\Watched {}
 }
-
-namespace SV\StandardLib\XF\Template
-{
-	class XFCP_Templater extends \XF\Template\Templater {}
-}
