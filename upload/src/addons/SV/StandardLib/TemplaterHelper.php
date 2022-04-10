@@ -53,7 +53,11 @@ class TemplaterHelper
         return isset($functions[$function]);
     }
 
-    protected function mangleCallable(callable $filter): callable
+    /**
+     * @param callable|callable-string $filter
+     * @return callable
+     */
+    protected function mangleCallable($filter): callable
     {
         if (is_string($filter))
         {
@@ -69,7 +73,13 @@ class TemplaterHelper
         return $filter;
     }
 
-    protected function addFilter(string $name, callable $filter, bool $replace = false)
+    /**
+     * @param string $name
+     * @param callable|callable-string $filter
+     * @param bool   $replace
+     * @return void
+     */
+    protected function addFilter(string $name, $filter, bool $replace = false)
     {
         if (!$replace && $this->hasFilter($name))
         {
@@ -79,7 +89,13 @@ class TemplaterHelper
         $this->templater->addFilter($name, $this->mangleCallable($filter));
     }
 
-    protected function addFunction(string $name, callable $filter, bool $replace = false)
+    /**
+     * @param string $name
+     * @param callable|callable-string $filter
+     * @param bool   $replace
+     * @return void
+     */
+    protected function addFunction(string $name, $filter, bool $replace = false)
     {
         if (!$replace && $this->hasFunction($name))
         {
