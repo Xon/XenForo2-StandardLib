@@ -114,6 +114,11 @@ class TemplaterHelper
      */
     protected function mangleCallable($filter): callable
     {
+        if ($filter === null)
+        {
+            throw new \LogicException('Require $filter to not be null');
+        }
+
         if (is_string($filter))
         {
             if (method_exists($this, $filter))
