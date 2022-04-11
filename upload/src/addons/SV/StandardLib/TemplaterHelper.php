@@ -8,7 +8,7 @@ namespace SV\StandardLib;
 use SV\StandardLib\Helper as StandardLibHelper;
 use XF\Mvc\Entity\AbstractCollection;
 use XF\Template\Templater as BaseTemplater;
-use function is_string, count, array_filter;
+use function is_string, is_array, count, array_filter, array_diff, array_reverse, abs, assert, trigger_error, trim, implode;
 
 class TemplaterHelper
 {
@@ -105,6 +105,11 @@ class TemplaterHelper
         $this->templater->addFunction($name, $this->mangleCallable($filter));
     }
 
+    protected function getStyle(): \XF\Style
+    {
+        return $this->templater->getStyle() ?? $this->app()->style();
+    }
+
     public function addDefaultHandlers()
     {
         $this->addFilter('replacevalue', 'filterReplaceValue');
@@ -113,6 +118,8 @@ class TemplaterHelper
         $this->addFunction('dynamicphrase', 'fnDynamicPhrase');
         $this->addFunction('sv_array_reverse', 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
+        $this->addFunction('parse_less_func', 'fnParseLessFunc');
+        $this->addFunction('abs', 'fnAbs');
     }
 
 
@@ -135,12 +142,12 @@ class TemplaterHelper
             $wasCollection = true;
             $value = $value->toArray();
         }
-        else if (!\is_array($value))
+        else if (!is_array($value))
         {
             $error = "addValue should be called on an array or an AbstractCollection";
             if (\XF::$debugMode)
             {
-                \trigger_error($error, E_USER_WARNING);
+                trigger_error($error, E_USER_WARNING);
             }
             \XF::logError($error);
 
@@ -205,8 +212,9 @@ class TemplaterHelper
             return $array1;
         }
 
-        return \array_diff($array1, ...$arrays);
+        return array_diff($array1, ...$arrays);
     }
+
     /**
      * @param BaseTemplater $templater
      * @param bool $escape
@@ -215,15 +223,15 @@ class TemplaterHelper
      *
      * @return array|AbstractCollection
      */
-    public function fnArrayReverse(BaseTemplater $templater, bool &$escape, $array, bool $preserveKeys = true)
+    public function fnSvArrayReverse(BaseTemplater $templater, bool &$escape, $array, bool $preserveKeys = true)
     {
         if ($array instanceof AbstractCollection)
         {
             return $array->reverse($preserveKeys);
         }
-        else if (\is_array($array))
+        else if (is_array($array))
         {
-            return \array_reverse($array, $preserveKeys);
+            return array_reverse($array, $preserveKeys);
         }
 
         return $array;
@@ -261,7 +269,7 @@ class TemplaterHelper
             $dateArr = $repo->buildRelativeDateString($interval, $maximumDateParts);
             if ($dateArr)
             {
-                $timeStr = \trim(\implode(', ', $dateArr));
+                $timeStr = trim(implode(', ', $dateArr));
             }
         }
         if (!$timeStr)
@@ -278,6 +286,28 @@ class TemplaterHelper
             'otherTimestamp' => $otherTimestamp,
             'maximumDateParts' => $maximumDateParts
         ]);
+    }
+
+    /**
+     * @param BaseTemplater    $templater
+     * @param bool             $escape
+     * @param string|float|int $value
+     * @return string
+     */
+    public function fnAbs(BaseTemplater $templater, bool &$escape, $value): string
+    {
+        return (string)abs($value ?? 0);
+    }
+
+    public function fnParseLessFunc(BaseTemplater $templater, bool &$escape, string $value, bool $forceDebug = false): string
+    {
+        $rendererClass = $this->app->extendClass('XF\CssRenderer');
+
+        $renderer = new $rendererClass($this->app, $this);
+        assert($renderer instanceof \SV\StandardLib\XF\CssRenderer);
+        $renderer->setStyle($this->getStyle());
+
+        return $renderer->parseLessColorFuncValue($value, $forceDebug) ?? '';
     }
 
     protected function app(): \XF\App

@@ -10,6 +10,7 @@ namespace SV\StandardLib\XF\Admin\Controller
 
 namespace SV\StandardLib\XF
 {
+	class XFCP_CssRenderer extends \XF\CssRenderer {}
 	class XFCP_InputFilterer extends \XF\InputFilterer {}
 }
 

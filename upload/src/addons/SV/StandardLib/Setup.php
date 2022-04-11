@@ -28,4 +28,9 @@ class Setup extends AbstractSetup
             $phrase->saveIfChanged();
         }
     }
+
+    protected function upgrade1110001Step1()
+    {
+        $this->renameOption('svAdvancedBbCodeLogLessFunc', 'svLogLessFunc', true);
+    }
 }
