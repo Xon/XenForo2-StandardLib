@@ -464,7 +464,7 @@ trait InstallerHelper
     /**
      * @since 1.10.0
      *
-     * @param array<string, Alter> $tables
+     * @param array<string, callable|callable-string> $tables
      *
      * @return array<string, Alter>
      */
