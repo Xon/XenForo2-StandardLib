@@ -115,6 +115,11 @@ class TemplaterHelper
         return $this->templater->getStyle() ?? $this->app()->style();
     }
 
+    public function uncacheTemplateData(string $type, string $template)
+    {
+        TemplaterAccess::uncacheTemplateData($this->templater, $type, $template);
+    }
+
     public function addDefaultHandlers()
     {
         $this->addFilter('replacevalue', 'filterReplaceValue');

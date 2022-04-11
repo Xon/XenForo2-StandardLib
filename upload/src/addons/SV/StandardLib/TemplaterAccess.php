@@ -20,4 +20,13 @@ abstract class TemplaterAccess extends Templater
     {
         return $templater->functions;
     }
+
+    public static function uncacheTemplateData(Templater $templater, string $type, string $template)
+    {
+        $languageId = $templater->getLanguage()->getId();
+        $styleId = $templater->getStyleId();
+        $cacheKey = "{$languageId}-{$styleId}-{$type}-{$template}";
+
+        unset($templater->templateCache[$cacheKey]);
+    }
 }
