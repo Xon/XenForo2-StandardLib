@@ -87,10 +87,26 @@ class TemplaterHelper
 
     protected function hasFunction(string $function): bool
     {
-        $functions = $this->templaterAccessClass::functions($this->templater);
-
-        return isset($functions[$function]);
+        return $this->function($function) !== null;
     }
+
+    /**
+     * @param string $function
+     * @return callable|callable-string|null
+     */
+    public function function(string $function)
+    {
+        $functions = $this->functions();
+
+        return $functions[$function] ?? null;
+    }
+
+    public function functions(): array
+    {
+        return $this->templaterAccessClass::functions($this->templater);
+    }
+
+
 
     /**
      * @param callable|callable-string $filter
