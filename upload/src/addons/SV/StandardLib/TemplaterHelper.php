@@ -17,7 +17,9 @@ class TemplaterHelper
     /** @var \XF\App */
     protected $app;
     /** @var bool */
-    private $hasFromCallable;
+    protected $hasFromCallable;
+    /** @var class-string|TemplaterAccess */
+    protected $templaterAccessClass;
 
     public static function templaterSetup(\XF\Container $container, BaseTemplater &$templater)
     {
@@ -30,8 +32,9 @@ class TemplaterHelper
     public function __construct(BaseTemplater $templater)
     {
         $this->hasFromCallable = \is_callable('\Closure::fromCallable');
-        $this->app = TemplaterAccess::app($templater);
         $this->templater = $templater;
+        $this->templaterAccessClass = \XF::extendClass(TemplaterAccess::class);
+        $this->app = $this->templaterAccessClass::app($templater);
     }
 
     public function setup()
@@ -46,14 +49,14 @@ class TemplaterHelper
 
     protected function hasFilter(string $filter): bool
     {
-        $filters = TemplaterAccess::filters($this->templater);
+        $filters = $this->templaterAccessClass::filters($this->templater);
 
         return isset($filters[$filter]);
     }
 
     protected function hasFunction(string $function): bool
     {
-        $functions = TemplaterAccess::functions($this->templater);
+        $functions = $this->templaterAccessClass::functions($this->templater);
 
         return isset($functions[$function]);
     }
@@ -117,7 +120,7 @@ class TemplaterHelper
 
     public function uncacheTemplateData(string $type, string $template)
     {
-        TemplaterAccess::uncacheTemplateData($this->templater, $type, $template);
+        $this->templaterAccessClass::uncacheTemplateData($this->templater, $type, $template);
     }
 
     public function addDefaultHandlers()
