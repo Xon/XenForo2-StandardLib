@@ -116,7 +116,8 @@ class TemplaterHelper
         $this->addFilter('addvalue', 'filterAddValue');
         $this->addFunction('array_diff', 'fnArrayDiff');
         $this->addFunction('dynamicphrase', 'fnDynamicPhrase');
-        $this->addFunction('sv_array_reverse', 'fnArrayReverse');
+        $this->addFunction('array_reverse', 'fnArrayReverse');
+        $this->addFunction('sv_array_reverse', \XF::$debugMode ? 'fnArrayReverseOld' : 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
         $this->addFunction('parse_less_func', 'fnParseLessFunc');
         $this->addFunction('abs', 'fnAbs');
@@ -222,8 +223,28 @@ class TemplaterHelper
      * @param bool $preserveKeys
      *
      * @return array|AbstractCollection
+     * @deprecated
      */
-    public function fnSvArrayReverse(BaseTemplater $templater, bool &$escape, $array, bool $preserveKeys = true)
+    public function fnArrayReverseOld(BaseTemplater $templater, bool &$escape, $array, bool $preserveKeys = true)
+    {
+        $error = "sv_array_reverse is deprecated use array_reverse instead";
+        if (\XF::$debugMode)
+        {
+            trigger_error($error, E_USER_WARNING);
+        }
+
+        return $this->fnArrayReverse($templater, $escape, $array, $preserveKeys);
+    }
+
+    /**
+     * @param BaseTemplater $templater
+     * @param bool $escape
+     * @param AbstractCollection|array $array
+     * @param bool $preserveKeys
+     *
+     * @return array|AbstractCollection
+     */
+    public function fnArrayReverse(BaseTemplater $templater, bool &$escape, $array, bool $preserveKeys = true)
     {
         if ($array instanceof AbstractCollection)
         {
