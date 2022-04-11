@@ -36,6 +36,11 @@ class TemplaterHelper
 
     public function setup()
     {
+        // add a reference on the templater to this class so it can be found
+        /** @noinspection PhpUndefinedFieldInspection */
+        $this->templater->svTemplateHelper = $this;
+        $this->templater->addDefaultParam('svTemplateHelper', $this);
+
         $this->addDefaultHandlers();
     }
 
