@@ -9,7 +9,7 @@ use SV\StandardLib\Helper as StandardLibHelper;
 use XF\Mvc\Entity\AbstractCollection;
 use XF\Mvc\Reply\AbstractReply;
 use XF\Template\Templater as BaseTemplater;
-use function is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
+use function method_exists, is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
 
 class TemplaterHelper
 {
@@ -100,7 +100,14 @@ class TemplaterHelper
     {
         if (is_string($filter))
         {
-            $filter = [$this, $filter];
+            if (method_exists($this, $filter))
+            {
+                $filter = [$this, $filter];
+            }
+            else
+            {
+                $filter = [$this->templater, $filter];
+            }
         }
 
         if ($this->hasFromCallable && !($filter instanceof \Closure))
