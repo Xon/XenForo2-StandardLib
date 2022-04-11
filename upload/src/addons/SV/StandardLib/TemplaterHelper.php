@@ -7,7 +7,7 @@ namespace SV\StandardLib;
 
 use SV\StandardLib\Helper as StandardLibHelper;
 use XF\Mvc\Entity\AbstractCollection;
-use XF\Template\Templater;
+use XF\Mvc\Reply\AbstractReply;
 use XF\Template\Templater as BaseTemplater;
 use function is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
 
@@ -30,9 +30,16 @@ class TemplaterHelper
         $templateHelper->setup();
     }
 
+    public static function templaterGlobalData(\XF\App $app, array &$data, AbstractReply $reply = null)
+    {
+        $helper = self::get($app->templater());
+        $helper->populateTemplaterGlobalData($data, $reply);
+    }
+
     /**
-     * @param Templater $templater
+     * @param BaseTemplater $templater
      * @return static
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function get(\XF\Template\Templater $templater)
     {
@@ -65,6 +72,10 @@ class TemplaterHelper
         $this->addDefaultParam('svTemplateHelper', $this);
 
         $this->addDefaultHandlers();
+    }
+
+    protected function populateTemplaterGlobalData(array &$data, AbstractReply $reply)
+    {
     }
 
     protected function hasFilter(string $filter): bool

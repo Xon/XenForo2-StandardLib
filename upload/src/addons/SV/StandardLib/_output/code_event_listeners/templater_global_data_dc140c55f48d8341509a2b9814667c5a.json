@@ -1,0 +1,9 @@
+{
+    "event_id": "templater_global_data",
+    "execute_order": 2147483647,
+    "callback_class": "SV\\StandardLib\\TemplaterHelper",
+    "callback_method": "templaterGlobalData",
+    "active": true,
+    "hint": "",
+    "description": "Route templater_global_data via TemplaterHelper to inject additional context"
+}
