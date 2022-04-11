@@ -8,7 +8,7 @@ namespace SV\StandardLib;
 use SV\StandardLib\Helper as StandardLibHelper;
 use XF\Mvc\Entity\AbstractCollection;
 use XF\Template\Templater as BaseTemplater;
-use function is_string, is_array, count, array_filter, array_diff, array_reverse, abs, assert, trigger_error, trim, implode;
+use function is_string, is_array, count, array_filter, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
 
 class TemplaterHelper
 {
@@ -216,20 +216,30 @@ class TemplaterHelper
      * @param BaseTemplater $templater
      * @param bool          $escape
      * @param array $array1
-     * @param array ...$arrays
+     * @param array<array|AbstractCollection> $arrays
      * @return array
      */
     public function fnArrayDiff(BaseTemplater $templater, bool &$escape, array $array1 = null, ...$arrays): array
     {
-        $array1 = $array1 ?? [];
-        $arrays = array_filter($arrays);
+        array_unshift($arrays, $array1);
+        foreach($arrays as &$array)
+        {
+            if ($array === null)
+            {
+                $array = [];
+            }
+            else if ($array instanceof AbstractCollection)
+            {
+                $array = $array->toArray();
+            }
+        }
 
-        if (count($arrays) === 0)
+        if (count($arrays) <= 1)
         {
             return $array1;
         }
 
-        return array_diff($array1, ...$arrays);
+        return array_diff(...$arrays);
     }
 
     /**

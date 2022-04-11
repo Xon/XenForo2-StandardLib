@@ -92,7 +92,7 @@ $array|replacevalue($elementValue, $newElementValue)
 Reverse an array/collection. See [`array_reverse`](https://www.php.net/manual/en/function.array-reverse.php) for details.
 
 ### Template Function: array_diff
-Computes the difference of arrays. See [`array_diff`](https://www.php.net/manual/en/function.array-diff.php) for details.
+Computes the difference of arrays/collections. See [`array_diff`](https://www.php.net/manual/en/function.array-diff.php) for details.
 
 ### Template Function: sv_relative_timestamp
 Provide a dynamic count up/down timestamp
