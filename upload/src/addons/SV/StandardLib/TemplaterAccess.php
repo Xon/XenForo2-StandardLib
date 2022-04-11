@@ -29,4 +29,9 @@ abstract class TemplaterAccess extends Templater
 
         unset($templater->templateCache[$cacheKey]);
     }
+
+    public static function getDefaultParam(Templater $templater, string $name)
+    {
+        return $templater->defaultParams[$name] ?? null;
+    }
 }

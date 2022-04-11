@@ -7,6 +7,7 @@ namespace SV\StandardLib;
 
 use SV\StandardLib\Helper as StandardLibHelper;
 use XF\Mvc\Entity\AbstractCollection;
+use XF\Template\Templater;
 use XF\Template\Templater as BaseTemplater;
 use function is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
 
@@ -29,6 +30,25 @@ class TemplaterHelper
         $templateHelper->setup();
     }
 
+    /**
+     * @param Templater $templater
+     * @return static
+     */
+    public static function get(\XF\Template\Templater $templater)
+    {
+        $helper = $templater->svTemplateHelper ?? null;
+        // make sure a non-null value is fetched
+        if ($helper === null)
+        {
+            self::templaterSetup(\XF::app()->container(), $templater);
+            $helper = $templater->svTemplateHelper ?? null;
+
+        }
+        assert($helper instanceof TemplaterHelper);
+
+        return $helper;
+    }
+
     public function __construct(BaseTemplater $templater)
     {
         $this->hasFromCallable = \is_callable('\Closure::fromCallable');
@@ -42,7 +62,7 @@ class TemplaterHelper
         // add a reference on the templater to this class so it can be found
         /** @noinspection PhpUndefinedFieldInspection */
         $this->templater->svTemplateHelper = $this;
-        $this->templater->addDefaultParam('svTemplateHelper', $this);
+        $this->addDefaultParam('svTemplateHelper', $this);
 
         $this->addDefaultHandlers();
     }
@@ -121,6 +141,20 @@ class TemplaterHelper
     public function uncacheTemplateData(string $type, string $template)
     {
         $this->templaterAccessClass::uncacheTemplateData($this->templater, $type, $template);
+    }
+
+    /**
+     * @param string $name
+     * @return mixed|null
+     */
+    public function getDefaultParam(string $name)
+    {
+        return $this->templaterAccessClass::getDefaultParam($this->templater, $name);
+    }
+
+    public function addDefaultParam(string $name, $value)
+    {
+        $this->templater->addDefaultParam($name, $value);
     }
 
     public function addDefaultHandlers()
