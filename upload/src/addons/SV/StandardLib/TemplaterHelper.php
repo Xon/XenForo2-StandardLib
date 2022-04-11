@@ -8,7 +8,7 @@ namespace SV\StandardLib;
 use SV\StandardLib\Helper as StandardLibHelper;
 use XF\Mvc\Entity\AbstractCollection;
 use XF\Template\Templater as BaseTemplater;
-use function is_string, is_array, count, array_filter, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
+use function is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
 
 class TemplaterHelper
 {
