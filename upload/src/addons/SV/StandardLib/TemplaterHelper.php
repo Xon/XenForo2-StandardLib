@@ -115,7 +115,7 @@ class TemplaterHelper
         $this->addFilter('replacevalue', 'filterReplaceValue');
         $this->addFilter('addvalue', 'filterAddValue');
         $this->addFunction('array_diff', 'fnArrayDiff');
-        $this->addFunction('dynamicphrase', 'fnDynamicPhrase');
+        $this->addFunction('phrase_dynamic', 'fnPhraseDynamic');
         $this->addFunction('array_reverse', 'fnArrayReverse');
         $this->addFunction('sv_array_reverse', \XF::$debugMode ? 'fnArrayReverseOld' : 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
@@ -194,6 +194,22 @@ class TemplaterHelper
         $escape = false;
 
         return \XF::phrase($value);
+    }
+
+    /**
+     * XF2.1 only, as XF2.2 implements this
+     *
+     * @param BaseTemplater $templater
+     * @param bool          $escape
+     * @param string        $phraseName
+     * @param array         $params
+     * @return string|\XF\PreEscaped
+     */
+    public function fnPhraseDynamic(BaseTemplater $templater, bool &$escape, string $phraseName, array $params = [])
+    {
+        $phrase = $this->templater->getLanguage()->phrase($phraseName, $params);
+
+        return $phrase->render();
     }
 
     /**
