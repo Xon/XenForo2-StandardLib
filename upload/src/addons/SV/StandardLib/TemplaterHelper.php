@@ -64,7 +64,7 @@ class TemplaterHelper
             $filter = [$this, $filter];
         }
 
-        if ($this->hasFromCallable)
+        if ($this->hasFromCallable && !($filter instanceof \Closure))
         {
             /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
             $filter = \Closure::fromCallable($filter);
