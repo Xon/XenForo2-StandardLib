@@ -431,4 +431,9 @@ class TemplaterHelper
     {
         return $this->app->em();
     }
+
+    protected function repository(string $identifier): \XF\Mvc\Entity\Repository
+    {
+        return $this->app->repository($identifier);
+    }
 }
