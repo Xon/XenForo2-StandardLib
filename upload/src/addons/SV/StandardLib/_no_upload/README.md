@@ -36,7 +36,7 @@ Inject arbitrary SQL at query time, as join vs subquery can have massive perform
 
 ## View template modifications
 
-Allows viewing template modfications which are applying to a template, including generated php source code
+Allows viewing template modifications which are applying to a template, including generated php source code
 
 ## \SV\StandardLib\Repository\Helper::getUserEntity
 Helps get the user that owns an entity
@@ -88,14 +88,26 @@ Replaces a value `$elementValue` in an array/collection with `$newElementValue`.
 $array|replacevalue($elementValue, $newElementValue)
 ```
 
-### Template Function: sv_array_reverse
-Reverse an array/collection (ie `array_reverse`)
+### Template Function: array_reverse
+Reverse an array/collection. See [`array_reverse`](https://www.php.net/manual/en/function.array-reverse.php) for details.
+
+### Template Function: array_diff
+Computes the difference of arrays. See [`array_diff`](https://www.php.net/manual/en/function.array-diff.php) for details.
 
 ### Template Function: sv_relative_timestamp
 Provide a dynamic count up/down timestamp
 ```html
 <abbr title="{$title|for_attr}" class="bbc-abbr">{{ sv_relative_timestamp($nowTimestamp, $otherTimestamp, $maximumDateParts, $countUp, 'bbc-time-counter') }}</abbr>
 ```
+### Template Function: abs
+Absolute value
+
+### Template Function: parse_less_func
+Similar to `parse_less_color`, except this allows parsing an arbitrary LESS expression.
+Enable the `svLogLessFunc` option to log debug information
+
+### Template Function: phrase_dynamic
+Backport `phrase_dynamic` from XF2.2 to XF2.1
 
 ### Store selected tab ID
 Extend `XF.Tabs` to store the ID of the selected tab on submit via a hidden field.
