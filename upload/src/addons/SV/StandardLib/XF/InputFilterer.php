@@ -17,6 +17,7 @@ class InputFilterer extends XFCP_InputFilterer
      */
     protected function cleanInternal($value, $type, array $options)
     {
+        /** @noinspection PhpSwitchStatementWitSingleBranchInspection */
         switch ($type)
         {
             case 'sv-datetime':

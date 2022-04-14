@@ -1,8 +1,4 @@
 <?php
-/**
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- */
 
 namespace SV\StandardLib\XF\Pub\Controller;
 

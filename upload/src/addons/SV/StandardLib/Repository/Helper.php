@@ -184,9 +184,9 @@ class Helper extends Repository
 
         if ($entity->isValidColumn($backupColumn) || $entity->isValidGetter($backupColumn))
         {
-            /** @noinspection PhpUnnecessaryLocalVariableInspection */
             /** @var \XF\Entity\User $user */
             $user = \XF::app()->find('XF:User', $entity->get($backupColumn));
+
             return $user;
         }
 

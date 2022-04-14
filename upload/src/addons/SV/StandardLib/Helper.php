@@ -11,7 +11,6 @@ class Helper
 
     public static function repo(): \SV\StandardLib\Repository\Helper
     {
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         /** @var \SV\StandardLib\Repository\Helper $repo */
         $repo = \XF::repository('SV\StandardLib:Helper');
 

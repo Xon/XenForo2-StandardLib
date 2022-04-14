@@ -1,13 +1,8 @@
 <?php
-/**
- * @noinspection PhpMissingParamTypeInspection
- * @noinspection PhpMissingReturnTypeInspection
- */
 
 namespace SV\StandardLib\XF\Pub\Controller;
 
 use SV\StandardLib\ControllerPlugin\Filter as FilterPlugin;
-use XF\Mvc\ParameterBag;
 use XF\Mvc\Reply\View;
 
 /**

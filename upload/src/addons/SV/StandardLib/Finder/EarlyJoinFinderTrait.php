@@ -2,7 +2,6 @@
 /**
  * @noinspection PhpRedundantOptionalArgumentInspection
  * @noinspection PhpMissingReturnTypeInspection
- * @noinspection PhpMissingParamTypeInspection
  * @noinspection PhpUndefinedClassInspection
  */
 
