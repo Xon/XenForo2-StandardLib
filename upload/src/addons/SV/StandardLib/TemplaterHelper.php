@@ -436,7 +436,7 @@ class TemplaterHelper
     {
         $rendererClass = $this->app->extendClass('XF\CssRenderer');
 
-        $renderer = new $rendererClass($this->app, $this);
+        $renderer = new $rendererClass($this->app, $this->templater);
         assert($renderer instanceof \SV\StandardLib\XF\CssRenderer);
         $renderer->setStyle($this->getStyle());
 
