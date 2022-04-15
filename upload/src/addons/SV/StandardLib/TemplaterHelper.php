@@ -109,13 +109,12 @@ class TemplaterHelper
         return $this->templaterAccessClass::functions($this->templater);
     }
 
-
-
     /**
      * @param callable|callable-string $filter
+     * @param bool                     $resolveToSelf
      * @return callable
      */
-    protected function mangleCallable($filter): callable
+    protected function mangleCallable($filter, bool $resolveToSelf = true): callable
     {
         if ($filter === null)
         {
@@ -124,7 +123,7 @@ class TemplaterHelper
 
         if (is_string($filter))
         {
-            if (method_exists($this, $filter))
+            if ($resolveToSelf && method_exists($this, $filter))
             {
                 $filter = [$this, $filter];
             }
