@@ -6,6 +6,7 @@
 namespace SV\StandardLib;
 
 use SV\StandardLib\Helper as StandardLibHelper;
+use SV\StandardLib\XF\CssRenderer;
 use XF\Mvc\Entity\AbstractCollection;
 use XF\Mvc\Reply\AbstractReply;
 use XF\Template\Templater as BaseTemplater;
@@ -21,6 +22,8 @@ class TemplaterHelper
     protected $hasFromCallable;
     /** @var class-string|TemplaterAccess */
     protected $templaterAccessClass;
+    /** @var CssRenderer|null */
+    protected $cssRenderer = null;
 
     public static function templaterSetup(\XF\Container $container, BaseTemplater &$templater)
     {
@@ -434,13 +437,27 @@ class TemplaterHelper
 
     public function fnParseLessFunc(BaseTemplater $templater, bool &$escape, string $value, bool $forceDebug = false): string
     {
-        $rendererClass = $this->app->extendClass('XF\CssRenderer');
+        return $this->getCssRenderer()->parseLessColorFuncValue($value, $forceDebug) ?? '';
+    }
 
-        $renderer = new $rendererClass($this->app, $this->templater);
-        assert($renderer instanceof \SV\StandardLib\XF\CssRenderer);
-        $renderer->setStyle($this->getStyle());
+    protected function getCssRenderer(): \SV\StandardLib\XF\CssRenderer
+    {
+        if ($this->cssRenderer === null)
+        {
+            $rendererClass = $this->app->extendClass('XF\CssRenderer');
 
-        return $renderer->parseLessColorFuncValue($value, $forceDebug) ?? '';
+            $renderer = new $rendererClass($this->app, $this->templater);
+            assert($renderer instanceof \SV\StandardLib\XF\CssRenderer);
+            $this->cssRenderer = $renderer;
+        }
+
+        $style = $this->getStyle();
+        if ($style->getId() !== $this->cssRenderer->getStyleId())
+        {
+            $this->cssRenderer->setStyle($style);
+        }
+
+        return $this->cssRenderer;
     }
 
     protected function app(): \XF\App
