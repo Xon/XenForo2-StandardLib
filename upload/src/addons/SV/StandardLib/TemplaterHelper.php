@@ -77,7 +77,7 @@ class TemplaterHelper
         $this->addDefaultHandlers();
     }
 
-    protected function populateTemplaterGlobalData(array &$data, AbstractReply $reply)
+    protected function populateTemplaterGlobalData(array &$data, AbstractReply $reply = null)
     {
     }
 
