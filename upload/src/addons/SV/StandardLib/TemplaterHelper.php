@@ -250,14 +250,36 @@ class TemplaterHelper
 
     /**
      * @param BaseTemplater   $templater
-     * @param int[]|string[]|\ArrayAccess  $value
+     * @param array|AbstractCollection  $value
      * @param bool            $escape
      * @param int|string      $toReplace
      * @param int|string|null $replaceWith
-     * @return int[]|string[]
+     * @return array|AbstractCollection
      */
     public function filterReplaceValue(BaseTemplater $templater, $value, bool &$escape, $toReplace, $replaceWith): array
     {
+        $wasCollection = false;
+        if ($value === null)
+        {
+            $value = [];
+        }
+        else if ($value instanceof AbstractCollection)
+        {
+            $wasCollection = true;
+            $value = $value->toArray();
+        }
+        else if (!is_array($value))
+        {
+            $error = "removeValue should be called on an array or an AbstractCollection";
+            if (\XF::$debugMode)
+            {
+                trigger_error($error, E_USER_WARNING);
+            }
+            \XF::logError($error);
+
+            return $value;
+        }
+
         foreach ($value as $key => $_val)
         {
             // deliberately using non-strict equality checks
@@ -274,7 +296,7 @@ class TemplaterHelper
             }
         }
 
-        return $value;
+        return $wasCollection ? $this->em()->getBasicCollection([$value]) : $value;
     }
 
     public function fnDynamicPhrase(BaseTemplater $templater, bool &$escape, string $value): \XF\Phrase
