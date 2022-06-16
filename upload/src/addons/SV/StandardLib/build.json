@@ -5,6 +5,7 @@
     ],
     "minify": [
         "js/sv/lib/relative_timestamp.js",
+        "js/sv/lib/xf/filter.js",
         "js/sv/lib/xf/core/structure.js"
     ]
 }

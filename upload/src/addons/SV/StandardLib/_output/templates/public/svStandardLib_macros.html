@@ -50,3 +50,37 @@
 		{$forum.title}
 	</a>
 </xf:trim></xf:macro>
+
+<xf:macro name="dynamic_quick_filter" arg-key="" arg-ajax="" arg-class="" arg-filter="{{ [] }}">	
+    <xf:js src="xf/filter.js" min="1" />
+	<xf:js src="sv/vendor/domurl/url.js" addon="SV/StandardLib" min="1" />
+	<xf:js src="sv/lib/xf/filter.js" addon="SV/StandardLib" min="1" />
+	<script class="js-extraPhrases" type="application/json">
+		{
+			"no_items_matched_your_filter": "{{ phrase('no_items_matched_your_filter')|escape('js') }}"
+		}
+	</script>
+	<xf:css src="sv_quick_filter.less" />
+	
+    <div class="{$class} quickFilter u-jsOnly"
+         data-xf-init="filter"
+         data-key="{$key}"
+         data-ajax="{$ajax}"
+         data-search-target=".userList"
+         data-search-row=".userList-row"
+         data-search-row-group=".contentRow"
+		 data-search-limit=".username"
+         data-no-results-format="<div class=&quot;blockMessage js-filterNoResults&quot;>%s</div>"
+		 data-sv-existing-filter-text="{$filter.text|for_attr}"
+		 data-sv-existing-filter-prefix="{{ $filter.prefix ? 'true' : 'false' }}">
+		<div class="inputGroup inputGroup--inline inputGroup--joined">
+			<input type="text" class="input js-filterInput" value="{$filter.text}" placeholder="{{ phrase('filter...')|for_attr }}" data-xf-key="{{ phrase('shortcut.filter')|for_attr }}" />
+			<span class="inputGroup-text">
+				<xf:checkbox standalone="true">
+					<xf:option class="js-filterPrefix" label="{{ phrase('prefix') }}" checked="{$filter.prefix}" />
+				</xf:checkbox>
+			</span>
+			<i class="inputGroup-text js-filterClear is-disabled" aria-hidden="true"></i>
+        </div>
+    </div>
+</xf:macro>
