@@ -1,100 +1,58 @@
 var SV = window.SV || {};
-SV.UserMentionImprovements = SV.UserMentionImprovements || {};
+SV.StandardLib = SV.StandardLib || {};
 
 (function($, window, document, _undefined)
 {
     "use strict";
 
-    XF.Filter = XF.extend(XF.Filter, {
+    SV.StandardLib.DynamicFilter = XF.extend(XF.Filter, {
         __backup: {
             'init': 'svLib__init',
             '_filterAjax': 'svLib__filterAjax',
             'filter': 'svLib__filter',
-            '_filterAjaxResponse': 'svLib__filterAjaxResponse',
-            '_getStoredValue': 'svLib__getStoredValue',
-            '_updateStoredValue': 'svLib__updateStoredValue'
+            'update': 'svLib__update',
+            '_filterAjaxResponse': 'svLib__filterAjaxResponse'
         },
 
         options: $.extend({}, XF.Filter.prototype.options, {
             svLoadInOverlay: true,
-            svExistingFilterText: '',
-            svExistingFilterPrefix: false,
             svPageNavWrapper: '.block-outer--page-nav-wrapper',
         }),
 
+        resetPage: true,
+        skipUpdate: false,
         inOverlay: false,
-        xhrFilterOriginal: null,
-        svPageChanged: false,
         svLastPageSelected: null,
+
+        _getStoredValue: function() {
+            return null;
+        },
+        _updateStoredValue: function(val, prefix) {
+            return;
+        },
 
         init: function ()
         {
             this.inOverlay = this.$target.parents('.overlay-container').length  !== 0;
 
-            this.svLib__init();
-
-            this.svOverlayShim();
-
-            var storedValue = this._getStoredValue();
-            if (!storedValue)
+            var existingPage = null,
+                $pageNavWrapper = this.getPageNavWrapper();
+            if ($pageNavWrapper)
             {
-                return;
+                existingPage = this.getPageFromAhref($pageNavWrapper.find('.pageNav-page--current').first());
+            }
+            this.svLastPageSelected = (typeof existingPage === 'number') ? existingPage : 1;
+
+            this.skipUpdate = true;
+            try
+            {
+                this.svLib__init();
+            }
+            finally {
+                this.skipUpdate = false;
             }
 
-            if (!this.inOverlay && storedValue.filter === '' && storedValue.page === 1)
-            {
-                var currentUrl = new Url(window.location.href);
-                if ("_xfFilter[text]" in currentUrl.query)
-                {
-                    var text = currentUrl.query["_xfFilter[text]"],
-                        prefix = false;
-                    if ("_xfFilter[prefix]" in currentUrl.query)
-                    {
-                        prefix = currentUrl.query["_xfFilter[prefix]"];
-                    }
-
-                    var data = this._readFromStorage(),
-                        storageKey = this.storageKey;
-                    if (!storedValue)
-                    {
-                        storedValue = {
-                            filter: '',
-                            prefix: false,
-                            page: 1
-                        };
-                    }
-
-                    if (data[storageKey])
-                    {
-                        var record = data[storageKey];
-                        if ('page' in record)
-                        {
-                            storedValue.page = parseInt(record.page) || 1;
-                        }
-                    }
-
-                    if (this.svLastPageSelected !== null)
-                    {
-                        storedValue.page = parseInt(this.svLastPageSelected) || 1;
-                    }
-
-                    data[storageKey] = storedValue;
-                    this._writeToStorage(data);
-
-                    if (text.length)
-                    {
-                        var $rows = this.$search
-                            .find(this.options.searchRow)
-                            .filter(':not(.is-hidden)');
-                        if (!$rows.length)
-                        {
-                            return;
-                        }
-
-                        this._applyFilter($rows, text, prefix);
-                    }
-                }
-            }
+            this.shimDynamicPageNav();
         },
 
         /**
@@ -107,23 +65,18 @@ SV.UserMentionImprovements = SV.UserMentionImprovements || {};
          */
         _filterAjax: function(text, prefix)
         {
-            // this will be null if not used with who replied
-            var currentPage = this.svGetCurrentPage();
-            if (!currentPage)
-            {
-                this.svLib__filterAjax(text, prefix);
-                return;
-            }
-
+            var currentPage = this.getCurrentPage() || 1;
             var data = {
-                page: currentPage,
                 _xfFilter: {
                     text: text,
                     prefix: prefix ? 1 : 0
                 }
             };
+            if (currentPage != 1) {
+                data['page'] = currentPage;
+            }
 
-            this.xhrFilter = { text: text, prefix: prefix, page: currentPage };
+            this.xhrFilter = data['_xfFilter'];
             XF.ajax('GET', this.options.ajax, data, XF.proxy(this, '_filterAjaxResponse'));
         },
 
@@ -131,7 +84,7 @@ SV.UserMentionImprovements = SV.UserMentionImprovements || {};
         {
             this.svLib__filterAjaxResponse(result);
 
-            var oldPageNavWrapper = this.svGetPageNavWrapper();
+            var oldPageNavWrapper = this.getPageNavWrapper();
             if (!oldPageNavWrapper)
             {
                 return;
@@ -146,7 +99,7 @@ SV.UserMentionImprovements = SV.UserMentionImprovements || {};
             }
 
             oldPageNavWrapper.html(newPageNavWrapper.html());
-            this.svOverlayShim();
+            this.shimDynamicPageNav();
 
             if (this.inOverlay)
             {
@@ -180,99 +133,20 @@ SV.UserMentionImprovements = SV.UserMentionImprovements || {};
             }
         },
 
-        /**
-         * @returns {Object}
-         *
-         * @private
-         */
-        _getStoredValue: function()
-        {
-            var storedValue = this.svLib__getStoredValue(),
-                storageKey = this.storageKey;
-
-            if (!storageKey)
-            {
-                return storedValue;
+        update: function() {
+            if (this.skipUpdate) {
+                return;
             }
 
-            var data = this._readFromStorage();
-            if (!storedValue)
-            {
-                storedValue = {
-                    filter: '',
-                    prefix: false,
-                    page: 1
-                };
-            }
-
-            if (data[storageKey])
-            {
-                var record = data[storageKey];
-                if ('page' in record)
-                {
-                    storedValue.page = parseInt(record.page) || 1;
-                }
-            }
-
-            if (this.svLastPageSelected !== null)
-            {
-                storedValue.page = parseInt(this.svLastPageSelected) || 1;
-            }
-
-            if (storedValue.filter === '')
-            {
-                var existingFilterText = this.options.svExistingFilterText;
-                if (typeof existingFilterText === 'string' && existingFilterText !== '')
-                {
-                    storedValue.filter = existingFilterText;
-
-                    var existingFilterPrefix = this.options.svExistingFilterPrefix;
-                    if (typeof existingFilterPrefix === 'boolean')
-                    {
-                        storedValue.prefix = existingFilterPrefix;
-                    }
-                }
-            }
-
-            data[storageKey] = storedValue;
-            this._writeToStorage(data);
-
-            return storedValue;
-        },
-
-        _updateStoredValue: function(text, prefix)
-        {
-            var storedValue = this._getStoredValue();
-            if (storedValue && typeof storedValue === 'object')
-            {
-                var storageKey = this.storageKey;
-                if (storageKey)
-                {
-                    var data = this._readFromStorage();
-                    if (data[storageKey])
-                    {
-                        var record = data[storageKey];
-                        record.page = 1;
-                        data[storageKey] = record;
-                        this._writeToStorage(data);
-                    }
-                }
-            }
-
-            this.svLib__updateStoredValue(text, prefix);
+            this.svLib__update();
         },
 
         filter: function(text, prefix)
         {
-            var page = this.svGetCurrentPage();
-            if (page === null)
+            if (this.resetPage)
             {
-                this.svLib__filter(text, prefix);
-
-                return;
+                this.svLastPageSelected = 1;
             }
-
-            this._updateStoredValue(text, prefix);
             this._toggleFilterHide(text.length > 0);
 
             if (this.options.ajax)
@@ -286,70 +160,54 @@ SV.UserMentionImprovements = SV.UserMentionImprovements || {};
             }
         },
 
-        svOverlayShim: function()
+        shimDynamicPageNav: function()
         {
-            var $pageNavWrapper = this.svGetPageNavWrapper();
+            var $pageNavWrapper = this.getPageNavWrapper();
             if (!$pageNavWrapper)
             {
                 return;
             }
 
-            $pageNavWrapper.find('.pageNav a[href]').on('click', XF.proxy(this, 'svUpdateCurrentPage'));
+            $pageNavWrapper.find('.pageNav a[href]').on('click', XF.proxy(this, 'ajaxLoadNewPage'));
             XF.activate($pageNavWrapper);
+        },
+
+        /**
+         * @param {jQuery} e
+         * @return number
+         */
+        getPageFromAhref: function ($e)
+        {
+            var url = $e.attr('href');
+
+            var currentUrl = new Url(url);
+            if ('page' in currentUrl.query)
+            {
+                return parseInt(currentUrl.query['page']) || 1;
+            }
+
+            return 1;
         },
 
         /**
          * @param {Event} e
          */
-        svUpdateCurrentPage: function(e)
+        ajaxLoadNewPage: function(e)
         {
-            var $target = $(e.target);
-            if ($target.hasClass('pageNav-jump--prev'))
+            e.preventDefault();
+            var page = this.getPageFromAhref($(e.target));
+            if (page != this.svLastPageSelected)
             {
-                $target = $target.parent()
-                    .find('ul.pageNav-main > .pageNav-page--current')
-                    .prev();
-            }
-            else if ($target.hasClass('pageNav-jump--next'))
-            {
-                $target = $target.parent()
-                    .find('ul.pageNav-main > .pageNav-page--current')
-                    .next()
-                    .find('a');
-            }
-
-            if ($target.length)
-            {
-                var storedValue = this._getStoredValue();
-                if (!storedValue || !(typeof storedValue === 'object'))
+                this.svLastPageSelected = page;
+                this.resetPage = false;
+                try
                 {
-                    storedValue = {
-                        filter: '',
-                        prefix: false,
-                        page: 1
-                    };
+                    this.update();
                 }
-
-                e.preventDefault();
-
-                storedValue.page = parseInt($target.text()) || 1;
-                storedValue.saved = Math.floor(new Date().getTime() / 1000);
-
-                this.svPageChanged = storedValue.page !== this.svGetCurrentPage();
-                this.svLastPageSelected = storedValue.page;
-
-                var data = this._readFromStorage();
-                data[this.storageKey] = storedValue;
-                this._writeToStorage(data);
-
-                this.update();
-
-                this.svPageChanged = false;
-                this.svLastPageSelected = null;
-            }
-            else
-            {
-                console.error('No valid page link found.'); // for debugging purposes when preserve log is checked for edge/chrome settings
+                finally
+                {
+                    this.resetPage = true;
+                }
             }
         },
 
@@ -359,7 +217,7 @@ SV.UserMentionImprovements = SV.UserMentionImprovements || {};
          *
          * @returns {null|{length}|*|jQuery|HTMLElement}
          */
-        svGetPageNavWrapper: function(logNotFound)
+        getPageNavWrapper: function(logNotFound)
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
             if (!this.options.svPageNavWrapper)
@@ -390,33 +248,31 @@ SV.UserMentionImprovements = SV.UserMentionImprovements || {};
          *
          * @returns {null|number}
          */
-        svGetCurrentPage: function ()
+        getCurrentPage: function ()
         {
             if (!this.options.svPageNavWrapper)
             {
                 return null;
             }
 
-            var pageNavWrapper = this.svGetPageNavWrapper(false);
+            var pageNavWrapper = this.getPageNavWrapper(false);
             if (!pageNavWrapper)
             {
                 return null;
             }
 
-            var storedValue = this._getStoredValue();
-            if (!storedValue)
+            var lastPageSelected = parseInt(this.svLastPageSelected) || null;
+            if (lastPageSelected)
             {
-                var lastPageSelected = parseInt(this.svLastPageSelected) || null;
-                if (lastPageSelected)
-                {
-                    return lastPageSelected;
-                }
-
-                return null;
+                return lastPageSelected;
             }
+
+            return null;
 
             return parseInt(storedValue.page) || 1;
         }
     });
+
+    XF.Element.register('sv-dynamic-filter', 'SV.StandardLib.DynamicFilter');
 }
 (jQuery, window, document));
