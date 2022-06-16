@@ -116,10 +116,10 @@ SV.UserMentionImprovements = SV.UserMentionImprovements || {};
             }
 
             var data = {
+                page: currentPage,
                 _xfFilter: {
                     text: text,
-                    prefix: prefix ? 1 : 0,
-                    page: currentPage
+                    prefix: prefix ? 1 : 0
                 }
             };
 
