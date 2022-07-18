@@ -4,6 +4,6 @@
     "execution_order": 7915,
     "enabled": true,
     "action": "preg_replace",
-    "find": "#^\\s*<div class=\"block-outer-opposite.*?>#sim",
-    "replace": "$0<xf:if is=\"1 || $svModificationCount > 0\">\n\t<a href=\"{{ link('templates/view-modifications', $template, {'style_id': $style.style_id}) }}\" target=\"_blank\">{{ phrase('svStandardLib_view_x_template_modifications', {'count': $svModificationCount|number}) }}</a>\n</xf:if>"
+    "find": "#[\\t ]*<xf:codeeditorrow name=\"template\"#",
+    "replace": "<xf:if is=\"1 || $svModificationCount > 0\">\n\t<xf:formrow rowtype=\"fullWidth\">\n\t\t<a href=\"{{ link('templates/view-modifications', $template, {'style_id': $style.style_id}) }}\" target=\"_blank\">{{ phrase('svStandardLib_view_x_template_modifications', {'count': $svModificationCount|number}) }}</a>\n\t</xf:formrow>\n</xf:if>\n$0"
 }
