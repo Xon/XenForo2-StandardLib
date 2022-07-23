@@ -103,6 +103,7 @@ trait SqlJoinTrait
             'fetch'          => false,
             'fundamental'    => false,
             'exists'         => $mustExist,
+            'reallyFundamental' => false,
 
             // this are all the attributes stored in the joins array, used by getHydrationMap() but not getQuery()
             'structure'      => null,
@@ -194,6 +195,7 @@ trait SqlJoinTrait
             if (isset($this->rawJoins[$alias][$column]))
             {
                 $this->joins[$alias]['fundamental'] = $markJoinFundamental;
+                $this->joins[$alias]['reallyFundamental'] = true;
 
                 return [$alias, $column];
             }

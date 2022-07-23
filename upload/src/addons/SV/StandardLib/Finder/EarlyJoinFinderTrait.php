@@ -157,12 +157,28 @@ trait EarlyJoinFinderTrait
         $srcJoins = $allJoins ?? $this->joins;
         foreach ($srcJoins AS $join)
         {
+            if ($join['exists'] && !$join['fetch'] && !$join['fundamental'])
+            {
+                // prune if this isn't actually required
+                continue;
+            }
+
             $joinType = $join['exists'] ? 'INNER' : 'LEFT';
             $table = $join['table'];
-            if (!($join['hasTableExpr'] ?? false))
+            if ($join['hasTableExpr'] ?? false)
+            {
+                // This is a table expression from SqlJoinTrait, and has already been used as a filter in the original expression
+                // but is not actually used in any other columns, so it can be discarded now
+                if (!($join['reallyFundamental'] ?? false))
+                {
+                    continue;
+                }
+            }
+            else
             {
                 $table = '`'.$table.'`';
             }
+
             $joins[] = "$joinType JOIN $table AS `$join[alias]` ON ($join[condition])";
             if ($join['fetch'] && !\is_array($fetchOnly))
             {
