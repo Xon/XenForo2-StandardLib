@@ -10,6 +10,8 @@ use SV\StandardLib\XF\CssRenderer;
 use XF\Mvc\Entity\AbstractCollection;
 use XF\Mvc\Reply\AbstractReply;
 use XF\Template\Templater as BaseTemplater;
+use function json_decode;
+use function max;
 use function method_exists, is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
 
 class TemplaterHelper
@@ -209,9 +211,55 @@ class TemplaterHelper
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
         $this->addFunction('parse_less_func', 'fnParseLessFunc');
         $this->addFunction('abs', 'fnAbs');
+        $this->addFunction('is_toggle_set', 'fnIsToggleSet');
     }
 
+    /**
+     * @param BaseTemplater $templater
+     * @param bool          $escape
+     * @param string        $storageKey
+     * @param string        $storageContainer
+     * @param bool|null   $default
+     * @return bool
+     */
+    public function fnIsToggleSet(BaseTemplater $templater, bool &$escape, string $storageKey, bool $default = false, string $storageContainer = 'toggle')
+    {
+        $cookie = $this->app->request()->getCookie($storageContainer);
+        if (!$cookie)
+        {
+            return $default;
+        }
 
+        $cookieDecoded = @json_decode($cookie, true);
+        if (!$cookieDecoded)
+        {
+            return $default;
+        }
+
+        $valueBag = $cookieDecoded[$storageKey] ?? [];
+
+        if (!is_array($valueBag) || count($valueBag) !== 3)
+        {
+            return $default;
+        }
+
+        $setDate = max(0, (int)($valueBag[0] ?? 0));
+        if ($setDate === 0)
+        {
+            return $default;
+        }
+        $expiryOffset = max(0, (int)($valueBag[1] ?? 0));
+        if ($expiryOffset === 0)
+        {
+            return $default;
+        }
+        if (($setDate+$expiryOffset) <= \XF::$time)
+        {
+            return $default;
+        }
+
+        return (bool)($valueBag[2] ?? $default);
+    }
     /**
      * @param BaseTemplater             $templater
      * @param array|AbstractCollection  $value

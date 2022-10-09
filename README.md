@@ -75,6 +75,31 @@ namespace SV\ElasticSearchEssentials\XF\Repository;
 
 ## Template additions
 
+### Template Filter: is_toggle_set
+
+While similar to `is_goggled`, `is_toggle_set` supports specifying the default toggle state.
+Stronlgy recommended to use `toggle-storage-ex` from `sv/lib/storage.js`.
+
+Example of a default collapsed node-list:
+```
+<xf:js src="sv/lib/storage.js" addon="SV/StandardLib" min="1" />
+<xf:set var="$isActive" value="{{ is_toggle_set($forum.node_id, false, 'node-toggle') ? ' is-active' : '' }}"/>
+<div class="block block--collapsible-child-nodes">
+	<div class="block-container">
+		<h3 class="block-minorHeader collapseTrigger collapseTrigger--block {$isActive} "
+			data-target=".block--collapsible-child-nodes .block-body"
+			data-xf-click="toggle"
+			data-xf-init="toggle-storage-ex"
+			data-storage-type="cookie"
+			data-storage-container="node-toggle"
+			data-storage-key="{$forum.node_id}"
+			data-default-value="0"
+			>{{ phrase('sub_forums') }}</h3>
+<div class="block-body toggleTarget {$isActive}">
+...
+</div
+```
+
 ### Template Filter: addvalue
 Append a value `$newElementValue` in an array/collection. If the array is null, then a new array is returned.
 If `$array` is a collection, then the return value is a collection.
