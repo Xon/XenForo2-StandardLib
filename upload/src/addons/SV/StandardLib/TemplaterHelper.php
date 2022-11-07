@@ -22,16 +22,24 @@ class TemplaterHelper
     protected $app;
     /** @var bool */
     protected $hasFromCallable;
-    /** @var class-string|TemplaterAccess */
+    /** @var class-string<TemplaterAccess>|TemplaterAccess */
     protected $templaterAccessClass;
     /** @var CssRenderer|null */
     protected $cssRenderer = null;
 
+    /**
+     * @param \XF\Container $container
+     * @param BaseTemplater $templater
+     * @return void
+     */
     public static function templaterSetup(\XF\Container $container, BaseTemplater &$templater)
     {
         $class = self::class;
+        /** @noinspection PhpUnhandledExceptionInspection */
         $class = \XF::extendClass($class);
+        /** @var TemplaterHelper $templateHelper */
         $templateHelper = new $class($templater);
+        assert($templateHelper instanceof self);
         $templateHelper->setup();
     }
 
@@ -48,12 +56,12 @@ class TemplaterHelper
      */
     public static function get(\XF\Template\Templater $templater)
     {
-        $helper = $templater->svTemplateHelper ?? null;
+        $helper = TemplaterAccess::getDefaultParam($templater, 'svTemplateHelper');
         // make sure a non-null value is fetched
         if ($helper === null)
         {
             self::templaterSetup(\XF::app()->container(), $templater);
-            $helper = $templater->svTemplateHelper ?? null;
+            $helper = TemplaterAccess::getDefaultParam($templater, 'svTemplateHelper');
 
         }
         assert($helper instanceof TemplaterHelper);
@@ -72,8 +80,6 @@ class TemplaterHelper
     public function setup()
     {
         // add a reference on the templater to this class so it can be found
-        /** @noinspection PhpUndefinedFieldInspection */
-        $this->templater->svTemplateHelper = $this;
         $this->addDefaultParam('svTemplateHelper', $this);
 
         $this->addDefaultHandlers();
