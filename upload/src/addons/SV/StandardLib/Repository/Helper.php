@@ -2,10 +2,44 @@
 
 namespace SV\StandardLib\Repository;
 
+use Collator;
 use XF\Mvc\Entity\Repository;
+use function class_exists;
+use function strcasecmp;
 
 class Helper extends Repository
 {
+    /**
+     * @param string $s1
+     * @param string $s2
+     * @param bool   $caseInsensitive
+     * @return int|false
+     */
+    public function compareString(string $s1, string $s2, bool $caseInsensitive = false)
+    {
+        if (class_exists(Collator::class))
+        {
+            $c = new Collator(\XF::language()->getLanguageCode());
+            if ($caseInsensitive)
+            {
+                $c->setStrength(Collator::PRIMARY);
+            }
+            return $c->compare($s1, $s2);
+        }
+
+        if ($caseInsensitive)
+        {
+            return strcasecmp($s1, $s2);
+        }
+
+        return strcmp($s1, $s2);
+    }
+
+    public function isMatchingString(string $s1, string $s2, bool $caseInsensitive = false): bool
+    {
+        return $this->compareString($s1, $s2, $caseInsensitive) === 0;
+    }
+
     /**
      * @param \DateInterval|array $interval
      * @param int                 $maximumDateParts
