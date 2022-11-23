@@ -1,0 +1,35 @@
+<xf:title>{{ phrase('confirm_action') }}</xf:title>
+
+<xf:breadcrumb href="{$editLink}">{$title}</xf:breadcrumb>
+
+<xf:form action="{$deleteLink}" class="block" ajax="true">
+	<div class="block-container">
+		<div class="block-body">
+			<xf:if is="{$entity.{$stateKey}} == 'deleted'">
+				<xf:radiorow name="hard_delete" value="0"
+							 label="{{ phrase('deletion_type') }}">
+
+					<xf:option value="0"
+							   label="{{ phrase('do_nothing') }}" />
+
+					<xf:if is="$canHardDelete">
+						<xf:option value="1"
+								   label="{{ phrase('permanently_delete') }}"
+								   hint="{{ phrase('selecting_this_option_will_permanently_and_irreversibly_delete_item') }}" />
+					</xf:if>
+
+					<xf:option value="2"
+							   label="{{ phrase('undelete') }}" />
+				</xf:radiorow>
+			<xf:else />
+				<xf:macro name="public:helper_action::delete_type" 
+						  arg-canHardDelete="{$canHardDelete}" />
+			</xf:if>
+			
+			<xf:if is="$includeAuthorAlert">
+				<xf:macro name="public:helper_action::author_alert" />
+			</xf:if>
+		</div>
+		<xf:submitrow rowtype="simple" icon="delete" />
+	</div>
+</xf:form>
