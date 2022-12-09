@@ -10,6 +10,7 @@ namespace SV\StandardLib\Finder;
 use XF\Mvc\Entity\Finder;
 use XF\Mvc\Entity\FinderExpression;
 use XF\Mvc\Entity\Structure;
+use function implode, count;
 
 /**
  * @method int getEarlyJoinThreshold(int $offset = null, int $limit = null, array $options = [])
@@ -164,6 +165,7 @@ trait EarlyJoinFinderTrait
             }
 
             $joinType = $join['exists'] ? 'INNER' : 'LEFT';
+            $joinHints = count($join['indexHints'] ?? []) === 0 ? ' ' . implode(' ', $join['indexHints']) : '';
             $table = $join['table'];
             if ($join['hasTableExpr'] ?? false)
             {
@@ -179,7 +181,7 @@ trait EarlyJoinFinderTrait
                 $table = '`'.$table.'`';
             }
 
-            $joins[] = "$joinType JOIN $table AS `$join[alias]` ON ($join[condition])";
+            $joins[] = "$joinType JOIN $table AS `$join[alias]`$joinHints ON ($join[condition])";
             if ($join['fetch'] && !\is_array($fetchOnly))
             {
                 $fetch[] = "`$join[alias]`.*";

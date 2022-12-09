@@ -104,8 +104,9 @@ trait SqlJoinTrait
             'fundamental'    => false,
             'exists'         => $mustExist,
             'reallyFundamental' => false,
+            'indexHints'     => [], // XF2.2.12+
 
-            // this are all the attributes stored in the joins array, used by getHydrationMap() but not getQuery()
+            // these are the attributes stored in the joins array, used by getHydrationMap() but not getQuery()
             'structure'      => null,
             'parentAlias'    => null,
             'proxy'          => null,
