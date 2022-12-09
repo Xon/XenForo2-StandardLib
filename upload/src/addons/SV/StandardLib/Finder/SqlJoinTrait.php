@@ -7,6 +7,10 @@
 
 namespace SV\StandardLib\Finder;
 
+use function count;
+use function implode;
+use function is_array;
+
 /**
  * @property array joins
  * @property string[] indexHints
@@ -47,8 +51,9 @@ trait SqlJoinTrait
                     }
 
                     $joinType = $join['exists'] ? 'INNER' : 'LEFT';
+                    $joinHints = count($join['indexHints'] ?? []) === 0 ? ' ' . implode(' ', $join['indexHints']) : '';
 
-                    $complexJoins[] = "{$joinType} JOIN {$join['table']} AS `{$join['alias']}` ON ({$join['condition']})";
+                    $complexJoins[] = "{$joinType} JOIN {$join['table']} AS `{$join['alias']}`{$joinHints} ON ({$join['condition']})";
 
                     unset($this->joins[$alias]);
                 }
@@ -119,7 +124,7 @@ trait SqlJoinTrait
         return $this;
     }
 
-    public function sqlJoinConditions(string $alias, array $conditions)
+    public function sqlJoinConditions(string $alias, array $conditions, array $indexHints = [])
     {
         if (empty($this->rawJoins[$alias]) || empty($this->joins[$alias]))
         {
@@ -176,7 +181,22 @@ trait SqlJoinTrait
                 $joinConditions[] = "$fromJoinAlias $operator $value";
             }
         }
+        $hints = [];
+        if (count($indexHints) !== 0 && \XF::$versionId >= 2021200)
+        {
+            if (!is_array($indexHints[0]))
+            {
+                $indexHints = [[$indexHints[0], $indexHints[1]]];
+            }
 
+            foreach ($indexHints as $indexHint)
+            {
+                /** @noinspection PhpUndefinedMethodInspection */
+                $hints[] = $this->buildIndexHint($indexHint[0], $indexHint[0]);
+            }
+        }
+
+        $this->joins[$alias]['indexHints'] = $hints;
         $this->joins[$alias]['fundamental'] = (bool)$joinConditions;
         $this->joins[$alias]['condition'] = \implode(' AND ', $joinConditions);
     }
