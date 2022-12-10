@@ -51,7 +51,8 @@ trait SqlJoinTrait
                     }
 
                     $joinType = $join['exists'] ? 'INNER' : 'LEFT';
-                    $joinHints = count($join['indexHints'] ?? []) === 0 ? ' ' . implode(' ', $join['indexHints']) : '';
+                    $indexHintArr = $join['indexHints'] ?? [];
+                    $joinHints = count($indexHintArr) === 0 ? '' : ' ' . implode(' ', $indexHintArr);
 
                     $complexJoins[] = "{$joinType} JOIN {$join['table']} AS `{$join['alias']}`{$joinHints} ON ({$join['condition']})";
 
