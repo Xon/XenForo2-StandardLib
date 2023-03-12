@@ -1,6 +1,6 @@
 MIT License
 
-- Copyright (c) 2018-2022 Perihelion Media Works
+- Copyright (c) 2018-2023 Perihelion Media Works
 - Copyright (c) 2020-2022 TickTackk
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
