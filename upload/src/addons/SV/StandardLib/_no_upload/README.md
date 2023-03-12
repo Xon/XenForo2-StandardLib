@@ -38,6 +38,9 @@ Inject arbitrary SQL at query time, as join vs subquery can have massive perform
 
 Allows viewing template modifications which are applying to a template, including generated php source code
 
+## SV\StandardLib\Repository\Permissions
+This is a helper repository designed to allow caching (and fetching) various permission in a way which can be extended
+
 ## \SV\StandardLib\Repository\Helper::getUserEntity
 Helps get the user that owns an entity
 
@@ -77,7 +80,7 @@ namespace SV\ElasticSearchEssentials\XF\Repository;
 
 ### Template Filter: is_toggle_set
 
-While similar to `is_goggled`, `is_toggle_set` supports specifying the default toggle state. 
+While similar to `is_goggled`, `is_toggle_set` supports specifying the default toggle state.
 Stronlgy recommended to use `toggle-storage-ex` from `sv/lib/storage.js`.
 
 Example of a default collapsed node-list:
@@ -117,7 +120,7 @@ $array|replacevalue($elementValue, $newElementValue)
 Reverse an array/collection. See [`array_reverse`](https://www.php.net/manual/en/function.array-reverse.php) for details.
 
 ### Template Function: array_diff
-Computes the difference of arrays. See [`array_diff`](https://www.php.net/manual/en/function.array-diff.php) for details.
+Computes the difference of arrays/collections. See [`array_diff`](https://www.php.net/manual/en/function.array-diff.php) for details.
 
 ### Template Function: sv_relative_timestamp
 Provide a dynamic count up/down timestamp

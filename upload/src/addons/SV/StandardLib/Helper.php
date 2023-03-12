@@ -16,4 +16,12 @@ class Helper
 
         return $repo;
     }
+
+    public static function perms(): \SV\StandardLib\Repository\Permissions
+    {
+        /** @var \SV\StandardLib\Repository\Permissions $repo */
+        $repo = \XF::repository('SV\StandardLib:Permissions');
+
+        return $repo;
+    }
 }

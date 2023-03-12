@@ -38,6 +38,9 @@ Inject arbitrary SQL at query time, as join vs subquery can have massive perform
 
 Allows viewing template modifications which are applying to a template, including generated php source code
 
+## SV\StandardLib\Repository\Permissions
+This is a helper repository designed to allow caching (and fetching) various permission in a way which can be extended
+
 ## \SV\StandardLib\Repository\Helper::getUserEntity
 Helps get the user that owns an entity
 
