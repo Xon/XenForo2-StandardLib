@@ -44,7 +44,7 @@ class Permissions extends Repository
 
         foreach ($permissions as $permissionCombination)
         {
-            \XF\Entity\PermissionCacheContent::instantiateProxied($permissionCombination);
+            \XF\Entity\PermissionCombination::instantiateProxied($permissionCombination);
         }
     }
 
