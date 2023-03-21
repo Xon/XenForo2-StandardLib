@@ -15,6 +15,11 @@ namespace SV\StandardLib\XF
 	class XFCP_InputFilterer extends \XF\InputFilterer {}
 }
 
+namespace SV\StandardLib\XF\Mvc
+{
+	class XFCP_Router extends \XF\Mvc\Router {}
+}
+
 namespace SV\StandardLib\XF\Pub\Controller
 {
 	class XFCP_Forum extends \XF\Pub\Controller\Forum {}

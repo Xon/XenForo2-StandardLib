@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Mvc\\Router",
+    "to_class": "SV\\StandardLib\\XF\\Mvc\\Router",
+    "execute_order": 10,
+    "active": true
+}

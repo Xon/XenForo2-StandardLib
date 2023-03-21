@@ -38,6 +38,29 @@ Inject arbitrary SQL at query time, as join vs subquery can have massive perform
 
 Allows viewing template modifications which are applying to a template, including generated php source code
 
+## `patch_route_build_callback` code event
+
+Called when a `XF\Mvc\Router` object is constructed to manipulate routes, as XF doesn't support chaining `build_callbacks`.
+
+Usage example (using a `Pub` event hint):
+```php
+public static function publicLinkBuilder(\SV\StandardLib\Repository\LinkBuilder $linkBuilder, \XF\Mvc\Router $router): void
+{
+    $callable = function (string &$prefix, array &$route, string &$action, &$data, array &$params, \XF\Mvc\Router $router, bool &$suppressDefaultCallback) {
+       if (isset($data['foo']) {
+            return 'http://example.org';
+       } elseif (isset($data['bar']) {
+            return new RouteBuiltLink('http://example.org');
+       } elseif (isset($data['foobar']) {
+            // stop default build_callback usage, and use default XF processing
+            $suppressDefaultCallback = true;
+       }
+       return null; // default XF processing
+    } 
+    $linkBuilder->injectLinkBuilderCallback($router, 'search', $callable);
+}
+```
+
 ## SV\StandardLib\Repository\Permissions
 This is a helper repository designed to allow caching (and fetching) various permission in a way which can be extended
 
