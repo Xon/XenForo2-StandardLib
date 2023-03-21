@@ -48,4 +48,30 @@ class LinkBuilder extends Repository
             $router->addRoute($routeLabel, $subSection, $route);
         }
     }
+
+    /**
+     * @param Router   $router
+     * @param string   $routeLabel
+     * @param callable $callable Should have the signature: callable(string &$prefix,array &$route,string &$action,&$data,array &$params,\XF\Mvc\Router $router):\XF\Mvc\RouteBuiltLink|string|false|null
+     * @return void
+     */
+    public function injectLinkBuilderCallbackForSubsection(\XF\Mvc\Router $router, string $routeLabel, string $subSection, callable $callable)
+    {
+        $routes = $router->getRoutes();
+
+        $route = $routes[$routeLabel][$subSection] ?? null;
+        if ($route === null)
+        {
+            return;
+        }
+
+        if (is_array($callable) && method_exists(\Closure::class, 'fromCallable'))
+        {
+            /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
+            $callable = \Closure::fromCallable($callable);
+        }
+
+        $route['build_callback_list'][] = $callable;
+        $router->addRoute($routeLabel, $subSection, $route);
+    }
 }
