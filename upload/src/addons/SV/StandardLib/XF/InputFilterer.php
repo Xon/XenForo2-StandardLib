@@ -17,6 +17,11 @@ class InputFilterer extends XFCP_InputFilterer
      */
     protected function cleanInternal($value, $type, array $options)
     {
+        if ($value === '' && isset($options['empty-str-to-null']))
+        {
+            return null;
+        }
+
         /** @noinspection PhpSwitchStatementWitSingleBranchInspection */
         switch ($type)
         {
