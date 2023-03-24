@@ -3,9 +3,47 @@
 namespace SV\StandardLib\Repository;
 
 use XF\Mvc\Entity\Repository;
+use function is_numeric;
+use function is_string;
+use function strpos;
+use function version_compare;
 
 class Helper extends Repository
 {
+    /**
+     * @param string $addonId
+     * @param string|int $targetVersion
+     * @return bool
+     */
+    public function hasDesiredAddOnVersion(string $addonId, $targetVersion): bool
+    {
+        if (is_string($targetVersion) && strpos($targetVersion, '.') === false && is_numeric($targetVersion))
+        {
+            $targetVersion = (int)$targetVersion;
+        }
+
+        if (is_string($targetVersion))
+        {
+            // todo cache this value?
+            $installedVersionId = \XF::db()->fetchOne('
+                SELECT version_string
+                FROM xf_addon
+                WHERE addon_id = ?
+            ', $addonId);
+            $targetVersion = $this->sanitizeVersionString($targetVersion);
+            $installedVersionId = $this->sanitizeVersionString($installedVersionId);
+
+            return version_compare($installedVersionId, $targetVersion, 'ge');
+        }
+
+        return \XF::isAddOnActive($addonId, $targetVersion);
+    }
+
+    protected function sanitizeVersionString(string $version): string
+    {
+        return $version;
+    }
+
     /**
      * @param \DateInterval|array $interval
      * @param int                 $maximumDateParts

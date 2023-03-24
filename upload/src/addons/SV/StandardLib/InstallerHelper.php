@@ -4,6 +4,7 @@ namespace SV\StandardLib;
 
 use SV\StandardLib\Db\AlterColumnUnwrapper;
 use SV\StandardLib\Db\AlterTableUnwrapper;
+use SV\StandardLib\Helper;
 use XF\Db\Schema\AbstractDdl;
 use XF\Db\Schema\Alter;
 use XF\Db\Schema\Column as DbColumnSchema;
@@ -653,7 +654,7 @@ trait InstallerHelper
             else
             {
                 $enabled = isset($addOns[$productKey]);
-                $versionValid = ($version === '*' || ($enabled && $addOns[$productKey] >= $version));
+                $versionValid = ($version === '*' || ($enabled && Helper::repo()->hasDesiredAddOnVersion($productKey, $version)));
             }
 
             if (!$enabled)
