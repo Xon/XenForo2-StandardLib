@@ -4,6 +4,11 @@
 // ################## THIS IS A GENERATED FILE ##################
 // DO NOT EDIT DIRECTLY. EDIT THE CLASS EXTENSIONS IN THE CONTROL PANEL.
 
+namespace SV\StandardLib\XF\AddOn
+{
+	class XFCP_Manager extends \XF\AddOn\Manager {}
+}
+
 namespace SV\StandardLib\XF\Admin\Controller
 {
 	class XFCP_Template extends \XF\Admin\Controller\Template {}

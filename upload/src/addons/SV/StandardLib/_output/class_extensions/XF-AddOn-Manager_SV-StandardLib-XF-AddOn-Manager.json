@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\AddOn\\Manager",
+    "to_class": "SV\\StandardLib\\XF\\AddOn\\Manager",
+    "execute_order": 1,
+    "active": true
+}
