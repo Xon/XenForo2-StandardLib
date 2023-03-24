@@ -5,6 +5,7 @@ namespace SV\StandardLib\Repository;
 use XF\Mvc\Entity\Repository;
 use function is_numeric;
 use function is_string;
+use function preg_replace;
 use function strpos;
 use function version_compare;
 
@@ -38,6 +39,10 @@ class Helper extends Repository
                     WHERE addon_id = ?
                 ', $addonId);
             }
+            if ($targetVersion === $installedVersionId)
+            {
+                return true;
+            }
             $targetVersion = $this->sanitizeVersionString($targetVersion);
             $installedVersionId = $this->sanitizeVersionString($installedVersionId);
 
@@ -47,8 +52,17 @@ class Helper extends Repository
         return \XF::isAddOnActive($addonId, $targetVersion);
     }
 
+    /** @noinspection PhpUnnecessaryLocalVariableInspection */
     protected function sanitizeVersionString(string $version): string
     {
+        $version = preg_replace('/\s+/u', ' ', mb_strtolower($version));
+        $version = trim($version);
+        if ($version === '')
+        {
+            return $version;
+        }
+        $version = preg_replace('/^(?:v|version)\s*/u', '', mb_strtolower($version));
+
         return $version;
     }
 
