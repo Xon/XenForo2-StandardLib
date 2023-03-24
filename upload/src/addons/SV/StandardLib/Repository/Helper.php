@@ -24,12 +24,20 @@ class Helper extends Repository
 
         if (is_string($targetVersion))
         {
-            // todo cache this value?
-            $installedVersionId = \XF::db()->fetchOne('
-                SELECT version_string
-                FROM xf_addon
-                WHERE addon_id = ?
-            ', $addonId);
+            $addOnEntity = \XF::em()->findCached('XF:AddOn', $addonId);
+            if ($addOnEntity instanceof \XF\Entity\AddOn)
+            {
+                $installedVersionId = $addOnEntity->version_string;
+            }
+            else
+            {
+                // todo cache this value?
+                $installedVersionId = \XF::db()->fetchOne('
+                    SELECT version_string
+                    FROM xf_addon
+                    WHERE addon_id = ?
+                ', $addonId);
+            }
             $targetVersion = $this->sanitizeVersionString($targetVersion);
             $installedVersionId = $this->sanitizeVersionString($installedVersionId);
 
