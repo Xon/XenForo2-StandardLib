@@ -6,6 +6,7 @@ use XF\Mvc\Entity\Repository;
 use function is_numeric;
 use function is_string;
 use function preg_replace;
+use function str_replace;
 use function strpos;
 use function version_compare;
 
@@ -61,7 +62,9 @@ class Helper extends Repository
         {
             return $version;
         }
-        $version = preg_replace('/^(?:v|version)\s*/u', '', mb_strtolower($version));
+        $version = preg_replace('/^(?:v|version)\s*/u', '', $version);
+        $version = str_replace('patch level', 'pl', $version);
+        $version = str_replace('release candidate', 'rc', $version);
 
         return $version;
     }
