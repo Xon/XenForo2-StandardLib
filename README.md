@@ -9,7 +9,7 @@ During use, Add the `requires` section to `addon.json` to document the dependenc
     "require": {
         "XF": ["2.2.0", "XenForo 2.2.0+"],
         "php": ["7.2.0", "PHP 7.2.0+"],
-        "SV/StandardLib": [1180000,"Standard Library by Xon v1.18.0+"]
+        "SV/StandardLib": [2001180000,"Standard Library by Xon v1.18.0+"]
     }
 }
 ```
