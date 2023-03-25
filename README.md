@@ -2,18 +2,27 @@
 
 A number of helper utilities designed to ease add-on development
 
-During use, Add the requires section to `addon.json` to document the dependancy
+During use, Add the `requires` section to `addon.json` to document the dependency
 
 ```json
 {
-
     "require": {
-        "XF": [2010070, "XenForo 2.1.0+"],
-        "php": ["7.0.0", "PHP 7.0.0+"],
-        "SV/StandardLib": [1100000,"Standard Library by Xon v1.10.0+"]
+        "XF": ["2.2.0", "XenForo 2.2.0+"],
+        "php": ["7.2.0", "PHP 7.2.0+"],
+        "SV/StandardLib": [1180000,"Standard Library by Xon v1.18.0+"]
     }
 }
 ```
+Note; `SV/StandardLib` should use a `version_id` and not a `version_string` to support sites which do not have the add-on installed yet.
+
+## Improve add-on requirement version checks
+
+Instead of matching on version_id, the `addon.json`'s `require` section can match on addon version strings.
+Uses [version_compare](https://www.php.net/manual/en/function.version-compare.php) under the hood after some very [i]basic[/i] standardization.
+
+php version strings support dotted versions, '1.2.3' and also each part may also support special character strings:
+> any string not found in this list < dev < alpha = a < beta = b < RC | Release Candidate = rc < # < patch level | pl = p.
+
 ## Finder extension traits
 
 ### RlikeOperatorTrait
@@ -23,7 +32,7 @@ During use, Add the requires section to `addon.json` to document the dependancy
 MySQL implements 'early row lookup' which results in the large select statement pulling in more data than is required.
 This trait allows migrating this with some minor configuration.
 
-See https://github.com/Xon/XenForo2-OptimizedListQueries for examples.
+See [Optimized List Queries add-on](https://github.com/Xon/XenForo2-OptimizedListQueries) for examples.
 
 ### ComplexJoinTrait
 Inject an entity relations at query time. This is useful to work-around XenForo lacking reverse relationships on handler-like entities
@@ -48,9 +57,9 @@ public static function publicLinkBuilder(\SV\StandardLib\Repository\LinkBuilder 
 {
     $callable = function (string &$prefix, array &$route, string &$action, &$data, array &$params, \XF\Mvc\Router $router, bool &$suppressDefaultCallback) {
        if (isset($data['foo']) {
-            return 'http://example.org';
+            return 'https://example.org';
        } elseif (isset($data['bar']) {
-            return new RouteBuiltLink('http://example.org');
+            return new RouteBuiltLink('https://example.org');
        } elseif (isset($data['foobar']) {
             // stop default build_callback usage, and use default XF processing
             $suppressDefaultCallback = true;
@@ -192,6 +201,7 @@ $scheduledStartDate = $this->filter('scheduled_start_date', 'sv-datetime');
 `InstallerHelper` injects various setup helper features designed to allow robust installers.
 Adds support for "require-soft" in `addon.json` which enables soft-dependencies
 
+eg:
 ```php
 class Setup extends AbstractSetup
 {
