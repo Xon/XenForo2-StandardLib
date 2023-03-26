@@ -98,7 +98,7 @@ class Permissions extends Repository
         }
     }
 
-    public function getContentPermissions(string $contentType, string $permissionGroup, User $user = null): array
+    public function getPerContentPermissions(string $contentType, User $user = null): array
     {
         $user = $user ?? \XF::visitor();
         $permissionCombinationId = $user->permission_combination_id;
@@ -106,7 +106,16 @@ class Permissions extends Repository
         $permissionCache->cacheAllContentPerms($permissionCombinationId, $contentType);
         $contentPerms = PermissionCache::getCachedContentPermissions($permissionCache);
 
-        return $contentPerms[$permissionCombinationId][$permissionGroup] ?? [];
+        return $contentPerms[$permissionCombinationId][$contentType] ?? [];
+    }
+
+    /**
+     * @deprecated Replacement is getPerContentPermissions
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function getContentPermissions(string $contentType, string $NotUseArg, User $user = null): array
+    {
+        return $this->getPerContentPermissions($contentType, $user);
     }
 
     public function getGlobalPermissions(User $user = null): array
