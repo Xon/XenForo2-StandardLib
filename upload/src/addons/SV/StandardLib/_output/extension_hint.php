@@ -6,6 +6,7 @@
 
 namespace SV\StandardLib\XF\AddOn
 {
+	class XFCP_DataManager extends \XF\AddOn\DataManager {}
 	class XFCP_Manager extends \XF\AddOn\Manager {}
 }
 

@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib\Repository;
 
+use XF\Container;
 use XF\Mvc\Entity\Repository;
 use function assert;
 use function in_array;
@@ -44,16 +45,17 @@ class Helper extends Repository
             $addOnEntity = \XF::em()->findCached('XF:AddOn', $addonId);
             if ($addOnEntity instanceof \XF\Entity\AddOn)
             {
-                $installedVersionId = $addOnEntity->version_string;
+                // unlike \XF::isAddOnActive, the add-on must not be in a processing state
+                $installedVersionId = $addOnEntity->is_processing ? null : $addOnEntity->version_string;
             }
             else
             {
-                // todo cache this value?
-                $installedVersionId = \XF::db()->fetchOne('
-                    SELECT version_string
-                    FROM xf_addon
-                    WHERE addon_id = ?
-                ', $addonId);
+                $addons = $this->getAddonVersions();
+                $installedVersionId = $addons[$addonId] ?? null;
+                if ($installedVersionId === null)
+                {
+                    return false;
+                }
             }
 
             if ($targetVersion === $installedVersionId && in_array($operator, ['=', '<=', '<='], true))
@@ -67,6 +69,33 @@ class Helper extends Repository
         }
 
         return \XF::isAddOnActive($addonId, $targetVersion, $operator);
+    }
+
+    /** @noinspection PhpUnusedParameterInspection */
+    protected function getAddonVersions(): array
+    {
+        $func = $this->app()->fromRegistry('addon.versionCache', function (Container $c, string $key) {
+            return $this->rebuildAddOnVersionCache();
+        });
+
+        return $func();
+    }
+
+    public function rebuildAddOnVersionCache(): array
+    {
+        // unlike \XF::isAddOnActive, the add-on must not be in a processing state
+        $data = $this->db()->fetchPairs('
+            SELECT addon_id, version_string
+            FROM xf_addon
+            WHERE `active` = 1 AND is_processing = 0
+        ');
+        $this->app()->registry()->set('addon.versionCache', $data);
+        return $data;
+    }
+
+    public function resetAddOnVersionCache()//: void
+    {
+        $this->app()->registry()->delete('addon.versionCache');
     }
 
     /** @noinspection PhpUnnecessaryLocalVariableInspection */

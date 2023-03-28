@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\AddOn\\DataManager",
+    "to_class": "SV\\StandardLib\\XF\\AddOn\\DataManager",
+    "execute_order": 1,
+    "active": true
+}

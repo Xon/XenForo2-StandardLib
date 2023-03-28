@@ -14,7 +14,12 @@ class Setup extends AbstractSetup
     use StepRunnerUpgradeTrait;
     use StepRunnerUninstallTrait;
 
-    public function uninstallStep1()
+    protected function upgrade1110001Step1()// : void
+    {
+        $this->renameOption('svAdvancedBbCodeLogLessFunc', 'svLogLessFunc', true);
+    }
+
+    public function uninstallStep1()// : void
     {
         /** @var \XF\Entity\Phrase[] $phrases */
         $phrases = \XF::finder('XF:Phrase')
@@ -29,8 +34,26 @@ class Setup extends AbstractSetup
         }
     }
 
-    protected function upgrade1110001Step1()
+    public function uninstallStep2()// : void
     {
-        $this->renameOption('svAdvancedBbCodeLogLessFunc', 'svLogLessFunc', true);
+        Helper::repo()->resetAddOnVersionCache();
+    }
+
+    public function postInstall(array &$stateChanges)// : void
+    {
+        parent::postInstall($stateChanges);
+        Helper::repo()->resetAddOnVersionCache();
+    }
+
+    public function postUpgrade($previousVersion, array &$stateChanges)// : void
+    {
+        parent::postUpgrade($previousVersion, $stateChanges);
+        Helper::repo()->resetAddOnVersionCache();
+    }
+
+    public function postRebuild()// : void
+    {
+        parent::postRebuild();
+        Helper::repo()->resetAddOnVersionCache();
     }
 }
