@@ -42,18 +42,18 @@ class Setup extends AbstractSetup
     public function postInstall(array &$stateChanges)// : void
     {
         parent::postInstall($stateChanges);
-        Helper::repo()->resetAddOnVersionCache();
+        Helper::repo()->rebuildAddOnVersionCache();
     }
 
     public function postUpgrade($previousVersion, array &$stateChanges)// : void
     {
         parent::postUpgrade($previousVersion, $stateChanges);
-        Helper::repo()->resetAddOnVersionCache();
+        Helper::repo()->rebuildAddOnVersionCache();
     }
 
     public function postRebuild()// : void
     {
         parent::postRebuild();
-        Helper::repo()->resetAddOnVersionCache();
+        Helper::repo()->rebuildAddOnVersionCache();
     }
 }

@@ -4,7 +4,6 @@ namespace SV\StandardLib\Repository;
 
 use XF\Container;
 use XF\Mvc\Entity\Repository;
-use function assert;
 use function in_array;
 use function is_numeric;
 use function is_string;
@@ -90,7 +89,18 @@ class Helper extends Repository
             WHERE `active` = 1 AND is_processing = 0
         ');
         $this->app()->registry()->set('addon.versionCache', $data);
+        $this->markAsCriticalAddon();
         return $data;
+    }
+
+    protected function markAsCriticalAddon()//: void
+    {
+        if (\XF::isAddOnActive('SV/InstallerAppHelper'))
+        {
+            /** @noinspection PhpUndefinedClassInspection */
+            /** @noinspection PhpUndefinedNamespaceInspection */
+            \SV\InstallerAppHelper\InstallAppBootstrap::markAddonCritical('SV/StandardLib');
+        }
     }
 
     public function resetAddOnVersionCache()//: void
