@@ -25,7 +25,6 @@ class Manager extends XFCP_Manager
     {
         $errors = [];
         $addOns = \XF::app()->container('addon.cache');
-        $repo = Helper::repo();
 
         foreach ($requirements as $productKey => $requirement)
         {
@@ -35,13 +34,14 @@ class Manager extends XFCP_Manager
             }
             list ($version, $product) = $requirement;
 
+            // only apply the version string constraint if it is a known add-on
             if (!array_key_exists($productKey, $addOns))
             {
                 continue;
             }
 
             unset($requirements[$productKey]);
-            if ($version !== '*' && !$repo->hasDesiredAddOnVersion($productKey, $version))
+            if (!Helper::isAddOnActive($productKey, $version))
             {
                 $errors[] = "{$title} requires $product.";
             }

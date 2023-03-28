@@ -3,6 +3,8 @@
 namespace SV\StandardLib\Repository;
 
 use XF\Mvc\Entity\Repository;
+use function assert;
+use function in_array;
 use function is_numeric;
 use function is_string;
 use function preg_replace;
@@ -13,12 +15,25 @@ use function version_compare;
 class Helper extends Repository
 {
     /**
-     * @param string $addonId
-     * @param string|int $targetVersion
+     * @param string          $addonId
+     * @param string|int|null $targetVersion
+     * @param string          $operator
      * @return bool
      */
-    public function hasDesiredAddOnVersion(string $addonId, $targetVersion): bool
+    public function hasDesiredAddOnVersion(string $addonId, $targetVersion, string $operator = '>='): bool
     {
+        // compatibility with \XF::isAddOnActive
+        if (!in_array($operator, ['>', '>=', '<', '<=', '='], true))
+        {
+            $operator = '=';
+        }
+
+        if ($targetVersion === null || $targetVersion === '*')
+        {
+            $addOns = \XF::app()->container('addon.cache');
+            return isset($addOns[$addonId]);
+        }
+
         if (is_string($targetVersion) && strpos($targetVersion, '.') === false && is_numeric($targetVersion))
         {
             $targetVersion = (int)$targetVersion;
@@ -40,17 +55,18 @@ class Helper extends Repository
                     WHERE addon_id = ?
                 ', $addonId);
             }
-            if ($targetVersion === $installedVersionId)
+
+            if ($targetVersion === $installedVersionId && in_array($operator, ['=', '<=', '<='], true))
             {
                 return true;
             }
             $targetVersion = $this->sanitizeVersionString($targetVersion);
             $installedVersionId = $this->sanitizeVersionString($installedVersionId);
 
-            return version_compare($installedVersionId, $targetVersion, 'ge');
+            return version_compare($installedVersionId, $targetVersion, $operator);
         }
 
-        return \XF::isAddOnActive($addonId, $targetVersion);
+        return \XF::isAddOnActive($addonId, $targetVersion, $operator);
     }
 
     /** @noinspection PhpUnnecessaryLocalVariableInspection */

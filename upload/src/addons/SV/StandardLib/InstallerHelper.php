@@ -654,7 +654,7 @@ trait InstallerHelper
             else
             {
                 $enabled = isset($addOns[$productKey]);
-                $versionValid = ($version === '*' || ($enabled && Helper::repo()->hasDesiredAddOnVersion($productKey, $version)));
+                $versionValid = Helper::isAddOnActive($productKey, $version);
             }
 
             if (!$enabled)

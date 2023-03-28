@@ -24,4 +24,14 @@ class Helper
 
         return $repo;
     }
+
+    /**
+     * @param string $addonId
+     * @param string|int $targetVersion
+     * @return bool
+     */
+    public static function isAddOnActive(string $addonId, $targetVersion = null): bool
+    {
+        return self::repo()->hasDesiredAddOnVersion($addonId, $targetVersion);
+    }
 }
