@@ -218,6 +218,12 @@ class TemplaterHelper
         $this->addFunction('parse_less_func', 'fnParseLessFunc');
         $this->addFunction('abs', 'fnAbs');
         $this->addFunction('is_toggle_set', 'fnIsToggleSet');
+        $this->addFunction('is_addon_active', 'fnIsAddonActive');
+    }
+
+    public function fnIsAddonActive($templater, &$escape, $addOnId, $versionId = null, $operator = '>=')
+    {
+        return Helper::isAddOnActive($addOnId, $versionId, $operator);
     }
 
     /**

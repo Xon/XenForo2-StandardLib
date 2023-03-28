@@ -26,12 +26,13 @@ class Helper
     }
 
     /**
-     * @param string $addonId
+     * @param string     $addonId
      * @param string|int $targetVersion
+     * @param string     $operator
      * @return bool
      */
-    public static function isAddOnActive(string $addonId, $targetVersion = null): bool
+    public static function isAddOnActive(string $addonId, $targetVersion = null, string $operator = '>='): bool
     {
-        return self::repo()->hasDesiredAddOnVersion($addonId, $targetVersion);
+        return self::repo()->hasDesiredAddOnVersion($addonId, $targetVersion, $operator);
     }
 }
