@@ -73,11 +73,12 @@ class Helper extends Repository
     /** @noinspection PhpUnusedParameterInspection */
     protected function getAddonVersions(): array
     {
+        /** @var callable(Container, string): array $func */
         $func = $this->app()->fromRegistry('addon.versionCache', function (Container $c, string $key) {
             return $this->rebuildAddOnVersionCache();
         });
 
-        return $func();
+        return $func($this->app()->container(), 'addon.versionCache');
     }
 
     public function rebuildAddOnVersionCache(): array
