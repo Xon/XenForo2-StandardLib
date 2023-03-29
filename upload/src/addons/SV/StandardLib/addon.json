@@ -8,7 +8,7 @@
     "dev_url": "https://atelieraphelion.com/",
     "faq_url": "",
     "support_url": "https://xenforo.com/community/resources/standard-library-by-xon.7915/",
-    "extra_urls": [],
+    "extra_urls": {"Add-on site": "https://atelieraphelion.com/products/standard-library.85/"},
     "require": {
         "XF": [2010070, "XenForo 2.1.0+"],
         "php": ["7.0.0", "PHP 7.0.0+"]
