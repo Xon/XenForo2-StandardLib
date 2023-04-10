@@ -67,7 +67,52 @@ class Helper extends Repository
             return version_compare($installedVersionId, $targetVersion, $operator);
         }
 
+        if (\XF::$versionId < 2020000)
+        {
+            return $this->isAddOnActiveForXF21($addonId, $targetVersion, $operator);
+        }
+
         return \XF::isAddOnActive($addonId, $targetVersion, $operator);
+    }
+
+    /**
+     * XF2.1 support
+     *
+     * @param string $addOnId
+     * @param int|null    $versionId
+     * @param string $operator
+     * @return bool|mixed
+     */
+    protected function isAddOnActiveForXF21(string $addOnId, int $versionId = null, string $operator = '>=')
+    {
+        $addOns = \XF::app()->container('addon.cache');
+        if (!isset($addOns[$addOnId]))
+        {
+            return false;
+        }
+
+        $activeVersionId = $addOns[$addOnId];
+        if ($versionId === null)
+        {
+            return $activeVersionId;
+        }
+
+        switch ($operator)
+        {
+            case '>':
+                return ($activeVersionId > $versionId);
+
+            case '>=':
+                return ($activeVersionId >= $versionId);
+
+            case '<':
+                return ($activeVersionId < $versionId);
+
+            case '<=':
+                return ($activeVersionId <= $versionId);
+        }
+
+        return $activeVersionId;
     }
 
     /** @noinspection PhpUnusedParameterInspection */
