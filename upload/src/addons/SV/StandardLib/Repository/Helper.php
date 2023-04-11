@@ -141,7 +141,7 @@ class Helper extends Repository
 
     protected function markAsCriticalAddon()//: void
     {
-        if (\XF::isAddOnActive('SV/InstallerAppHelper'))
+        if ($this->hasDesiredAddOnVersion('SV/InstallerAppHelper', null))
         {
             /** @noinspection PhpUndefinedClassInspection */
             /** @noinspection PhpUndefinedNamespaceInspection */
