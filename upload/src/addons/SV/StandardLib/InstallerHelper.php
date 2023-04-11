@@ -33,24 +33,9 @@ trait InstallerHelper
         $this->isCliRecommended($warnings);
     }
 
-    /**
-     * @param string $addonId
-     * @param int    $minVersion
-     * @return bool|int
-     */
-    protected function addonExists(string $addonId, int $minVersion = 0)
+    protected function addonExists(string $addonId, int $minVersion = 0): bool
     {
-        $addOns = \XF::app()->container('addon.cache');
-        if (empty($addOns[$addonId]))
-        {
-            return false;
-        }
-        else if ($minVersion && ($addOns[$addonId] < $minVersion))
-        {
-            return false;
-        }
-
-        return $addOns[$addonId];
+        return Helper::isAddOnActive($addonId, $minVersion ?: null);
     }
 
     /**

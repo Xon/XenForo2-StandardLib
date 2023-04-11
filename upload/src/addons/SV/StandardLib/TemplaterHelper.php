@@ -221,7 +221,15 @@ class TemplaterHelper
         $this->addFunction('is_addon_active', 'fnIsAddonActive');
     }
 
-    public function fnIsAddonActive($templater, &$escape, $addOnId, $versionId = null, $operator = '>=')
+    /**
+     * @param BaseTemplater   $templater
+     * @param bool            $escape
+     * @param string          $addOnId
+     * @param string|int|null $versionId
+     * @param string          $operator
+     * @return bool
+     */
+    public function fnIsAddonActive(BaseTemplater $templater, bool &$escape, string $addOnId, $versionId = null, string $operator = '>='): bool
     {
         return Helper::isAddOnActive($addOnId, $versionId, $operator);
     }
