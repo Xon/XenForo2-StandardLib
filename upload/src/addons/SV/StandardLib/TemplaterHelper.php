@@ -211,7 +211,10 @@ class TemplaterHelper
         $this->addFilter('replacevalue', 'filterReplaceValue');
         $this->addFilter('addvalue', 'filterAddValue');
         $this->addFunction('array_diff', 'fnArrayDiff');
-        $this->addFunction('phrase_dynamic', 'fnPhraseDynamic');
+        if (\XF::$versionId < 2020000)
+        {
+            $this->addFunction('phrase_dynamic', 'fnPhraseDynamic');
+        }
         $this->addFunction('array_reverse', 'fnArrayReverse');
         $this->addFunction('sv_array_reverse', \XF::$debugMode ? 'fnArrayReverseOld' : 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
