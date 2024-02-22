@@ -34,12 +34,7 @@ class TemplaterHelper
      */
     public static function templaterSetup(\XF\Container $container, BaseTemplater &$templater)
     {
-        $class = self::class;
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $class = \XF::extendClass($class);
-        /** @var TemplaterHelper $templateHelper */
-        $templateHelper = new $class($templater);
-        assert($templateHelper instanceof self);
+        $templateHelper = Helper::newExtendedClass(self::class, $templater);
         $templateHelper->setup();
     }
 
@@ -536,9 +531,7 @@ class TemplaterHelper
     {
         if ($this->cssRenderer === null)
         {
-            $rendererClass = $this->app->extendClass('XF\CssRenderer');
-
-            $renderer = new $rendererClass($this->app, $this->templater);
+            $renderer = Helper::newExtendedClass(\XF\CssRenderer::class, $this->app, $this->templater);
             assert($renderer instanceof \SV\StandardLib\XF\CssRenderer);
             $this->cssRenderer = $renderer;
         }

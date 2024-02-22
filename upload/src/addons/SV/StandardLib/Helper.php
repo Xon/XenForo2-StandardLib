@@ -46,6 +46,20 @@ class Helper
     }
 
     /**
+     * @template T
+     * @param class-string<T> $classname
+     * @param        ...$args
+     * @return T
+     */
+    public static function newExtendedClass(string $classname, ...$args)
+    {
+        $classname = \XF::extendClass($classname);
+        /** @var T $obj */
+        $obj = new $classname(...$args);
+        return $obj;
+    }
+
+    /**
      * @param string|null $entityName
      * @return Structure|null
      * @noinspection PhpMissingParamTypeInspection
