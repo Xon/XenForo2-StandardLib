@@ -7,9 +7,9 @@ During use, Add the `requires` section to `addon.json` to document the dependenc
 ```json
 {
     "require": {
+        "SV/StandardLib": [2001190000,"Standard Library by Xon v1.19.0+"],
         "XF": ["2.2.0", "XenForo 2.2.0+"],
-        "php": ["7.2.0", "PHP 7.2.0+"],
-        "SV/StandardLib": [2001180000,"Standard Library by Xon v1.18.0+"]
+        "php": ["7.2.0", "PHP 7.2.0+"]
     }
 }
 ```
@@ -108,7 +108,35 @@ namespace SV\ElasticSearchEssentials\XF\Repository;
 );
 ```
 
+## \SV\StandardLib\Repository\Helper - createEntity/finder/repository/find/findCached/service
+
+These methods accept `::class` references, and have the return type hinted to match the argument.
+
+```php
+$obj = Helper::repository(\XF\Repository\User::class);
+```
+For static analysis and IDE, `$obj` will have the type `\XF\Repository\User`
+
 ## Template additions
+
+## ajax pagination
+
+Load pagination pages via ajax instead of requiring full page-loads. Useful for overlays.
+
+```html
+<xf:js src="sv/vendor/domurl/url.js" addon="SV/StandardLib" min="1" />
+<xf:js src="sv/lib/ajaxPagination.js" addon="SV/Threadmarks" min="1" />
+...
+<div class="block" data-xf-init="sv-ajax-pagination" data-content-wrapper=".block-body--wrapper">
+    ...
+    <div class="block-body--wrapper">
+        ...
+        <xf:pagenav ... />
+        <xf:hiddenval name="final_url" value="{$finalUrl}" />
+    </div>
+</div>
+```
+`<xf:pagenav>` and `<xf:hiddenval name="final_url" />` must be inside the div which is tagged with `data-content-wrapper`'s css selector
 
 ### Template Filter: is_toggle_set
 
@@ -116,23 +144,23 @@ While similar to `is_goggled`, `is_toggle_set` supports specifying the default t
 Stronlgy recommended to use `toggle-storage-ex` from `sv/lib/storage.js`.
 
 Example of a default collapsed node-list:
-```
+```html
 <xf:js src="sv/lib/storage.js" addon="SV/StandardLib" min="1" />
 <xf:set var="$isActive" value="{{ is_toggle_set($forum.node_id, false, 'node-toggle') ? ' is-active' : '' }}"/>
 <div class="block block--collapsible-child-nodes">
-	<div class="block-container">
-		<h3 class="block-minorHeader collapseTrigger collapseTrigger--block {$isActive} "
-			data-target=".block--collapsible-child-nodes .block-body"
-			data-xf-click="toggle"
-			data-xf-init="toggle-storage-ex"
-			data-storage-type="cookie"
-			data-storage-container="node-toggle"
-			data-storage-key="{$forum.node_id}"
-			data-default-value="0"
-			>{{ phrase('sub_forums') }}</h3>
-<div class="block-body toggleTarget {$isActive}">
-...
-</div
+    <div class="block-container">
+        <h3 class="block-minorHeader collapseTrigger collapseTrigger--block {$isActive} "
+            data-target=".block--collapsible-child-nodes .block-body"
+            data-xf-click="toggle"
+            data-xf-init="toggle-storage-ex"
+            data-storage-type="cookie"
+            data-storage-container="node-toggle"
+            data-storage-key="{$forum.node_id}"
+            data-default-value="0"
+        >{{ phrase('sub_forums') }}</h3>
+        <div class="block-body toggleTarget {$isActive}">
+            ...
+        </div
 ```
 
 ### Template Filter: addvalue
