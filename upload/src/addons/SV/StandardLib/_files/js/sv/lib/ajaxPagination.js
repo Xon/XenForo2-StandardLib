@@ -28,7 +28,7 @@ var SV = window.SV || {};
                 $pageNavWrapper = this.getPageNavWrapper();
             if ($pageNavWrapper)
             {
-                existingPage = this.getPageFromAhref($pageNavWrapper.find('.pageNav-page--current').first());
+                existingPage = this.getPageFromAhref($pageNavWrapper.find('.pageNav-page--current > a').first());
             }
             this.lastPageSelected = (typeof existingPage === 'number') ? existingPage : 1;
 
@@ -134,6 +134,9 @@ var SV = window.SV || {};
         getPageFromAhref: function ($e)
         {
             var url = $e.attr('href');
+            if (!url) {
+                return 1;
+            }
 
             var currentUrl = new Url(url);
             if ('page' in currentUrl.query)
