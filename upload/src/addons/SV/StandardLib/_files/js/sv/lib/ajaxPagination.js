@@ -9,10 +9,12 @@ var SV = window.SV || {};
             contentWrapper: null
         },
 
+        inOverlay: false,
         lastPageSelected: null,
 
         init: function()
         {
+            this.inOverlay = this.$target.parents('.overlay-container').length  !== 0;
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
             if (!this.options.contentWrapper)
             {
