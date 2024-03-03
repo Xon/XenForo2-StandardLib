@@ -71,6 +71,11 @@ class Helper
             return null;
         }
 
+        // XF2.2 entity cache key is on the short name, not the class name. So map to the expected thing
+        if (\XF::$versionId < 2030000 && strpos($entityName, ':') === false)
+        {
+            $entityName = str_replace('\\Entity\\', ':', $entityName);
+        }
         $class = \XF::stringToClass($entityName, '%s\Entity\%s');
         // detect invalid content type+entity configuration; Vault Wiki appears a major offender
         // note; SV/TitleEditHistory can also trigger this
@@ -95,6 +100,12 @@ class Helper
      */
     public static function createEntity(string $identifier)
     {
+        // XF2.2 entity cache key is on the short name, not the class name. So map to the expected thing
+        if (\XF::$versionId < 2030000 && strpos($identifier, ':') === false)
+        {
+            $identifier = str_replace('\\Entity\\', ':', $identifier);
+        }
+
         /** @var T $e */
         $e = \XF::em()->create($identifier);
         return $e;
