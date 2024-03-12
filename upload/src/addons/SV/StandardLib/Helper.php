@@ -112,6 +112,27 @@ class Helper
     }
 
     /**
+     * @template T of Entity
+     * @param class-string<T> $identifier
+     * @param array $values Values for the columns in the entity, in source encoded form
+     * @param array $relations
+     * @param int $options Bit field of the \XF\Mvc\Entity\Manager::INSTANTIATE_* options
+     * @return T
+     */
+    public static function instantiateEntity(string $identifier, array $values = [], array $relations = [], $options = 0)
+    {
+        // XF2.2 entity cache key is on the short name, not the class name. So map to the expected thing
+        if (\XF::$versionId < 2030000 && strpos($identifier, ':') === false)
+        {
+            $identifier = str_replace('\\Entity\\', ':', $identifier);
+        }
+
+        /** @var T $e */
+        $e = \XF::em()->instantiateEntity($identifier, $values, $relations, $options);
+        return $e;
+    }
+
+    /**
      * @template T of Finder
      * @param class-string<T> $identifier
      * @return T
