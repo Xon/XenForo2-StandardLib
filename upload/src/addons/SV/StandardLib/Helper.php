@@ -119,7 +119,7 @@ class Helper
      * @param int $options Bit field of the \XF\Mvc\Entity\Manager::INSTANTIATE_* options
      * @return T
      */
-    public static function instantiateEntity(string $identifier, array $values = [], array $relations = [], $options = 0)
+    public static function instantiateEntity(string $identifier, array $values = [], array $relations = [], int $options = 0)
     {
         // XF2.2 entity cache key is on the short name, not the class name. So map to the expected thing
         if (\XF::$versionId < 2030000 && strpos($identifier, ':') === false)
