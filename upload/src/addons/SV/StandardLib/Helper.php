@@ -153,7 +153,7 @@ class Helper
     /**
      * @template T of Entity
      * @param class-string<T> $identifier
-     * @param int|string      $id
+     * @param int|string|array<int|string>      $id
      * @param array           $with
      * @return T|null
      */
@@ -174,10 +174,10 @@ class Helper
     /**
      * @template T of Entity
      * @param class-string<T> $identifier
-     * @param int             $id
+     * @param int|string|array<int|string> $id
      * @return T|null
      */
-    public static function findCached(string $identifier, int $id)
+    public static function findCached(string $identifier, $id)
     {
         // XF2.2 entity cache key is on the short name, not the class name. So map to the expected thing
         if (\XF::$versionId < 2030000 && strpos($identifier, ':') === false)
