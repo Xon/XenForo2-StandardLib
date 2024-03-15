@@ -192,7 +192,7 @@ var SV = window.SV || {};
                 return null;
             }
 
-            var pageNavWrapper = $(this.options.pageNavWrapper);
+            var pageNavWrapper = this.$target.find(this.options.pageNavWrapper);
             if (!pageNavWrapper.length)
             {
                 if (logNotFound)
@@ -214,7 +214,7 @@ var SV = window.SV || {};
         getContentWrapper: function(logNotFound)
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
-            var contentWrapper = $(this.options.contentWrapper);
+            var contentWrapper = this.$target.find(this.options.contentWrapper);
             if (!contentWrapper.length)
             {
                 if (logNotFound)
