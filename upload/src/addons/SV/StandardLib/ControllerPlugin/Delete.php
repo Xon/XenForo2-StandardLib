@@ -39,7 +39,7 @@ class Delete extends AbstractPlugin
 		$title,
 		bool $canHardDelete = false,
 		bool $includeAuthorAlert = true,
-		string $templateName = null,
+		?string $templateName = null,
 		array $params = []
 	): \XF\Mvc\Reply\AbstractReply
     {

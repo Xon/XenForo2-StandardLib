@@ -83,7 +83,7 @@ class Helper extends Repository
      * @param string $operator
      * @return bool|mixed
      */
-    protected function isAddOnActiveForXF21(string $addOnId, int $versionId = null, string $operator = '>=')
+    protected function isAddOnActiveForXF21(string $addOnId, ?int $versionId = null, string $operator = '>=')
     {
         $addOns = \XF::app()->container('addon.cache');
         if (!isset($addOns[$addOnId]))

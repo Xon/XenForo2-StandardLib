@@ -348,7 +348,7 @@ trait InstallerHelper
      * @param string[]          $oldNames
      * @return DbColumnSchema
      */
-    protected function addOrChangeColumn(AbstractDdl $table, string $name, string $type = null, $length = null, array $oldNames = []) : DbColumnSchema
+    protected function addOrChangeColumn(AbstractDdl $table, string $name, ?string $type = null, $length = null, array $oldNames = []) : DbColumnSchema
     {
         if ($table instanceof Create)
         {

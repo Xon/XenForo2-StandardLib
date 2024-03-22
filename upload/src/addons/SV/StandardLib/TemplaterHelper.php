@@ -38,7 +38,7 @@ class TemplaterHelper
         $templateHelper->setup();
     }
 
-    public static function templaterGlobalData(\XF\App $app, array &$data, AbstractReply $reply = null)
+    public static function templaterGlobalData(\XF\App $app, array &$data, ?AbstractReply $reply = null)
     {
         $helper = self::get($app->templater());
         $helper->populateTemplaterGlobalData($data, $reply);
@@ -80,7 +80,7 @@ class TemplaterHelper
         $this->addDefaultHandlers();
     }
 
-    protected function populateTemplaterGlobalData(array &$data, AbstractReply $reply = null)
+    protected function populateTemplaterGlobalData(array &$data, ?AbstractReply $reply = null)
     {
     }
 
@@ -395,7 +395,7 @@ class TemplaterHelper
      * @param array<array|AbstractCollection> $arrays
      * @return array
      */
-    public function fnArrayDiff(BaseTemplater $templater, bool &$escape, array $array1 = null, ...$arrays): array
+    public function fnArrayDiff(BaseTemplater $templater, bool &$escape, ?array $array1 = null, ...$arrays): array
     {
         array_unshift($arrays, $array1);
         foreach($arrays as &$array)
