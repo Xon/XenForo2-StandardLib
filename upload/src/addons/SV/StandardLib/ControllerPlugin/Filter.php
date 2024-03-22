@@ -19,7 +19,7 @@ class Filter extends AbstractPlugin
      * @param Entity|null $container
      * @return void
      */
-    public function injectIntoReply(View $reply, string $route, Entity $container = null)
+    public function injectIntoReply(View $reply, string $route, ?Entity $container = null)
     {
         $reply->setParam('filterRoute', $route);
         $reply->setParam('filterContainer', $container);

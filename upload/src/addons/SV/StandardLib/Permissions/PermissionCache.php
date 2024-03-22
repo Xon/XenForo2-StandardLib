@@ -10,7 +10,7 @@ abstract class PermissionCache extends \XF\PermissionCache
      * @param \XF\PermissionCache|null $permissionCache
      * @return array
      */
-    public static function getCachedGlobalPermissions(\XF\PermissionCache $permissionCache = null): array
+    public static function getCachedGlobalPermissions(?\XF\PermissionCache $permissionCache = null): array
     {
         $permissionCache = $permissionCache ?? \XF::permissionCache();
         return $permissionCache->globalPerms;
@@ -22,7 +22,7 @@ abstract class PermissionCache extends \XF\PermissionCache
      * @param \XF\PermissionCache|null $permissionCache
      * @return array
      */
-    public static function getCachedContentPermissions(\XF\PermissionCache $permissionCache = null): array
+    public static function getCachedContentPermissions(?\XF\PermissionCache $permissionCache = null): array
     {
         $permissionCache = $permissionCache ?? \XF::permissionCache();
         return $permissionCache->contentPerms;

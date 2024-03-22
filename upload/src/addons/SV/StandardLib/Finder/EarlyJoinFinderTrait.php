@@ -13,7 +13,7 @@ use XF\Mvc\Entity\Structure;
 use function implode, count;
 
 /**
- * @method int getEarlyJoinThreshold(int $offset = null, int $limit = null, array $options = [])
+ * @method int getEarlyJoinThreshold(?int $offset = null, ?int $limit = null, array $options = [])
  * @method string columnSqlName(string $column, bool $markFundamental = true)
  * @method void whereImpossible()
  *
@@ -31,7 +31,7 @@ use function implode, count;
  */
 trait EarlyJoinFinderTrait
 {
-    //abstract protected function getEarlyJoinThreshold(int $offset = null, int $limit = null, array $options = []): int
+    //abstract protected function getEarlyJoinThreshold(?int $offset = null, ?int $limit = null, array $options = []): int
 
     /**
      * @param array $options
