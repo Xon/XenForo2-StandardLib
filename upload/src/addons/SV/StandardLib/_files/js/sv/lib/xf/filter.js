@@ -17,6 +17,12 @@ SV.StandardLib = SV.StandardLib || {};
         options: $.extend({}, XF.Filter.prototype.options, {
             svLoadInOverlay: true,
             svPageNavWrapper: '.block-outer--page-nav-wrapper',
+            searchTarget: '.userList',
+            searchRow: '.userList-row',
+            searchRowGroup: '.contentRow',
+            searchLimit: '.username',
+            noResultsFormat: '<div class="blockMessage js-filterNoResults">%s</div>',
+            globalFind: true
         }),
 
         resetPage: true,
@@ -233,7 +239,10 @@ SV.StandardLib = SV.StandardLib || {};
                 return null;
             }
 
-            var oldPageNavWrapper = $(this.options.svPageNavWrapper);
+            var oldPageNavWrapper = this.options.globalFind
+                ? $(this.options.svPageNavWrapper)
+                : this.$target.find(this.options.svPageNavWrapper)
+            ;
             if (!oldPageNavWrapper.length)
             {
                 if (logNotFound)
