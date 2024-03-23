@@ -22,13 +22,16 @@ SV.StandardLib = SV.StandardLib || {};
             searchRowGroup: '.contentRow',
             searchLimit: '.username',
             noResultsFormat: '<div class="blockMessage js-filterNoResults">%s</div>',
-            globalFind: true
+            globalFind: true,
+            perPageDropdown: 'select[name="per_page"]'
         }),
 
         resetPage: true,
         skipUpdate: false,
         inOverlay: false,
         svLastPageSelected: null,
+        svPerPageDropdown: null,
+        svChangeTimer: null,
 
         _getStoredValue: function() {
             return null;
@@ -49,6 +52,12 @@ SV.StandardLib = SV.StandardLib || {};
             }
             this.svLastPageSelected = (typeof existingPage === 'number') ? existingPage : 1;
 
+            this.svPerPageDropdown = this.$target.find(this.options.perPageDropdown);
+            if (this.svPerPageDropdown.length)
+            {
+                this.svPerPageDropdown.on('change', XF.proxy(this, 'svPerPageChange'));
+            }
+
             this.skipUpdate = true;
             try
             {
@@ -59,6 +68,28 @@ SV.StandardLib = SV.StandardLib || {};
             }
 
             this.shimDynamicPageNav();
+        },
+
+        svPerPageChange: function()
+        {
+            if (this.svChangeTimer)
+            {
+                clearTimeout(this.svChangeTimer);
+            }
+
+            this.svChangeTimer = setTimeout(XF.proxy(this, 'svPerPageOnTimer'), 200);
+        },
+
+        svPerPageOnTimer: function()
+        {
+            var value = this.svPerPageDropdown.val();
+
+            if (!value)
+            {
+                return;
+            }
+
+            this.update();
         },
 
         /**
@@ -82,12 +113,33 @@ SV.StandardLib = SV.StandardLib || {};
                 data['page'] = currentPage;
             }
 
+            var finalUrl = this.options.ajax;
+            if (this.svPerPageDropdown)
+            {
+                var currentUrl = new Url(this.options.ajax);
+                currentUrl.query['per_page'] = this.svPerPageDropdown.val()
+
+                finalUrl = currentUrl.toString();
+            }
+
             this.xhrFilter = data['_xfFilter'];
-            XF.ajax('GET', this.options.ajax, data, XF.proxy(this, '_filterAjaxResponse'));
+            XF.ajax('GET', finalUrl, data, XF.proxy(this, '_filterAjaxResponse'));
         },
 
         _filterAjaxResponse: function(result)
         {
+            var filter = this.xhrFilter,
+                $existingRows = this._getSearchRows()
+            ;
+            if (!filter.text)
+            {
+                if ($existingRows)
+                {
+                    $existingRows.remove();
+                    $existingRows = null;
+                }
+            }
+
             this.svLib__filterAjaxResponse(result);
 
             var oldPageNavWrapper = this.getPageNavWrapper();
