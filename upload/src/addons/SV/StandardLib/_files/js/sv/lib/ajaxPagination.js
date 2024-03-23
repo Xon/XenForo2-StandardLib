@@ -6,11 +6,14 @@ var SV = window.SV || {};
     SV.AjaxPagination = XF.Element.newHandler({
         options: {
             pageNavWrapper: '.block-outer--page-nav-wrapper',
-            contentWrapper: null
+            contentWrapper: null,
+            perPageDropdown: 'select[name="per_page"]'
         },
 
         inOverlay: false,
         lastPageSelected: null,
+        perPageDropdown: null,
+        changeTimer: null,
 
         init: function()
         {
@@ -35,6 +38,37 @@ var SV = window.SV || {};
             this.lastPageSelected = (typeof existingPage === 'number') ? existingPage : 1;
 
             this.shimDynamicPageNav();
+
+            this.perPageDropdown = this.$target.find(this.options.perPageDropdown);
+            if (this.perPageDropdown.length)
+            {
+                this.perPageDropdown.on('change', XF.proxy(this, 'perPageChange'));
+            }
+        },
+
+        perPageChange: function()
+        {
+            if (this.changeTimer)
+            {
+                clearTimeout(this.changeTimer);
+            }
+
+            this.changeTimer = setTimeout(XF.proxy(this, 'perPageOnTimer'), 200);
+        },
+
+        perPageOnTimer: function()
+        {
+            var value = this.perPageDropdown.val();
+
+            if (!value)
+            {
+                return;
+            }
+
+            var currentUrl = new Url(window.location.href);
+            currentUrl.query['per_page'] = this.perPageDropdown.val()
+
+            XF.ajax('GET', currentUrl.toString(), {}, XF.proxy(this, '_paginationAjaxResponse'));
         },
 
         _paginationAjaxResponse: function(result)
