@@ -2,18 +2,18 @@
 		  arg-filters="!"
 		  arg-prefixId="!"
 		  ><xf:trim>
-	
+
 	<xf:if is="!is_scalar($prefixId)">
 		<xf:set var="$prefixId" value="{{ $prefixId.prefix_id is not empty ? $prefixId.prefix_id : 0 }}" />
 	</xf:if>
-	
+
 	<xf:set var="$filterRoute" value="{{ $__globals.filterRoute !== null ? $__globals.filterRoute : 'forums' }}" />
 	<xf:set var="$filterContainer" value="{{ ($filterRoute === 'forums' && $__globals.filterContainer !== null) ? $__globals.filterContainer : null }}" />
 
 	<xf:set var="$removeFilter" value="{{ $prefixId === $filters.prefix_id }}" />
-	<xf:set var="$filters" value="{{ $removeFilter 
-									? $filters|replace('prefix_id', null) 
-									: $filters|replace('prefix_id', $prefixId) 
+	<xf:set var="$filters" value="{{ $removeFilter
+									? $filters|replace('prefix_id', null)
+									: $filters|replace('prefix_id', $prefixId)
 								}}" />
 	<xf:if contentcheck="true">
 		<a href="{{ link($filterRoute, $filterContainer, $filters) }}" class="labelLink" rel="nofollow" data-xf-init="tooltip" title="{{
@@ -33,15 +33,15 @@
 		  arg-removeFilter="!"
 		  arg-noFilterValue=""
 		  ><xf:trim>
-	
+
 	<xf:set var="$filterRoute" value="{{ $__globals.filterRoute !== null ? $__globals.filterRoute : 'forums' }}" />
 	<xf:set var="$filterContainer" value="{{ ($filterRoute === 'forums' && $__globals.filterContainer !== null) ? $__globals.filterContainer : $forum }}" />
-	
+
 	<xf:set var="$removeFilter" value="{{ in_array($nodeId, $filters.nodes ?: [], true) }}" />
-	<xf:set var="$filters.nodes" value="{{ $removeFilter 
+	<xf:set var="$filters.nodes" value="{{ $removeFilter
 											   ? ($filters.nodes|replaceValue($nodeId, null) ?: $noFilterValue)
-											   : $filters.nodes|addValue($nodeId) 
-											   }}" />	
+											   : $filters.nodes|addValue($nodeId)
+											   }}" />
 	<a href="{{ link($filterRoute, $filterContainer, $filters) }}" class="labelLink" rel="nofollow" data-xf-init="tooltip" title="{{
 		($removeFilter
 			? phrase('svStandardLib_remove_from_filters')
@@ -61,14 +61,13 @@
 		}
 	</script>
 	<xf:css src="sv_quick_filter.less" />
-	
+
     <div class="{$class} quickFilter u-jsOnly"
          data-xf-init="sv-dynamic-filter"
          data-key="{$key}"
          data-ajax="{$ajax}"
          data-search-target=".userList"
          data-search-row=".userList-row"
-         data-search-row-group=".contentRow"
 		 data-search-limit=".username"
          data-no-results-format="<div class=&quot;blockMessage js-filterNoResults&quot;>%s</div>">
 		<div class="inputGroup inputGroup--inline inputGroup--joined">
