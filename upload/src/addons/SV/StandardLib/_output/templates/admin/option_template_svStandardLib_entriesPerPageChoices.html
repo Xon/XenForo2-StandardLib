@@ -1,0 +1,19 @@
+<xf:formrow rowtype="input"
+	label="{$option.title}"
+	hint="{$hintHtml}"
+	explain="{$explainHtml}"
+	html="{$listedHtml}"
+	rowclass="{$rowClass}">
+
+	<ul class="listPlain inputGroup-container">
+		<xf:foreach loop="$choices" key="$counter" value="$choice">
+			<li class="inputGroup">
+				<xf:textbox name="{$inputName}[{$counter}][value]" value="{$choice.value}" placeholder="{{ phrase('value') }}" size="20" />
+			</li>
+		</xf:foreach>
+
+		<li class="inputGroup" data-xf-init="field-adder" data-increment-format="{$inputName}[{counter}]">
+			<xf:textbox name="{$inputName}[{$nextCounter}][value]" placeholder="{{ phrase('value') }}" size="20" />
+		</li>
+	</ul>
+</xf:formrow>
