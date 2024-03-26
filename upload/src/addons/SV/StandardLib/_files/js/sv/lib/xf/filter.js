@@ -29,10 +29,11 @@ SV.StandardLib = SV.StandardLib || {};
 
         resetPage: true,
         skipUpdate: false,
-        inOverlay: false,
-        svLastPageSelected: null,
         svPerPageDropdown: null,
+        finalUrl: null,
+        inOverlay: false,
         svChangeTimer: null,
+        svLastPageSelected: null,
 
         _getStoredValue: function() {
             return null;
@@ -44,6 +45,24 @@ SV.StandardLib = SV.StandardLib || {};
         init: function ()
         {
             this.inOverlay = this.$target.parents('.overlay-container').length  !== 0;
+
+            var $finalUrlInput = this.$target.find('input[type="hidden"][name="final_url"]');
+            if (!$finalUrlInput.length)
+            {
+                console.error('No final URL input was provided.');
+                return;
+            }
+
+            var finalUrl = $finalUrlInput.val();
+            if (!finalUrl)
+            {
+                console.error('No final URL available.');
+                return;
+            }
+
+            this.finalUrl = finalUrl;
+
+            this.options.ajax = this.finalUrl;
 
             var existingPage = null,
                 $pageNavWrapper = this.getPageNavWrapper();
@@ -123,10 +142,10 @@ SV.StandardLib = SV.StandardLib || {};
                 data['page'] = currentPage;
             }
 
-            var finalUrl = this.options.ajax;
+            var finalUrl = this.finalUrl;
             if (this.svPerPageDropdown)
             {
-                var currentUrl = new Url(this.options.ajax);
+                var currentUrl = new Url(this.finalUrl);
                 currentUrl.query['per_page'] = this.svPerPageDropdown.val()
 
                 finalUrl = currentUrl.toString();
@@ -187,6 +206,9 @@ SV.StandardLib = SV.StandardLib || {};
                 console.error('No final URL available.');
                 return;
             }
+
+            this.finalUrl = finalUrl;
+            this.options.ajax = finalUrl;
 
             if ('pushState' in window.history)
             {
@@ -273,6 +295,14 @@ SV.StandardLib = SV.StandardLib || {};
                 this.resetPage = false;
                 try
                 {
+                    var currentUrl = new Url(this.finalUrl);
+                    currentUrl.query['page'] = page
+
+                    var finalUrl = currentUrl.toString();
+
+                    this.finalUrl = finalUrl;
+                    this.options.ajax = finalUrl;
+
                     this.update();
                 }
                 finally
@@ -342,8 +372,6 @@ SV.StandardLib = SV.StandardLib || {};
             }
 
             return null;
-
-            return parseInt(storedValue.page) || 1;
         }
     });
 

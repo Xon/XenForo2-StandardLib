@@ -11,10 +11,11 @@ var SV = window.SV || {};
             perPageCookiePrefix: null
         },
 
-        inOverlay: false,
-        lastPageSelected: null,
         perPageDropdown: null,
+        finalUrl: null,
+        inOverlay: false,
         changeTimer: null,
+        lastPageSelected: null,
 
         init: function()
         {
@@ -29,6 +30,22 @@ var SV = window.SV || {};
 
                 return null;
             }
+
+            var $finalUrlInput = this.$target.find('input[type="hidden"][name="final_url"]');
+            if (!$finalUrlInput.length)
+            {
+                console.error('No final URL input was provided.');
+                return;
+            }
+
+            var finalUrl = $finalUrlInput.val();
+            if (!finalUrl)
+            {
+                console.error('No final URL available.');
+                return;
+            }
+
+            this.finalUrl = finalUrl;
 
             var existingPage = null,
                 $pageNavWrapper = this.getPageNavWrapper();
@@ -75,7 +92,7 @@ var SV = window.SV || {};
                 );
             }
 
-            var currentUrl = new Url(window.location.href);
+            var currentUrl = new Url(this.finalUrl);
             currentUrl.query['per_page'] = this.perPageDropdown.val()
 
             XF.ajax('GET', currentUrl.toString(), {}, XF.proxy(this, '_paginationAjaxResponse'));
@@ -134,6 +151,8 @@ var SV = window.SV || {};
                 console.error('No final URL available.');
                 return;
             }
+
+            this.finalUrl = finalUrl;
 
             if ('pushState' in window.history)
             {

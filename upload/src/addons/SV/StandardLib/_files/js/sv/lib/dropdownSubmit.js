@@ -14,6 +14,8 @@ var SV = window.SV || {};
             perPageCookiePrefix: null
         },
 
+        perPageDropdown: null,
+        finalUrl: null,
         inOverlay: false,
         changeTimer: null,
         xhr: null,
@@ -27,6 +29,22 @@ var SV = window.SV || {};
                 console.error('No content wrapper query expression defined');
                 return null;
             }
+
+            var $finalUrlInput = this.$target.find('input[type="hidden"][name="final_url"]');
+            if (!$finalUrlInput.length)
+            {
+                console.error('No final URL input was provided.');
+                return;
+            }
+
+            var finalUrl = $finalUrlInput.val();
+            if (!finalUrl)
+            {
+                console.error('No final URL available.');
+                return;
+            }
+
+            this.finalUrl = finalUrl;
 
             this.perPageDropdown = this.$target.find(this.options.perPageDropdown);
             if (this.perPageDropdown.length)
@@ -69,21 +87,7 @@ var SV = window.SV || {};
                 );
             }
 
-            var $finalUrlInput = this.$target.find('input[type="hidden"][name="final_url"]');
-            if (!$finalUrlInput.length)
-            {
-                console.error('No final URL input was provided.');
-                return;
-            }
-
-            var finalUrl = $finalUrlInput.val();
-            if (!finalUrl)
-            {
-                console.error('No final URL available.');
-                return;
-            }
-
-            var currentUrl = new Url(finalUrl);
+            var currentUrl = new Url(this.finalUrl);
             currentUrl.query['per_page'] = this.perPageDropdown.val()
 
             this.xhr = XF.ajax('post', currentUrl.toString(), {}, XF.proxy(this, 'onLoad'));
@@ -141,6 +145,8 @@ var SV = window.SV || {};
                 console.error('No final URL available.');
                 return;
             }
+
+            this.finalUrl = finalUrl;
 
             if ('pushState' in window.history)
             {
