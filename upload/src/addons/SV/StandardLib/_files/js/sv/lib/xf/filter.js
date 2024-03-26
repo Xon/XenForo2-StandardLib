@@ -19,7 +19,7 @@ SV.StandardLib = SV.StandardLib || {};
             svPageNavWrapper: '.block-outer--page-nav-wrapper',
             searchTarget: '.userList',
             searchRow: '.userList-row',
-            searchRowGroup: '.contentRow',
+            searchRowGroup: null,
             searchLimit: '.username',
             noResultsFormat: '<div class="blockMessage js-filterNoResults">%s</div>',
             globalFind: true,

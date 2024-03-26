@@ -1,54 +1,48 @@
 .sv-quick-filter
 {
-	.userList
-	{
-		.block,
-		.blockMessage
-		{
-			&.is-hidden
-			{
-				display: none;
-			}
-		}
-	}
+  .block,
+  .blockMessage
+  {
+    &.is-hidden
+    {
+      display: none;
+    }
+  }
 
-	.userList-row
-	{
-		&.is-disabled
-		{
-			.contentRow-figure,
-			.contentRow-header,
-			.contentRow-lesser
-			{
-				opacity: 0.5;
-			}
+  .is-disabled
+  {
+    .contentRow-figure,
+    .contentRow-header,
+    .contentRow-lesser
+    {
+      opacity: 0.5;
+    }
 
-			.contentRow-header
-			{
-				text-decoration: line-through;
-			}
+    .contentRow-header
+    {
+      text-decoration: line-through;
+    }
 
-			.contentRow-extra
-			{
-				// this is needed to move this above the semi-transparent layer that's created above
-				position: relative;
-				z-index: 2;
-			}
-		}
+    .contentRow-extra
+    {
+      // this is needed to move this above the semi-transparent layer that's created above
+      position: relative;
+      z-index: 2;
+    }
+  }
 
-		&.is-hidden
-		{
-			display: none;
-		}
+  .is-hidden
+  {
+    display: none;
+  }
 
-		.contentRow-lesser
-		{
-			&.no-description
-			{
-				visibility: hidden;
-			}
-		}
-	}
+  .contentRow-lesser
+  {
+    &.no-description
+    {
+      visibility: hidden;
+    }
+  }
 
   .is-match
   {
