@@ -7,7 +7,8 @@ var SV = window.SV || {};
         options: {
             pageNavWrapper: '.block-outer--page-nav-wrapper',
             contentWrapper: null,
-            perPageDropdown: 'select[name="per_page"]'
+            perPageDropdown: 'select[name="per_page"]',
+            perPageCookiePrefix: null
         },
 
         inOverlay: false,
@@ -63,6 +64,15 @@ var SV = window.SV || {};
             if (!value)
             {
                 return;
+            }
+
+            if (this.options.perPageCookiePrefix !== null)
+            {
+                XF.Cookie.set(
+                    this.options.perPageCookiePrefix + 'per_page',
+                    value,
+                    new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+                );
             }
 
             var currentUrl = new Url(window.location.href);
@@ -136,8 +146,6 @@ var SV = window.SV || {};
             {
                 window.location = finalUrl; // force
             }
-
-
         },
 
         shimDynamicPageNav: function()

@@ -23,7 +23,8 @@ SV.StandardLib = SV.StandardLib || {};
             searchLimit: '.username',
             noResultsFormat: '<div class="blockMessage js-filterNoResults">%s</div>',
             globalFind: true,
-            perPageDropdown: 'select[name="per_page"]'
+            perPageDropdown: 'select[name="per_page"]',
+            perPageCookiePrefix: null
         }),
 
         resetPage: true,
@@ -87,6 +88,15 @@ SV.StandardLib = SV.StandardLib || {};
             if (!value)
             {
                 return;
+            }
+
+            if (this.options.perPageCookiePrefix !== null)
+            {
+                XF.Cookie.set(
+                    this.options.perPageCookiePrefix + 'per_page',
+                    value,
+                    new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+                );
             }
 
             this.update();
