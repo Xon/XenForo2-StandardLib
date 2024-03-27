@@ -46,29 +46,9 @@ SV.StandardLib = SV.StandardLib || {};
         {
             this.inOverlay = this.$target.parents('.overlay-container').length  !== 0;
 
-            var $finalUrlInput = this.$target.find('input[type="hidden"][name="final_url"]');
-            if ($finalUrlInput.length) {
-                var finalUrl = $finalUrlInput.val();
-                if (!finalUrl) {
-                    console.error('No final URL available.');
-                    return;
-                }
-
-                this.finalUrl = finalUrl;
-                this.options.ajax = this.finalUrl;
-            } else {
-                if (!this.options.ajax) {
-                    console.error('No final URL input was provided.');
-                    return;
-                }
-                this.finalUrl = this.options.ajax;
-            }
-
-            // backwards compatibility where data-ajax is set
-            if (this.options.ajax) {
-                this.finalUrl = this.options.ajax
-            } else {
-
+            if (!this.options.ajax) {
+                console.error('No filter AJAX URL input was provided.');
+                return;
             }
 
             var existingPage = null,
@@ -145,14 +125,15 @@ SV.StandardLib = SV.StandardLib || {};
                     prefix: prefix ? 1 : 0
                 }
             };
+
             if (currentPage != 1) {
                 data['page'] = currentPage;
             }
 
-            var finalUrl = this.finalUrl;
+            var finalUrl = this.options.ajax;
             if (this.svPerPageDropdown)
             {
-                var currentUrl = new Url(this.finalUrl);
+                var currentUrl = new Url(this.options.ajax);
                 currentUrl.query['per_page'] = this.svPerPageDropdown.val()
 
                 finalUrl = currentUrl.toString();
@@ -213,9 +194,6 @@ SV.StandardLib = SV.StandardLib || {};
                 console.error('No final URL available.');
                 return;
             }
-
-            this.finalUrl = finalUrl;
-            this.options.ajax = finalUrl;
 
             if ('pushState' in window.history)
             {
@@ -302,14 +280,6 @@ SV.StandardLib = SV.StandardLib || {};
                 this.resetPage = false;
                 try
                 {
-                    var currentUrl = new Url(this.finalUrl);
-                    currentUrl.query['page'] = page
-
-                    var finalUrl = currentUrl.toString();
-
-                    this.finalUrl = finalUrl;
-                    this.options.ajax = finalUrl;
-
                     this.update();
                 }
                 finally
