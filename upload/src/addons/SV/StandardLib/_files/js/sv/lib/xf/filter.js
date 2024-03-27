@@ -16,7 +16,7 @@ SV.StandardLib = SV.StandardLib || {};
 
         options: $.extend({}, XF.Filter.prototype.options, {
             svLoadInOverlay: true,
-            svPageNavWrapper: '.block-outer--page-nav-wrapper',
+            pageNavWrapper: '.block-outer--page-nav-wrapper',
             searchTarget: '.userList',
             searchRow: '.userList-row',
             searchRowGroup: null,
@@ -166,7 +166,7 @@ SV.StandardLib = SV.StandardLib || {};
             }
 
             var $result = $($.parseHTML(result.html.content)),
-                newPageNavWrapper = $result.find(this.options.svPageNavWrapper);
+                newPageNavWrapper = $result.find(this.options.pageNavWrapper);
             if (!newPageNavWrapper.length)
             {
                 oldPageNavWrapper.empty();
@@ -298,7 +298,7 @@ SV.StandardLib = SV.StandardLib || {};
         getPageNavWrapper: function(logNotFound)
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
-            if (!this.options.svPageNavWrapper)
+            if (!this.options.pageNavWrapper)
             {
                 if (logNotFound)
                 {
@@ -309,8 +309,8 @@ SV.StandardLib = SV.StandardLib || {};
             }
 
             var oldPageNavWrapper = this.options.globalFind
-                ? $(this.options.svPageNavWrapper)
-                : this.$target.find(this.options.svPageNavWrapper)
+                ? $(this.options.pageNavWrapper)
+                : this.$target.find(this.options.pageNavWrapper)
             ;
             if (!oldPageNavWrapper.length)
             {
@@ -331,7 +331,7 @@ SV.StandardLib = SV.StandardLib || {};
          */
         getCurrentPage: function ()
         {
-            if (!this.options.svPageNavWrapper)
+            if (!this.options.pageNavWrapper)
             {
                 return null;
             }
