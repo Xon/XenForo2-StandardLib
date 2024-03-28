@@ -2,7 +2,7 @@
     "legacy_addon_id": "",
     "title": "Standard Library",
     "description": "A number of helper utilities designed to ease add-on development",
-    "version_id" : 2001200000,
+    "version_id" : 2001200001,
     "version_string": "1.20.0",
     "dev": "Atelier Aphelion",
     "dev_url": "https://atelieraphelion.com/",

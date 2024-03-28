@@ -2,6 +2,8 @@
 
 namespace SV\StandardLib;
 
+use XF\ControllerPlugin\AbstractPlugin;
+use XF\Mvc\Controller;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Finder;
 use XF\Mvc\Entity\Repository;
@@ -227,5 +229,18 @@ class Helper
         $service = \XF::service($identifier, ...$arguments);
 
         return $service;
+    }
+
+    /**
+     * @template T of AbstractPlugin
+     * @param Controller|AbstractPlugin $controller
+     * @param class-string<T> $class
+     * @return T
+     */
+    public static function plugin($controller, string $class)
+    {
+        /** @var AbstractPlugin $plugin */
+        $plugin = $controller->plugin($class);
+        return $plugin;
     }
 }
