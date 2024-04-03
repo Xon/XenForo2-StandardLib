@@ -43,17 +43,20 @@ class Setup extends AbstractSetup
     {
         parent::postInstall($stateChanges);
         Helper::repo()->rebuildAddOnVersionCache();
+        Helper::repo()->clearShimCache();
     }
 
     public function postUpgrade($previousVersion, array &$stateChanges)// : void
     {
         parent::postUpgrade($previousVersion, $stateChanges);
         Helper::repo()->rebuildAddOnVersionCache();
+        Helper::repo()->clearShimCache();
     }
 
     public function postRebuild()// : void
     {
         parent::postRebuild();
         Helper::repo()->rebuildAddOnVersionCache();
+        Helper::repo()->clearShimCache();
     }
 }

@@ -4,12 +4,19 @@ namespace SV\StandardLib\Repository;
 
 use XF\Container;
 use XF\Mvc\Entity\Repository;
+use XF\Util\File as FileUtil;
+use function assert;
+use function class_alias;
+use function file_exists;
 use function in_array;
 use function is_numeric;
 use function is_string;
+use function md5;
 use function preg_replace;
 use function str_replace;
 use function strpos;
+use function strrpos;
+use function substr;
 use function version_compare;
 
 class Helper extends Repository
@@ -357,29 +364,133 @@ class Helper extends Repository
         return null;
     }
 
-    public function aliasClass(string $destClass, string $srcClass)
+    /**
+     * @param string $destClass
+     * @param class-string $srcClass
+     * @return void
+     */
+    public function aliasClass(string $destClass, string $srcClass): void
     {
-        \class_alias($srcClass, $destClass);
-
-        $nsEnd = \strrpos($srcClass, '\\');
-        if ($nsEnd)
+        if (\XF::$versionId < 2021300)
         {
-            $srcAlias = \substr($srcClass, 0, $nsEnd) . '\\XFCP_' . \substr($srcClass, $nsEnd + 1);
+            $this->aliasClassSimple($destClass, $srcClass);
+
+            return;
+        }
+
+        if ($destClass[0] !== '\\')
+        {
+            $destClass = '\\'.$destClass;
+        }
+        if ($srcClass[0] !== '\\')
+        {
+            $srcClass = '\\'.$srcClass;
+        }
+        $file = '/svShim/'.md5($destClass.'-'.$srcClass).'.php';
+        $stubFile = FileUtil::getCodeCachePath() . $file;
+
+        // include returns false if the file doesn't exist, so don't bother with file_exists/is_readable checks
+        $result = false;
+        try
+        {
+            $result = @include($stubFile);
+        }
+        catch (\Throwable $e)
+        {
+            $this->logException($e);
+        }
+        if ($result === true)
+        {
+            return;
+        }
+
+        $php = $this->buildShimStubFile($srcClass, $destClass);
+
+        FileUtil::writeToAbstractedPath('code-cache:/'.$file, $php);
+
+        try
+        {
+            @include($stubFile);
+        }
+        catch (\Throwable $e)
+        {
+            $this->logException($e);
+        }
+    }
+
+    protected function buildShimStubFile(string $srcClass, string $destClass): string
+    {
+        assert($srcClass !== '' && $srcClass[0] === '\\');
+        assert($destClass !== '' && $destClass[0] === '\\');
+        $nsEnd = strrpos($srcClass, '\\');
+        $srcAlias = substr($srcClass, 1, $nsEnd) . '\\XFCP_' . substr($srcClass, $nsEnd + 1);
+
+        $nsEnd = strrpos($destClass, '\\');
+        $namespace = substr($destClass, 1, $nsEnd - 1);
+        $class = substr($destClass, $nsEnd + 1);
+        $destAlias = $namespace. '\\XFCP_' . $class;
+
+        return <<<EOL
+<?php
+namespace $namespace;
+class $class extends $srcClass {}
+class_alias('$destAlias', '$srcAlias', false);
+return true;
+EOL;
+    }
+
+    public function clearShimCache(): void
+    {
+        try
+        {
+            FileUtil::deleteAbstractedDirectory('code-cache://svShim');
+        }
+        catch (\Throwable $e)
+        {
+            $this->logException($e);
+        }
+    }
+
+    protected function logException($e): void
+    {
+        // Suppress error reporting, as it is likely to be a transient issue during add-on install/upgrade that can be safely ignored
+        if (\XF::$developmentMode)
+        {
+            \XF::logException($e, false, 'Suppressed:');
+        }
+    }
+
+    /**
+     * XF2.2.13+ implements \XF\Extension::inverseExtensionMap, which simplifies resolveExtendedClassToRoot significantly
+     * However this is incompatible with class_alias for the top-level class extension
+     *
+     * @param string $destClass
+     * @param string $srcClass
+     * @return void
+     */
+    public function aliasClassSimple(string $destClass, string $srcClass)
+    {
+        class_alias($srcClass, $destClass);
+
+        $nsEnd = strrpos($srcClass, '\\');
+        if ($nsEnd !== false)
+        {
+            $srcAlias = substr($srcClass, 0, $nsEnd) . '\\XFCP_' . substr($srcClass, $nsEnd + 1);
         }
         else
         {
             $srcAlias = "XFCP_$srcClass";
         }
-        $nsEnd = \strrpos($destClass, '\\');
-        if ($nsEnd)
+        $nsEnd = strrpos($destClass, '\\');
+        if ($nsEnd !== false)
         {
-            $destAlias = \substr($destClass, 0, $nsEnd) . '\\XFCP_' . \substr($destClass, $nsEnd + 1);
+            $destAlias = substr($destClass, 0, $nsEnd) . '\\XFCP_' . substr($destClass, $nsEnd + 1);
         }
         else
         {
             $destAlias = "XFCP_$destClass";
         }
 
-        \class_alias($destAlias, $srcAlias, false);
+        class_alias($destAlias, $srcAlias, false);
     }
 }
