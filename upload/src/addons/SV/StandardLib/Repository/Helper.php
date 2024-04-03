@@ -423,7 +423,7 @@ class Helper extends Repository
         assert($srcClass !== '' && $srcClass[0] === '\\');
         assert($destClass !== '' && $destClass[0] === '\\');
         $nsEnd = strrpos($srcClass, '\\');
-        $srcAlias = substr($srcClass, 1, $nsEnd) . '\\XFCP_' . substr($srcClass, $nsEnd + 1);
+        $srcAlias = substr($srcClass, 1, $nsEnd) . 'XFCP_' . substr($srcClass, $nsEnd + 1);
 
         $nsEnd = strrpos($destClass, '\\');
         $namespace = substr($destClass, 1, $nsEnd - 1);
