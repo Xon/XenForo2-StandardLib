@@ -26,7 +26,7 @@ class Router extends XFCP_Router
      * @param string $action
      * @param mixed  $data
      * @param array  $parameters
-     * @return \XF\Mvc\RouteBuiltLink|string|null
+     * @return RouteBuiltLink|string|null
      */
     protected function buildRouteUrl($prefix, array $route, $action, $data = null, array &$parameters = [])
     {

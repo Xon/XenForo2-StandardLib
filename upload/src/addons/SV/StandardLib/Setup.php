@@ -6,6 +6,7 @@ use XF\AddOn\AbstractSetup;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
+use XF\Entity\Phrase;
 
 class Setup extends AbstractSetup
 {
@@ -21,7 +22,7 @@ class Setup extends AbstractSetup
 
     public function uninstallStep1()// : void
     {
-        /** @var \XF\Entity\Phrase[] $phrases */
+        /** @var Phrase[] $phrases */
         $phrases = \XF::finder('XF:Phrase')
                       ->where('language_id', '=', 0)
                       ->where('addon_id', '=', 'SV/StandardLib')

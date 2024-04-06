@@ -6,11 +6,7 @@ use XF\Db\Schema\Column;
 
 class AlterColumnUnwrapper extends Column
 {
-    /**
-     * @param Column $column
-     * @return string|null
-     */
-    public static function getRename(Column $column)
+    public static function getRename(Column $column): ?string
     {
         return $column->newName;
     }

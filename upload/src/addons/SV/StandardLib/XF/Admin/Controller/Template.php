@@ -12,6 +12,8 @@ use XF\Entity\Template as TemplateEntity;
 use XF\Repository\TemplateModification as TemplateModificationRepo;
 use XF\Mvc\Reply\Exception as ExceptionReply;
 use XF\Template\Compiler\Exception as TemplateCompilerException;
+use function in_array;
+use function is_numeric;
 
 class Template extends XFCP_Template
 {
@@ -71,7 +73,7 @@ class Template extends XFCP_Template
                 return $mod->enabled;
             }
 
-            return \in_array($mod->modification_id, $activeModIds, true);
+            return in_array($mod->modification_id, $activeModIds, true);
         });
         $filtered = $filtered->toArray();
 
@@ -83,9 +85,9 @@ class Template extends XFCP_Template
             $statuses
         );
 
-        $statuses = \array_map(function ($status)
+        $statuses = array_map(function ($status)
         {
-            if (\is_numeric($status))
+            if (is_numeric($status))
             {
                 return \XF::phrase('svStandardLib_match_count_x', [
                     'count' => $this->app()->language()->numberFormat($status)

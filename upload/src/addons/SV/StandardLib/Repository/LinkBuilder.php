@@ -4,8 +4,6 @@ namespace SV\StandardLib\Repository;
 
 use XF\Mvc\Entity\Repository;
 use XF\Mvc\Router;
-use function is_array;
-use function method_exists;
 
 class LinkBuilder extends Repository
 {
@@ -13,7 +11,7 @@ class LinkBuilder extends Repository
      * @param Router $router
      * @return void
      */
-    public function hookRouteBuilder(\XF\Mvc\Router $router)
+    public function hookRouteBuilder(Router $router)
     {
         $app = $this->app();
         $classType = $app->container('app.classType');
@@ -26,7 +24,7 @@ class LinkBuilder extends Repository
      * @param callable $callable Should have the signature: callable(string &$prefix,array &$route,string &$action,&$data,array &$params,\XF\Mvc\Router $router):\XF\Mvc\RouteBuiltLink|string|false|null
      * @return void
      */
-    public function injectLinkBuilderCallback(\XF\Mvc\Router $router, string $routeLabel, callable $callable)
+    public function injectLinkBuilderCallback(Router $router, string $routeLabel, callable $callable)
     {
         $routes = $router->getRoutes();
 
@@ -36,11 +34,7 @@ class LinkBuilder extends Repository
             return;
         }
 
-        if (is_array($callable) && method_exists(\Closure::class, 'fromCallable'))
-        {
-            /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
-            $callable = \Closure::fromCallable($callable);
-        }
+        $callable = \Closure::fromCallable($callable);
 
         foreach ($routeSection as $subSection => $route)
         {
@@ -52,10 +46,11 @@ class LinkBuilder extends Repository
     /**
      * @param Router   $router
      * @param string   $routeLabel
+     * @param string   $subSection
      * @param callable $callable Should have the signature: callable(string &$prefix,array &$route,string &$action,&$data,array &$params,\XF\Mvc\Router $router):\XF\Mvc\RouteBuiltLink|string|false|null
      * @return void
      */
-    public function injectLinkBuilderCallbackForSubsection(\XF\Mvc\Router $router, string $routeLabel, string $subSection, callable $callable)
+    public function injectLinkBuilderCallbackForSubsection(Router $router, string $routeLabel, string $subSection, callable $callable)
     {
         $routes = $router->getRoutes();
 
@@ -65,11 +60,7 @@ class LinkBuilder extends Repository
             return;
         }
 
-        if (is_array($callable) && method_exists(\Closure::class, 'fromCallable'))
-        {
-            /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
-            $callable = \Closure::fromCallable($callable);
-        }
+        $callable = \Closure::fromCallable($callable);
 
         $route['build_callback_list'][] = $callable;
         $router->addRoute($routeLabel, $subSection, $route);

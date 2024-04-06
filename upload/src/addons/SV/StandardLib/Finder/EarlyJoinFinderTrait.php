@@ -7,10 +7,13 @@
 
 namespace SV\StandardLib\Finder;
 
+use XF\Db\AbstractAdapter;
 use XF\Mvc\Entity\Finder;
 use XF\Mvc\Entity\FinderExpression;
 use XF\Mvc\Entity\Structure;
 use function implode, count;
+use function is_callable;
+use function is_float;
 
 /**
  * @method int getEarlyJoinThreshold(?int $offset = null, ?int $limit = null, array $options = [])
@@ -26,7 +29,7 @@ use function implode, count;
  * @property int limit
  * @property int offset
  *
- * @property \XF\Db\AbstractAdapter $db
+ * @property AbstractAdapter $db
  * @property Structure $structure
  */
 trait EarlyJoinFinderTrait
@@ -57,7 +60,7 @@ trait EarlyJoinFinderTrait
         // offset is computed as page*page-size, which can be user-controlled which can make it appear as a float
         // Do not trigger a possible type error because of the url; /forums/1/page-9223372036854775807
         // Support 32bit builds where floats only have 23 bits of precision which is less than PHP_INT_MAX
-        if (\is_float($offset) && $offset >= (1 << (\PHP_INT_SIZE >= 8 ? 52 : 23)))
+        if (is_float($offset) && $offset >= (1 << (\PHP_INT_SIZE >= 8 ? 52 : 23)))
         {
             $this->whereImpossible();
 
@@ -74,7 +77,7 @@ trait EarlyJoinFinderTrait
         $offset = (int)$offset;
         $limit = (int)$limit;
 
-        $threshold = \is_callable([$this, 'getEarlyJoinThreshold']) ? $this->getEarlyJoinThreshold($offset, $limit, $options) : -1;
+        $threshold = is_callable([$this, 'getEarlyJoinThreshold']) ? $this->getEarlyJoinThreshold($offset, $limit, $options) : -1;
 
         if ($this->parentFinder ||
             $threshold < 0 ||
@@ -141,7 +144,7 @@ trait EarlyJoinFinderTrait
         {
             if (!$fetchOnly)
             {
-                throw new \InvalidArgumentException("Must specify one or more specific columns to fetch");
+                throw new \InvalidArgumentException('Must specify one or more specific columns to fetch');
             }
 
             foreach ($fetchOnly AS $key => $fetchValue)
@@ -191,33 +194,33 @@ trait EarlyJoinFinderTrait
 
         if ($this->order)
         {
-            $orderBy = 'ORDER BY ' . \implode(', ', $this->order);
+            $orderBy = 'ORDER BY ' . implode(', ', $this->order);
         }
         else if ($defaultOrderSql)
         {
-            $orderBy = 'ORDER BY ' . \implode(', ', $defaultOrderSql);
+            $orderBy = 'ORDER BY ' . implode(', ', $defaultOrderSql);
         }
         else
         {
             $orderBy = '';
         }
 
-        $innerTable = "earlyJoinQuery_". $this->aliasCounter++;
+        $innerTable = 'earlyJoinQuery_' . $this->aliasCounter++;
         $primaryJoin = [];
         foreach($primaryKeys as $primaryKey)
         {
             $primaryJoin[] = "(`$coreTable`.`$primaryKey` = `$innerTable`.`$primaryKey`)";
         }
-        $primaryJoinSql = \implode(' AND ', $primaryJoin);
+        $primaryJoinSql = implode(' AND ', $primaryJoin);
 
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $q = $this->db->limit("
-			SELECT " . \implode(', ', $fetch) . "
+        $q = $this->db->limit('
+			SELECT ' . implode(', ', $fetch) . "
 			FROM (
 			$innerSql
 			) as `$innerTable`
 			JOIN `$coreTable` ON ($primaryJoinSql)
-			" . \implode("\n", $joins) . "
+			" . implode("\n", $joins) . "
 			$orderBy
         ", $limit);
 

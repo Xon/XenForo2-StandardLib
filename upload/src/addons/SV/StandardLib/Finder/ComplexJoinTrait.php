@@ -2,11 +2,12 @@
 
 namespace SV\StandardLib\Finder;
 
+use XF\Mvc\Entity\Finder;
 use XF\Mvc\Entity\Structure;
 
 /**
- * @property \XF\Mvc\Entity\Structure structure
- * @method \XF\Mvc\Entity\Finder with(string|string[] $name, bool $mustExist = false)
+ * @property Structure structure
+ * @method Finder with(string|string[] $name, bool $mustExist = false)
  */
 trait ComplexJoinTrait
 {

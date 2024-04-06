@@ -2,12 +2,15 @@
 
 namespace SV\StandardLib\Repository;
 
+use SV\InstallerAppHelper\InstallAppBootstrap;
 use XF\Container;
+use XF\Entity\AddOn;
+use XF\Entity\User;
+use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Repository;
 use XF\Util\File as FileUtil;
 use function assert;
 use function class_alias;
-use function file_exists;
 use function in_array;
 use function is_numeric;
 use function is_string;
@@ -49,7 +52,7 @@ class Helper extends Repository
         if (is_string($targetVersion))
         {
             $addOnEntity = \XF::em()->findCached('XF:AddOn', $addonId);
-            if ($addOnEntity instanceof \XF\Entity\AddOn)
+            if ($addOnEntity instanceof AddOn)
             {
                 // unlike \XF::isAddOnActive, the add-on must not be in a processing state
                 $installedVersionId = $addOnEntity->is_processing ? null : $addOnEntity->version_string;
@@ -76,10 +79,10 @@ class Helper extends Repository
 
         if (\XF::$versionId < 2020000)
         {
-            return $this->isAddOnActiveForXF21($addonId, $targetVersion, $operator);
+            return (bool)$this->isAddOnActiveForXF21($addonId, $targetVersion, $operator);
         }
 
-        return \XF::isAddOnActive($addonId, $targetVersion, $operator);
+        return (bool)\XF::isAddOnActive($addonId, $targetVersion, $operator);
     }
 
     /**
@@ -88,17 +91,17 @@ class Helper extends Repository
      * @param string $addOnId
      * @param int|null    $versionId
      * @param string $operator
-     * @return bool|mixed
+     * @return bool|int
      */
     protected function isAddOnActiveForXF21(string $addOnId, ?int $versionId = null, string $operator = '>=')
     {
         $addOns = \XF::app()->container('addon.cache');
-        if (!isset($addOns[$addOnId]))
+        $activeVersionId = $addOns[$addOnId] ?? null;
+        if ($activeVersionId === null)
         {
             return false;
         }
-
-        $activeVersionId = $addOns[$addOnId];
+        /** @var int $activeVersionId */
         if ($versionId === null)
         {
             return $activeVersionId;
@@ -146,17 +149,15 @@ class Helper extends Repository
         return $data;
     }
 
-    protected function markAsCriticalAddon()//: void
+    protected function markAsCriticalAddon(): void
     {
         if ($this->hasDesiredAddOnVersion('SV/InstallerAppHelper', null))
         {
-            /** @noinspection PhpUndefinedClassInspection */
-            /** @noinspection PhpUndefinedNamespaceInspection */
-            \SV\InstallerAppHelper\InstallAppBootstrap::markAddonCritical('SV/StandardLib');
+            InstallAppBootstrap::markAddonCritical('SV/StandardLib');
         }
     }
 
-    public function resetAddOnVersionCache()//: void
+    public function resetAddOnVersionCache(): void
     {
         $this->app()->registry()->delete('addon.versionCache');
     }
@@ -327,19 +328,19 @@ class Helper extends Repository
     }
 
     /**
-     * @param mixed|\XF\Mvc\Entity\Entity|null $entity
-     * @param string                           $relationOrGetter
-     * @param string                           $backupColumn
-     * @return \XF\Entity\User|null
+     * @param mixed|Entity|null $entity
+     * @param string            $relationOrGetter
+     * @param string            $backupColumn
+     * @return User|null
      */
-    public function getUserEntity($entity, string $relationOrGetter = 'User', string $backupColumn = 'user_id')
+    public function getUserEntity($entity, string $relationOrGetter = 'User', string $backupColumn = 'user_id'): ?User
     {
-        if (!($entity instanceof \XF\Mvc\Entity\Entity))
+        if (!($entity instanceof Entity))
         {
             return null;
         }
 
-        if ($entity instanceof \XF\Entity\User)
+        if ($entity instanceof User)
         {
             return $entity;
         }
@@ -347,7 +348,7 @@ class Helper extends Repository
         if ($entity->isValidGetter($relationOrGetter) || $entity->isValidRelation($relationOrGetter))
         {
             $user = $entity->get($relationOrGetter);
-            if ($user instanceof \XF\Entity\User)
+            if ($user instanceof User)
             {
                 return $user;
             }
@@ -355,7 +356,7 @@ class Helper extends Repository
 
         if ($entity->isValidColumn($backupColumn) || $entity->isValidGetter($backupColumn))
         {
-            /** @var \XF\Entity\User $user */
+            /** @var User $user */
             $user = \XF::app()->find('XF:User', $entity->get($backupColumn));
 
             return $user;
@@ -468,7 +469,7 @@ EOL;
      * @param string $srcClass
      * @return void
      */
-    public function aliasClassSimple(string $destClass, string $srcClass)
+    public function aliasClassSimple(string $destClass, string $srcClass): void
     {
         class_alias($srcClass, $destClass);
 

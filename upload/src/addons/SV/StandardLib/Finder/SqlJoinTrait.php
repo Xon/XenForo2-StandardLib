@@ -7,14 +7,19 @@
 
 namespace SV\StandardLib\Finder;
 
+use XF\Db\AbstractAdapter;
+use function array_fill_keys;
+use function array_slice;
 use function count;
 use function implode;
 use function is_array;
+use function is_string;
+use function substr;
 
 /**
  * @property array joins
  * @property string[] indexHints
- * @property \XF\Db\AbstractAdapter db
+ * @property AbstractAdapter db
  *
  * @method string columnSqlName(string $column, bool $markFundamental = true)
  */
@@ -59,7 +64,7 @@ trait SqlJoinTrait
                     unset($this->joins[$alias]);
                 }
             }
-            $this->indexHints[] = "\n". \implode('', $complexJoins);
+            $this->indexHints[] = "\n". implode('', $complexJoins);
         }
         try
         {
@@ -87,7 +92,7 @@ trait SqlJoinTrait
      */
     public function sqlJoin(string $rawJoinTable, string $alias, array $columns, bool $mustExist = false, bool $hasTableExpr = false)
     {
-        $columns = \array_fill_keys($columns, true);
+        $columns = array_fill_keys($columns, true);
         $this->rawJoins[$alias] = isset($this->rawJoins[$alias]) ? $this->rawJoins[$alias] + $columns : $columns;
 
         if (isset($this->joins[$alias]))
@@ -136,22 +141,22 @@ trait SqlJoinTrait
 
         foreach ($conditions AS $condition)
         {
-            if (\is_string($condition))
+            if (is_string($condition))
             {
                 $joinConditions[] = "`$alias`.`$condition` = " . $this->columnSqlName($condition);
             }
             else
             {
-                list($field, $operator, $value) = $condition;
+                [$field, $operator, $value] = $condition;
 
-                if (\count($condition) > 3)
+                if (count($condition) > 3)
                 {
                     $readValue = [];
-                    foreach (\array_slice($condition, 2) AS $v)
+                    foreach (array_slice($condition, 2) AS $v)
                     {
                         if ($v && $v[0] === '$')
                         {
-                            $readValue[] = $this->columnSqlName(\substr($v, 1));
+                            $readValue[] = $this->columnSqlName(substr($v, 1));
                         }
                         else
                         {
@@ -159,11 +164,11 @@ trait SqlJoinTrait
                         }
                     }
 
-                    $value = 'CONCAT(' . \implode(', ', $readValue) . ')';
+                    $value = 'CONCAT(' . implode(', ', $readValue) . ')';
                 }
-                else if (\is_string($value) && $value && $value[0] === '$')
+                else if (is_string($value) && $value && $value[0] === '$')
                 {
-                    $value = $this->columnSqlName(\substr($value, 1));
+                    $value = $this->columnSqlName(substr($value, 1));
                 }
                 else
                 {
@@ -172,7 +177,7 @@ trait SqlJoinTrait
 
                 if ($field[0] === '$')
                 {
-                    $fromJoinAlias = $this->columnSqlName(\substr($field, 1));
+                    $fromJoinAlias = $this->columnSqlName(substr($field, 1));
                 }
                 else
                 {
@@ -199,7 +204,7 @@ trait SqlJoinTrait
 
         $this->joins[$alias]['indexHints'] = $hints;
         $this->joins[$alias]['fundamental'] = (bool)$joinConditions;
-        $this->joins[$alias]['condition'] = \implode(' AND ', $joinConditions);
+        $this->joins[$alias]['condition'] = implode(' AND ', $joinConditions);
     }
 
     /**
@@ -211,9 +216,9 @@ trait SqlJoinTrait
     public function resolveFieldToTableAndColumn($field, $markJoinFundamental = true)
     {
         $parts = \explode('.', $field);
-        if (\count($parts) === 2)
+        if (count($parts) === 2)
         {
-            list($alias, $column) = $parts;
+            [$alias, $column] = $parts;
             if (isset($this->rawJoins[$alias][$column]))
             {
                 $this->joins[$alias]['fundamental'] = $markJoinFundamental;

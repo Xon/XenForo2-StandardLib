@@ -7,13 +7,7 @@ namespace SV\StandardLib\XF\AddOn;
 use SV\StandardLib\Helper;
 use function array_key_exists;
 use function array_merge;
-use function explode;
-use function extension_loaded;
 use function is_array;
-use function phpversion;
-use function strpos;
-use function strtolower;
-use function version_compare;
 
 /**
  * Extends \XF\AddOn\Manager

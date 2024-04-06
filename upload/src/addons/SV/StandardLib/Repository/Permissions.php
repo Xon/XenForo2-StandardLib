@@ -3,6 +3,8 @@
 namespace SV\StandardLib\Repository;
 
 use SV\StandardLib\Permissions\PermissionCache;
+use XF\Entity\PermissionCacheContent;
+use XF\Entity\PermissionCombination;
 use XF\Entity\User;
 use XF\Mvc\Entity\Repository;
 use function array_key_exists;
@@ -44,7 +46,7 @@ class Permissions extends Repository
 
         foreach ($permissions as $permissionCombination)
         {
-            \XF\Entity\PermissionCombination::instantiateProxied($permissionCombination);
+            PermissionCombination::instantiateProxied($permissionCombination);
         }
     }
 
@@ -94,7 +96,7 @@ class Permissions extends Repository
 
         foreach ($permissions as $permissionCombination)
         {
-            \XF\Entity\PermissionCacheContent::instantiateProxied($permissionCombination);
+            PermissionCacheContent::instantiateProxied($permissionCombination);
         }
     }
 

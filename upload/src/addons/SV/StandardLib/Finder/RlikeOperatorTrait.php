@@ -2,10 +2,11 @@
 
 namespace SV\StandardLib\Finder;
 
+use XF\Db\AbstractAdapter;
 use XF\Mvc\Entity\FinderExpression;
 
 /**
- * @property \XF\Db\AbstractAdapter db
+ * @property AbstractAdapter db
  * @method FinderExpression expression(string $sqlExpression, string... $columns)
  */
 trait RlikeOperatorTrait

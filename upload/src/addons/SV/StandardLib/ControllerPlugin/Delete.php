@@ -3,6 +3,11 @@
 namespace SV\StandardLib\ControllerPlugin;
 
 use XF\ControllerPlugin\AbstractPlugin;
+use XF\ControllerPlugin\InlineMod;
+use XF\Entity\Phrase;
+use XF\Mvc\Entity\Entity;
+use XF\Mvc\Reply\AbstractReply;
+use function is_callable;
 
 /**
  * Class Delete
@@ -12,24 +17,23 @@ use XF\ControllerPlugin\AbstractPlugin;
 class Delete extends AbstractPlugin
 {
 	/**
-	 * @param \XF\Mvc\Entity\Entity $entity
+	 * @param Entity $entity
 	 * @param string $stateKey
 	 * @param string $deleterService
 	 * @param string $contentType
 	 * @param string $deleteLink
 	 * @param string $editLink
 	 * @param string $redirectLink
-	 * @param \XF\Entity\Phrase|string $title
+	 * @param Phrase|string $title
 	 * @param bool $canHardDelete
 	 * @param bool $includeAuthorAlert
 	 * @param string|null $templateName
 	 * @param array $params
 	 *
-	 * @return \XF\Mvc\Reply\AbstractReply
-     * @noinspection PhpMissingParamTypeInspection
+	 * @return AbstractReply
      */
 	public function actionDeleteWithState(
-		\XF\Mvc\Entity\Entity $entity,
+		Entity $entity,
 		string $stateKey,
 		string $deleterService,
 		string $contentType,
@@ -41,9 +45,9 @@ class Delete extends AbstractPlugin
 		bool $includeAuthorAlert = true,
 		?string $templateName = null,
 		array $params = []
-	): \XF\Mvc\Reply\AbstractReply
+	): AbstractReply
     {
-        if (!\is_callable([$entity, 'canDelete']) || !\is_callable([$entity, 'canUndelete']))
+        if (!is_callable([$entity, 'canDelete']) || !is_callable([$entity, 'canUndelete']))
         {
             throw new \LogicException('Either canDelete or canUndelete is not callable on ' . \get_class($entity));
         }
@@ -58,7 +62,7 @@ class Delete extends AbstractPlugin
 			$id = $entity->getIdentifierValues();
 			if (!$id || count($id) != 1)
 			{
-				throw new \InvalidArgumentException("Entity does not have an ID or does not have a simple key");
+				throw new \InvalidArgumentException('Entity does not have an ID or does not have a simple key');
 			}
 			$entityId = intval(reset($id));
 			
@@ -87,7 +91,7 @@ class Delete extends AbstractPlugin
 						}
 						$deleter->delete('hard', $reason);
 						
-						/** @var \XF\ControllerPlugin\InlineMod $inlineModPlugin */
+						/** @var InlineMod $inlineModPlugin */
 						$inlineModPlugin = $this->plugin('XF:InlineMod');
 						$inlineModPlugin->clearIdFromCookie($contentType, $entityId);
 						
@@ -128,7 +132,7 @@ class Delete extends AbstractPlugin
 				}
 				$deleter->delete($type, $reason);
 				
-				/** @var \XF\ControllerPlugin\InlineMod $inlineModPlugin */
+				/** @var InlineMod $inlineModPlugin */
 				$inlineModPlugin = $this->plugin('XF:InlineMod');
 				$inlineModPlugin->clearIdFromCookie($contentType, $entityId);
 				

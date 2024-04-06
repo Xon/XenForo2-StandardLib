@@ -1,6 +1,12 @@
 <?php
+/**
+ * @noinspection PhpVariableVariableInspection
+ * @noinspection PhpExpressionAlwaysNullInspection
+ */
 
 namespace SV\StandardLib;
+
+use function get_class;
 
 class BypassAccessStatus
 {
@@ -10,12 +16,12 @@ class BypassAccessStatus
      * @param mixed  $context
      * @return \Closure
      */
-    public function getPrivate($obj, string $attribute, $context = null) : \Closure
+    public function getPrivate(object $obj, string $attribute, $context = null) : \Closure
     {
         $getter = function () use ($attribute) { return $this->$attribute; };
         if (!$context)
         {
-            $context = \get_class($obj);
+            $context = get_class($obj);
         }
 
         return \Closure::bind($getter, $obj, $context);
@@ -27,12 +33,12 @@ class BypassAccessStatus
      * @param mixed  $context
      * @return \Closure
      */
-    public function setPrivate($obj, string $attribute, $context = null) : \Closure
+    public function setPrivate(object $obj, string $attribute, $context = null) : \Closure
     {
         $setter = function ($value) use ($attribute) { $this->$attribute = $value; };
         if (!$context)
         {
-            $context = \get_class($obj);
+            $context = get_class($obj);
         }
 
         return \Closure::bind($setter, $obj, $context);
@@ -42,7 +48,6 @@ class BypassAccessStatus
      * @param string|object $obj
      * @param string $attribute
      * @return \Closure
-     * @noinspection PhpMissingParamTypeInspection
      */
     public function getStaticPrivate($obj, string $attribute) : \Closure
     {
@@ -57,7 +62,6 @@ class BypassAccessStatus
      * @param string|object $obj
      * @param string $attribute
      * @return \Closure
-     * @noinspection PhpMissingParamTypeInspection
      */
     public function setStaticPrivate($obj, string $attribute) : \Closure
     {

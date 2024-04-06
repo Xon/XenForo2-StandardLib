@@ -2,16 +2,17 @@
 
 namespace SV\StandardLib;
 
+use XF\App;
 use XF\Template\Templater;
 
 abstract class TemplaterAccess extends Templater
 {
-    public static function app(\XF\Template\Templater $templater): \XF\App
+    public static function app(Templater $templater): App
     {
         return $templater->app;
     }
 
-    public static function filters(\XF\Template\Templater $templater): array
+    public static function filters(Templater $templater): array
     {
         return $templater->filters;
     }

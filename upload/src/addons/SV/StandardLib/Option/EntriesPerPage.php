@@ -2,17 +2,15 @@
 
 namespace SV\StandardLib\Option;
 
+use XF\Entity\Option;
 use XF\Option\AbstractOption;
 use function count;
 use function is_int;
-use function is_string;
 use function sort;
-use function strlen;
-use function strval;
 
 abstract class EntriesPerPage extends AbstractOption
 {
-    public static function renderOption(\XF\Entity\Option $option, array $htmlParams): string
+    public static function renderOption(Option $option, array $htmlParams): string
     {
         $choices = [];
         foreach ($option->option_value AS $perPage)

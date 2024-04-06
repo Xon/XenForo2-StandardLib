@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib;
 
+use SV\StandardLib\Repository\Permissions as PermissionsRepo;
 use XF\ControllerPlugin\AbstractPlugin;
 use XF\Mvc\Controller;
 use XF\Mvc\Entity\Entity;
@@ -22,18 +23,12 @@ class Helper
 
     public static function repo(): \SV\StandardLib\Repository\Helper
     {
-        /** @var \SV\StandardLib\Repository\Helper $repo */
-        $repo = \XF::repository('SV\StandardLib:Helper');
-
-        return $repo;
+        return self::repository(\SV\StandardLib\Repository\Helper::class);
     }
 
-    public static function perms(): \SV\StandardLib\Repository\Permissions
+    public static function perms(): PermissionsRepo
     {
-        /** @var \SV\StandardLib\Repository\Permissions $repo */
-        $repo = \XF::repository('SV\StandardLib:Permissions');
-
-        return $repo;
+        return self::repository(PermissionsRepo::class);
     }
 
     /**
@@ -61,12 +56,7 @@ class Helper
         return $obj;
     }
 
-    /**
-     * @param string|null $entityName
-     * @return Structure|null
-     * @noinspection PhpMissingParamTypeInspection
-     */
-    public static function getEntityStructure($entityName)
+    public static function getEntityStructure(?string $entityName): ?Structure
     {
         if ($entityName === null || $entityName === '')
         {

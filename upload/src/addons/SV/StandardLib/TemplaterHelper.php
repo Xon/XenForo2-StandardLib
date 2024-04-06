@@ -7,8 +7,15 @@ namespace SV\StandardLib;
 
 use SV\StandardLib\Helper as StandardLibHelper;
 use SV\StandardLib\XF\CssRenderer;
+use XF\App;
+use XF\Container;
 use XF\Mvc\Entity\AbstractCollection;
+use XF\Mvc\Entity\Manager;
+use XF\Mvc\Entity\Repository;
 use XF\Mvc\Reply\AbstractReply;
+use XF\Phrase;
+use XF\PreEscaped;
+use XF\Style;
 use XF\Template\Templater as BaseTemplater;
 use function json_decode;
 use function max;
@@ -18,7 +25,7 @@ class TemplaterHelper
 {
     /** @var BaseTemplater */
     protected $templater;
-    /** @var \XF\App */
+    /** @var App */
     protected $app;
     /** @var bool */
     protected $hasFromCallable;
@@ -28,17 +35,17 @@ class TemplaterHelper
     protected $cssRenderer = null;
 
     /**
-     * @param \XF\Container $container
+     * @param Container $container
      * @param BaseTemplater $templater
      * @return void
      */
-    public static function templaterSetup(\XF\Container $container, BaseTemplater &$templater)
+    public static function templaterSetup(Container $container, BaseTemplater &$templater)
     {
         $templateHelper = Helper::newExtendedClass(self::class, $templater);
         $templateHelper->setup();
     }
 
-    public static function templaterGlobalData(\XF\App $app, array &$data, ?AbstractReply $reply = null)
+    public static function templaterGlobalData(App $app, array &$data, ?AbstractReply $reply = null)
     {
         $helper = self::get($app->templater());
         $helper->populateTemplaterGlobalData($data, $reply);
@@ -49,7 +56,7 @@ class TemplaterHelper
      * @return static
      * @noinspection PhpMissingReturnTypeInspection
      */
-    public static function get(\XF\Template\Templater $templater)
+    public static function get(BaseTemplater $templater)
     {
         $helper = TemplaterAccess::getDefaultParam($templater, 'svTemplateHelper');
         // make sure a non-null value is fetched
@@ -136,11 +143,8 @@ class TemplaterHelper
             }
         }
 
-        if ($this->hasFromCallable && !($filter instanceof \Closure))
-        {
-            /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
-            $filter = \Closure::fromCallable($filter);
-        }
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
+        $filter = \Closure::fromCallable($filter);
 
         return $filter;
     }
@@ -177,7 +181,7 @@ class TemplaterHelper
         $this->templater->addFunction($name, $this->mangleCallable($filter));
     }
 
-    protected function getStyle(): \XF\Style
+    protected function getStyle(): Style
     {
         return $this->templater->getStyle() ?? $this->app()->style();
     }
@@ -237,10 +241,10 @@ class TemplaterHelper
      * @param bool          $escape
      * @param string        $storageKey
      * @param string        $storageContainer
-     * @param bool|null   $default
-     * @return bool
+     * @param bool          $default
+     * @return ?bool
      */
-    public function fnIsToggleSet(BaseTemplater $templater, bool &$escape, string $storageKey, bool $default = false, string $storageContainer = 'toggle')
+    public function fnIsToggleSet(BaseTemplater $templater, bool &$escape, string $storageKey, bool $default = false, string $storageContainer = 'toggle'): bool
     {
         $cookie = $this->app->request()->getCookie($storageContainer);
         if (!$cookie)
@@ -299,7 +303,7 @@ class TemplaterHelper
         }
         else if (!is_array($value))
         {
-            $error = "addValue should be called on an array or an AbstractCollection";
+            $error = 'addValue should be called on an array or an AbstractCollection';
             if (\XF::$debugMode)
             {
                 trigger_error($error, E_USER_WARNING);
@@ -336,7 +340,7 @@ class TemplaterHelper
         }
         else if (!is_array($value))
         {
-            $error = "removeValue should be called on an array or an AbstractCollection";
+            $error = 'removeValue should be called on an array or an AbstractCollection';
             if (\XF::$debugMode)
             {
                 trigger_error($error, E_USER_WARNING);
@@ -365,7 +369,7 @@ class TemplaterHelper
         return $wasCollection ? $this->em()->getBasicCollection([$value]) : $value;
     }
 
-    public function fnDynamicPhrase(BaseTemplater $templater, bool &$escape, string $value): \XF\Phrase
+    public function fnDynamicPhrase(BaseTemplater $templater, bool &$escape, string $value): Phrase
     {
         $escape = false;
 
@@ -379,7 +383,7 @@ class TemplaterHelper
      * @param bool          $escape
      * @param string        $phraseName
      * @param array         $params
-     * @return string|\XF\PreEscaped
+     * @return string|PreEscaped
      */
     public function fnPhraseDynamic(BaseTemplater $templater, bool &$escape, string $phraseName, array $params = [])
     {
@@ -391,7 +395,7 @@ class TemplaterHelper
     /**
      * @param BaseTemplater $templater
      * @param bool          $escape
-     * @param array $array1
+     * @param ?array        $array1
      * @param array<array|AbstractCollection> $arrays
      * @return array
      */
@@ -429,7 +433,7 @@ class TemplaterHelper
      */
     public function fnArrayReverseOld(BaseTemplater $templater, bool &$escape, $array, bool $preserveKeys = true)
     {
-        $error = "sv_array_reverse is deprecated use array_reverse instead";
+        $error = 'sv_array_reverse is deprecated use array_reverse instead';
         if (\XF::$debugMode)
         {
             trigger_error($error, E_USER_WARNING);
@@ -441,7 +445,7 @@ class TemplaterHelper
     /**
      * @param BaseTemplater $templater
      * @param bool $escape
-     * @param AbstractCollection|array $array
+     * @param AbstractCollection|array|null $array
      * @param bool $preserveKeys
      *
      * @return array|AbstractCollection
@@ -457,7 +461,7 @@ class TemplaterHelper
             return array_reverse($array, $preserveKeys);
         }
 
-        return $array;
+        return $array ?? [];
     }
 
     /**
@@ -470,10 +474,9 @@ class TemplaterHelper
      * @param string $class
      * @param string $triggerEvent
      * @param string $triggerEventOnSelector
-     *
-     * @return string|\XF\PreEscaped
-     *
+     * @return string|PreEscaped
      * @throws \Exception
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function fnRelativeTimestamp(
         BaseTemplater $templater, bool &$escape, int $nowTimestamp, int $otherTimestamp,
@@ -527,12 +530,12 @@ class TemplaterHelper
         return $this->getCssRenderer()->parseLessColorFuncValue($value, $forceDebug) ?? '';
     }
 
-    protected function getCssRenderer(): \SV\StandardLib\XF\CssRenderer
+    protected function getCssRenderer(): CssRenderer
     {
         if ($this->cssRenderer === null)
         {
             $renderer = Helper::newExtendedClass(\XF\CssRenderer::class, $this->app, $this->templater);
-            assert($renderer instanceof \SV\StandardLib\XF\CssRenderer);
+            assert($renderer instanceof CssRenderer);
             $this->cssRenderer = $renderer;
         }
 
@@ -545,17 +548,17 @@ class TemplaterHelper
         return $this->cssRenderer;
     }
 
-    protected function app(): \XF\App
+    protected function app(): App
     {
         return $this->app;
     }
 
-    protected function em(): \XF\Mvc\Entity\Manager
+    protected function em(): Manager
     {
         return $this->app->em();
     }
 
-    protected function repository(string $identifier): \XF\Mvc\Entity\Repository
+    protected function repository(string $identifier): Repository
     {
         return $this->app->repository($identifier);
     }
