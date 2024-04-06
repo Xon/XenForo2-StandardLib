@@ -10,7 +10,7 @@ use function array_merge;
 use function is_array;
 
 /**
- * Extends \XF\AddOn\Manager
+ * @Extends \XF\AddOn\Manager
  */
 class Manager extends XFCP_Manager
 {

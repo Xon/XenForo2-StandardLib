@@ -6,7 +6,7 @@ use SV\StandardLib\ControllerPlugin\Filter as FilterPlugin;
 use XF\Mvc\Reply\View;
 
 /**
- * Extends \XF\Pub\Controller\Watched
+ * @Extends \XF\Pub\Controller\Watched
  */
 class Watched extends XFCP_Watched
 {

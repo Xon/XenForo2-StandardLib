@@ -7,7 +7,7 @@ use XF\Mvc\RouteBuiltLink;
 use function is_string;
 
 /**
- * Extends \XF\Mvc\Router
+ * @Extends \XF\Mvc\Router
  */
 class Router extends XFCP_Router
 {

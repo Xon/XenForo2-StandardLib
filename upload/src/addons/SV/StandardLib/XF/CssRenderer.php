@@ -5,7 +5,7 @@ namespace SV\StandardLib\XF;
 use function preg_match;
 
 /**
- * Extends \XF\CssRenderer
+ * @Extends \XF\CssRenderer
  */
 class CssRenderer extends XFCP_CssRenderer
 {

@@ -15,6 +15,9 @@ use XF\Template\Compiler\Exception as TemplateCompilerException;
 use function in_array;
 use function is_numeric;
 
+/**
+ * @extends \XF\Admin\Controller\Template
+ */
 class Template extends XFCP_Template
 {
     public function actionEdit(ParameterBag $params)

@@ -16,6 +16,9 @@ use function is_int;
 use function is_numeric;
 use function is_string;
 
+/**
+ * @extends \XF\InputFilterer
+ */
 class InputFilterer extends XFCP_InputFilterer
 {
     /**
