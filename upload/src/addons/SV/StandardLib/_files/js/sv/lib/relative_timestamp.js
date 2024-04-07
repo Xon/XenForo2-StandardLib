@@ -1,7 +1,8 @@
+// noinspection ES6ConvertVarToLetConst
 var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
 
-!function($, window, document, _undefined)
+(function()
 {
     "use strict";
 
@@ -10,7 +11,7 @@ SV.StandardLib = SV.StandardLib || {};
         /**
          * @see https://gist.github.com/phpmypython/f97c5f5f59f2a934599d
          */
-        (function (m)
+        (function ()
         {
             /*
              * PHP => moment.js
@@ -18,19 +19,17 @@ SV.StandardLib = SV.StandardLib || {};
              * http://www.php.net/manual/en/function.date.php
              * http://momentjs.com/docs/#/displaying/format/
              */
-            var formatMap = {
+            let formatMap = {
                     d: 'DD',
                     D: 'ddd',
                     j: 'D',
                     l: 'dddd',
                     N: 'E',
-                    S: function ()
-                    {
+                    S: function () {
                         return '[' + this.format('Do').replace(/\d*/g, '') + ']';
                     },
                     w: 'd',
-                    z: function ()
-                    {
+                    z: function () {
                         return this.format('DDD') - 1;
                     },
                     W: 'W',
@@ -38,12 +37,10 @@ SV.StandardLib = SV.StandardLib || {};
                     m: 'MM',
                     M: 'MMM',
                     n: 'M',
-                    t: function ()
-                    {
+                    t: function () {
                         return this.daysInMonth();
                     },
-                    L: function ()
-                    {
+                    L: function () {
                         return this.isLeapYear() ? 1 : 0;
                     },
                     o: 'GGGG',
@@ -51,8 +48,7 @@ SV.StandardLib = SV.StandardLib || {};
                     y: 'YY',
                     a: 'a',
                     A: 'A',
-                    B: function ()
-                    {
+                    B: function () {
                         var thisUTC = this.clone().utc(),
                             // Shamelessly stolen from http://javascript.about.com/library/blswatch.htm
                             swatch = ((thisUTC.hours() + 1) % 24) + (thisUTC.minutes() / 60) + (thisUTC.seconds() / 3600);
@@ -67,15 +63,13 @@ SV.StandardLib = SV.StandardLib || {};
                     s: 'ss',
                     u: '[u]', // not sure if moment has this
                     e: '[e]', // moment does not have this
-                    I: function ()
-                    {
+                    I: function () {
                         return this.isDST() ? 1 : 0;
                     },
                     O: 'ZZ',
                     P: 'Z',
                     T: '[T]', // deprecated in moment
-                    Z: function ()
-                    {
+                    Z: function () {
                         return parseInt(this.format('ZZ'), 10) * 36;
                     },
                     c: 'YYYY-MM-DD[T]HH:mm:ssZ',
@@ -86,7 +80,7 @@ SV.StandardLib = SV.StandardLib || {};
 
             moment.fn.formatPHP = function (format)
             {
-                var self = this;
+                let self = this;
 
                 return this.format(format.replace(formatEx, function (phpStr)
                 {
@@ -98,7 +92,7 @@ SV.StandardLib = SV.StandardLib || {};
                     return formatMap[phpStr];
                 }));
             };
-        }(moment));
+        }());
     }
 
     SV.StandardLib.RelativeTimestamp = XF.Element.newHandler({
@@ -112,6 +106,7 @@ SV.StandardLib = SV.StandardLib || {};
             maximumDateParts: 0
         },
 
+        field: null,
         timer: null,
 
         init: function()
@@ -140,12 +135,14 @@ SV.StandardLib = SV.StandardLib || {};
                 return;
             }
 
-            this.timer = setInterval(XF.proxy(this, 'updateTime'), 1000);
+            // noinspection JSUnresolvedReference
+            this.field = this.target || this.$target.get(0)
+            this.timer = setInterval(this.updateTime.bind(this), 1000);
         },
 
         updateTime: function ()
         {
-            var now = Math.floor(Date.now() / 1000) * 1000,
+            let now = Math.floor(Date.now() / 1000) * 1000,
                 end = this.options.timestamp * 1000;
 
             if (now <= end)
@@ -176,10 +173,10 @@ SV.StandardLib = SV.StandardLib || {};
         {
             this.clearTimer();
 
-            var momentObj = moment.unix(endTimestamp / 1000),
+            let momentObj = moment.unix(endTimestamp / 1000),
                 fullEnd = this.getPhrase('date_x_at_time_y', {
                     '{date}': momentObj.formatPHP(this.options.dateFormat),
-                    '{time}': momentObj.formatPHP(this.options.timeFormat),
+                    '{time}': momentObj.formatPHP(this.options.timeFormat)
                 });
 
             if (!fullEnd)
@@ -188,7 +185,7 @@ SV.StandardLib = SV.StandardLib || {};
                 return;
             }
 
-            this.$target.text(fullEnd);
+            this.field.textContent = fullEnd;
         },
 
         /**
@@ -199,8 +196,8 @@ SV.StandardLib = SV.StandardLib || {};
         {
             if (typeof timeStr === "string")
             {
-                if (this.$target.text() !== timeStr) {
-                    this.$target.text(timeStr);
+                if (this.field.textContent !== timeStr) {
+                    this.field.textContent = timeStr;
                 }
             }
             else
@@ -216,20 +213,17 @@ SV.StandardLib = SV.StandardLib || {};
          */
         getTimeStr: function (momentObj)
         {
-            var self = this,
+            let self = this,
                 timeArr = [],
-                maximumDateParts = this.options.maximumDateParts
+                maximumDateParts = this.options.maximumDateParts;
 
-            $.each(['year', 'month', 'day', 'hour', 'minute', 'second'], function(index, type)
-            {
-                if (maximumDateParts && timeArr.length >= maximumDateParts)
-                {
+            ['year', 'month', 'day', 'hour', 'minute', 'second'].forEach((type) => {
+                if (maximumDateParts && timeArr.length >= maximumDateParts) {
                     return;
                 }
 
-                var timePartStr = self.getDatePart(momentObj, type);
-                if (typeof timePartStr !== 'string')
-                {
+                let timePartStr = self.getDatePart(momentObj, type);
+                if (typeof timePartStr !== 'string') {
                     if (maximumDateParts > 0 && timeArr.length > 0) {
                         maximumDateParts = timeArr.length;
                     }
@@ -259,14 +253,14 @@ SV.StandardLib = SV.StandardLib || {};
                 return false;
             }
 
-            var methodName = type + 's';
+            let methodName = type + 's';
             if (typeof momentObj[methodName] !== 'function')
             {
                 console.error('Invalid date type provided.', type);
                 return false;
             }
 
-            var value = parseInt(momentObj[methodName]()),
+            let value = parseInt(momentObj[methodName]()),
                 phrase = 'svStandardLib_time.' + type + (value > 1 ? 's' : '');
 
             // skip zero items
@@ -306,7 +300,7 @@ SV.StandardLib = SV.StandardLib || {};
                 return false;
             }
 
-            var translatedValue = XF.phrase(phrase, args, null);
+            let translatedValue = XF.phrase(phrase, args, null);
             if (translatedValue === null)
             {
                 this.clearTimer();
@@ -330,29 +324,39 @@ SV.StandardLib = SV.StandardLib || {};
 
         getEventTarget: function ()
         {
-            var eventTargetSelector = this.options.triggerEventOnSelector;
+            let eventTargetSelector = this.options.triggerEventOnSelector;
             if (!eventTargetSelector.length)
             {
                 return null; // eg: if dismiss button is not found, we do not want to click on the span itself
             }
 
-            return XF.findRelativeIf(eventTargetSelector, this.$target);
+            if (this.$target)
+            {
+                // jQuery
+                let $result = XF.findRelativeIf(eventTargetSelector, this.target || this.$target)
+                return $result.length !== 0 ? $result.get(0) : null;
+            }
+
+            return XF.findRelativeIf(eventTargetSelector, this.target);
         },
 
         triggerEventIfNeeded: function ()
         {
-            var $evenToTriggerOn = this.getEventTarget(),
+            let eventTarget = this.getEventTarget(),
                 eventName = this.options.triggerEvent;
 
-            if (!$evenToTriggerOn.length || !eventName)
+            if (!eventTarget || !eventName)
             {
                 return;
             }
 
-            $evenToTriggerOn.trigger($.Event(eventName));
-        },
+            if (XF.trigger) {
+                XF.trigger(eventTarget, eventName);
+            } else {
+                jQuery(eventTarget).trigger(eventName);
+            }
+        }
     });
 
     XF.Element.register('sv-standard-lib--relative-timestamp', 'SV.StandardLib.RelativeTimestamp');
-}
-(jQuery, window, document);
+})();
