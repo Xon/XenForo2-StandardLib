@@ -7,7 +7,9 @@ use XF\ControllerPlugin\InlineMod;
 use XF\Entity\Phrase;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Reply\AbstractReply;
+use function assert;
 use function is_callable;
+use function method_exists;
 
 /**
  * Class Delete
@@ -87,8 +89,10 @@ class Delete extends AbstractPlugin
 						$deleter = $this->service($deleterService, $entity);
 						if ($includeAuthorAlert && $this->filter('author_alert', 'bool'))
 						{
+                            assert(method_exists($deleter, 'setSendAlert'));
 							$deleter->setSendAlert(true, $this->filter('author_alert_reason', 'str'));
 						}
+                        assert(method_exists($deleter, 'delete'));
 						$deleter->delete('hard', $reason);
 						
 						/** @var InlineMod $inlineModPlugin */
@@ -106,10 +110,11 @@ class Delete extends AbstractPlugin
 						$deleter = $this->service($deleterService, $entity);
 						if ($includeAuthorAlert && $this->filter('author_alert', 'bool'))
 						{
+                            assert(method_exists($deleter, 'setSendAlert'));
 							$deleter->setSendAlert(true, $this->filter('author_alert_reason', 'str'));
 						}
 
-                        /** @noinspection PhpUndefinedMethodInspection */
+                        assert(method_exists($deleter, 'unDelete'));
                         $deleter->unDelete();
 						
 						return $this->redirect($redirectLink . $linkHash);
@@ -128,8 +133,10 @@ class Delete extends AbstractPlugin
 				$deleter = $this->service($deleterService, $entity);
 				if ($includeAuthorAlert && $this->filter('author_alert', 'bool'))
 				{
+                    assert(method_exists($deleter, 'setSendAlert'));
 					$deleter->setSendAlert(true, $this->filter('author_alert_reason', 'str'));
 				}
+                assert(method_exists($deleter, 'delete'));
 				$deleter->delete($type, $reason);
 				
 				/** @var InlineMod $inlineModPlugin */

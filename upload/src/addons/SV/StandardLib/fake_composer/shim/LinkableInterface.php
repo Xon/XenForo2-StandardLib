@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpMissingParamTypeInspection
  * @noinspection PhpMissingReturnTypeInspection
  * @noinspection PhpIllegalPsrClassPathInspection
  */
