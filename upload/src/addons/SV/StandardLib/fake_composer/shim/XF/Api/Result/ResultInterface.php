@@ -5,8 +5,9 @@
  * @noinspection PhpIllegalPsrClassPathInspection
  */
 
-namespace XF\Entity;
+namespace XF\Api\Result;
 
-interface ResultInterface extends \XF\Api\Result\ResultInterface
+interface ResultInterface
 {
+    public function render();
 }

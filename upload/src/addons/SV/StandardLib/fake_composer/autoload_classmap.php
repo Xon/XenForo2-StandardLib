@@ -8,6 +8,10 @@ $classmap = [];
 if (\XF::$versionId < 2030036)
 {
     $classmap[\XF\Entity\ViewableInterface::class] = __DIR__ . '/shim/XF/Entity/ViewableInterface.php';
+    if (\XF::$versionId > 2030000)
+    {
+        $classmap[\XF\Api\Result\ResultInterface::class] = __DIR__ . '/shim/XF/Api/Result/ResultInterface.php';
+    }
 }
 if (\XF::$versionId < 2030031)
 {
