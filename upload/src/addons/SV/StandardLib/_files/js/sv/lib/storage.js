@@ -4,6 +4,20 @@ var SV = window.SV || {};
 {
     "use strict";
 
+    setTimeout(function ()
+    {
+        const jsUrl = XF.config.url.js
+        if (!sUrl)
+        {
+            console.error('No JS URL so cannot lazy-load JS')
+            return
+        }
+
+        XF.Loader.loadJs([
+            jsUrl.replace('__SENTINEL__', 'xf/structure.js') + '_mt=' + XF.config.jsMt['xf/structure.js'] || ''
+        ])
+    })
+
     SV.ToggleStorage = XF.extend(XF.ToggleStorage, {
         options: {
             storageType: 'local',
