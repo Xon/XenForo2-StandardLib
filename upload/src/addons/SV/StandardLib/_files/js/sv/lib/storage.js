@@ -76,7 +76,7 @@ var SV = window.SV || {};
                 jsUrl.replace('__SENTINEL__', 'xf/structure.js') + '_mt=' + XF.config.jsMt['xf/structure.js'] || ''
             ], function() {
                 defineFunc();
-                XF.Event.register('click', 'toggle-storage-ex', 'SV.ToggleStorage');
+                XF.Element.register('toggle-storage-ex', 'SV.ToggleStorage');
             });
         }, 0);
         XF.LazyHandlerLoader.register('xf/structure.js', 'toggle-class-ex', 'click');
@@ -84,7 +84,7 @@ var SV = window.SV || {};
     else
     {
         defineFunc();
-        XF.Event.register('click', 'toggle-storage-ex', 'SV.ToggleStorage');
+        XF.Element.register('toggle-storage-ex', 'SV.ToggleStorage');
     }
 
 })(window, document)
