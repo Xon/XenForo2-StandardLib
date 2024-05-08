@@ -79,6 +79,7 @@ var SV = window.SV || {};
                 XF.Event.register('click', 'toggle-storage-ex', 'SV.ToggleStorage');
             });
         }, 0);
+        XF.LazyHandlerLoader.register('xf/structure.js', 'toggle-class-ex', 'click');
     }
     else
     {
