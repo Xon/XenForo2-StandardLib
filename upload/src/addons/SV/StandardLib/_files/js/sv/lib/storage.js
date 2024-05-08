@@ -1,6 +1,6 @@
 var SV = window.SV || {};
 
-(function ($, window, document, _undefined)
+(function ()
 {
     "use strict";
 
@@ -30,7 +30,8 @@ var SV = window.SV || {};
             options.defaultValue = !!options.defaultValue;
 
             // noinspection EqualityComparisonWithCoercionJS
-            var activeClass = this.$target.hasClass(options.activeClass);
+            var thisTarget = this.$target || this.target.get(0),
+                activeClass = thisTarget.classList.contains(options.activeClass);
             if (activeClass === options.defaultValue) {
                 this.storage.remove(
                     options.storageContainer,
@@ -42,7 +43,8 @@ var SV = window.SV || {};
         updateStorage: function()
         {
             var options = this.options;
-            var activeClass = this.$target.hasClass(options.activeClass);
+            var thisTarget = this.$target || this.target.get(0),
+                activeClass = thisTarget.classList.contains(options.activeClass);
             if (activeClass === options.defaultValue) {
                 this.storage.remove(
                     options.storageContainer,
@@ -60,4 +62,4 @@ var SV = window.SV || {};
     });
 
     XF.Click.register('toggle-storage-ex', 'SV.ToggleStorage');
-}) (jQuery, window, document);
+}) ();
