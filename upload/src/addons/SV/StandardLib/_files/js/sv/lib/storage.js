@@ -4,23 +4,7 @@ var SV = window.SV || {};
 {
     "use strict";
 
-    if (typeof XF.ToggleStorage === "undefined")
-    {
-        setTimeout(function ()
-        {
-            const jsUrl = XF.config.url.js
-            if (!jsUrl)
-            {
-                console.error('No JS URL so cannot lazy-load JS')
-                return
-            }
-
-            XF.Loader.loadJs([
-                jsUrl.replace('__SENTINEL__', 'xf/structure.js') + '_mt=' + XF.config.jsMt['xf/structure.js'] || ''
-            ])
-        })
-    }
-
+    const defineFunc = function () {
     SV.ToggleStorage = XF.extend(XF.ToggleStorage, {
         options: {
             storageType: 'local',
@@ -77,6 +61,29 @@ var SV = window.SV || {};
             }
         }
     });
+    };
 
-    XF.Event.register('click', 'toggle-storage-ex', 'SV.ToggleStorage')
+    if (typeof XF.ToggleStorage === "undefined")
+    {
+        setTimeout(function () {
+            const jsUrl = XF.config.url.js
+            if (!jsUrl) {
+                console.error('No JS URL so cannot lazy-load JS')
+                return
+            }
+
+            XF.Loader.loadJs([
+                jsUrl.replace('__SENTINEL__', 'xf/structure.js') + '_mt=' + XF.config.jsMt['xf/structure.js'] || ''
+            ], function() {
+                defineFunc();
+                XF.Event.register('click', 'toggle-storage-ex', 'SV.ToggleStorage');
+            });
+        }, 0);
+    }
+    else
+    {
+        defineFunc();
+        XF.Event.register('click', 'toggle-storage-ex', 'SV.ToggleStorage');
+    }
+
 })(window, document)
