@@ -1,11 +1,42 @@
 <?php
-/**
- * @noinspection PhpUndefinedClassInspection
- */
 
 namespace SV\StandardLib\XF\Template;
 
+/**
+ * @version 1.21.0
+ */
 class Templater extends XFCP_Templater
 {
-    // This is an empty file to handle the case where people delete the entire add-on files, upload the new files, and then wonder why their entire site breaks as XenForo still tries to load this file.
+    protected $svIncludeJsMap = [
+        'SV/StandardLib' => [
+            'sv/lib/storage.js' => [
+                ['dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
+            ]
+        ]
+    ];
+
+    public function includeJs(array $options)
+    {
+        $tmpOptions = array_replace([
+            'src'   => null,
+            'defer' => true,
+            'addon' => null,
+            'min'   => null,
+            'dev'   => null,
+            'prod'  => null,
+            'root'  => false,
+        ], $options);
+
+        $addOnJsMap = $this->svIncludeJsMap[$tmpOptions['addon']] ?? [];
+        $extraIncludeJsArr = $addOnJsMap[$tmpOptions['src']] ?? [];
+        if (is_array($extraIncludeJsArr))
+        {
+            foreach ($extraIncludeJsArr AS $extraIncludeJs)
+            {
+                parent::includeJs($extraIncludeJs);
+            }
+        }
+
+        parent::includeJs($options);
+    }
 }
