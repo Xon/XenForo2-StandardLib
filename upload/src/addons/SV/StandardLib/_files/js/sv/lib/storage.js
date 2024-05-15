@@ -4,7 +4,6 @@ var SV = window.SV || {};
 {
     "use strict";
 
-    const defineFunc = function () {
     SV.ToggleStorage = XF.extend(XF.ToggleStorage, {
         options: {
             storageType: 'local',
@@ -61,30 +60,6 @@ var SV = window.SV || {};
             }
         }
     });
-    };
 
-    if (typeof XF.ToggleStorage === "undefined")
-    {
-        setTimeout(function () {
-            const jsUrl = XF.config.url.js
-            if (!jsUrl) {
-                console.error('No JS URL so cannot lazy-load JS')
-                return
-            }
-
-            XF.Loader.loadJs([
-                jsUrl.replace('__SENTINEL__', 'xf/structure.js') + '_mt=' + XF.config.jsMt['xf/structure.js'] || ''
-            ], function() {
-                defineFunc();
-                XF.Element.register('toggle-storage-ex', 'SV.ToggleStorage');
-            });
-        }, 0);
-        XF.LazyHandlerLoader.register('xf/structure.js', 'toggle-class-ex', 'click');
-    }
-    else
-    {
-        defineFunc();
-        XF.Element.register('toggle-storage-ex', 'SV.ToggleStorage');
-    }
-
+    XF.Element.register('toggle-storage-ex', 'SV.ToggleStorage');
 })(window, document)
