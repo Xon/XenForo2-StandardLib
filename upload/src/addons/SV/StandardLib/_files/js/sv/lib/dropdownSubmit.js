@@ -1,6 +1,6 @@
 var SV = window.SV || {};
 
-!function($, window, document)
+;((window, document) =>
 {
     "use strict";
 
@@ -22,7 +22,8 @@ var SV = window.SV || {};
 
         init: function()
         {
-            this.inOverlay = this.$target.parents('.overlay-container').length  !== 0;
+            var thisTarget = this.$target ? this.$target.get(0) : this.target;
+            this.inOverlay = XF.findRelativeIf('< .overlay-container', thisTarget) !== null;
 
             if (!this.options.contentWrapper)
             {
@@ -30,14 +31,14 @@ var SV = window.SV || {};
                 return null;
             }
 
-            var $finalUrlInput = this.$target.find('input[type="hidden"][name="final_url"]');
-            if (!$finalUrlInput.length)
+            var finalUrlInput = XF.findRelativeIf('input[type="hidden"][name="final_url"]', thisTarget);
+            if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');
                 return;
             }
 
-            var finalUrl = $finalUrlInput.val();
+            var finalUrl = finalUrlInput.value;
             if (!finalUrl)
             {
                 console.error('No final URL available.');
@@ -46,10 +47,17 @@ var SV = window.SV || {};
 
             this.finalUrl = finalUrl;
 
-            this.perPageDropdown = this.$target.find(this.options.perPageDropdown);
+            this.perPageDropdown = XF.findRelativeIf(this.options.perPageDropdown, thisTarget);
             if (this.perPageDropdown.length)
             {
-                this.perPageDropdown.on('change', XF.proxy(this, 'perPageChange'));
+                if (typeof this.perPageDropdown.on !== "undefined") // XF 2.2 only
+                {
+                    this.perPageDropdown.on('change', XF.proxy(this, 'perPageChange'));
+                }
+                else
+                {
+                    XF.on(this.perPageDropdown, 'change', this.perPageChange.bind(this));
+                }
             }
         },
 
@@ -71,8 +79,7 @@ var SV = window.SV || {};
 
         perPageOnTimer: function()
         {
-            var value = this.perPageDropdown.val();
-
+            var value = this.perPageDropdown.value;
             if (!value)
             {
                 return;
@@ -88,7 +95,7 @@ var SV = window.SV || {};
             }
 
             var currentUrl = new Url(this.finalUrl);
-            currentUrl.query['per_page'] = this.perPageDropdown.val()
+            currentUrl.query['per_page'] = this.perPageDropdown.value;
 
             this.xhr = XF.ajax('post', currentUrl.toString(), {}, XF.proxy(this, 'onLoad'));
         },
@@ -98,48 +105,57 @@ var SV = window.SV || {};
             this.xhr = null;
 
             var oldPageNavWrapper = this.getPageNavWrapper();
-            if (!oldPageNavWrapper)
+            if (oldPageNavWrapper === null)
             {
                 return;
             }
 
             var oldContentWrapper = this.getContentWrapper();
-            if (!oldContentWrapper)
+            if (oldContentWrapper === null)
             {
                 return;
             }
 
-            var $result = $($.parseHTML(result.html.content)),
-                newPageNavWrapper = $result.find(this.options.pageNavWrapper),
-                newContentWrapper = $result.find(this.options.contentWrapper);
-            if (!newPageNavWrapper.length)
+            var tmpResult;
+            if (typeof $ !== "undefined") // XF 2.2 and earlier
             {
-                oldPageNavWrapper.empty();
+                tmpResult = $($.parseHTML(result.html.content));
+            }
+            else
+            {
+                tmpResult = XF.createElementFromString(result.html.content.trim());
+            }
+
+            var newPageNavWrapper = XF.findRelativeIf(this.options.pageNavWrapper, tmpResult),
+                newContentWrapper = XF.findRelativeIf(this.options.contentWrapper, tmpResult);
+            if (newPageNavWrapper === null)
+            {
+                oldPageNavWrapper.innerHTML = '';
                 return;
             }
 
-            if (!newContentWrapper.length)
+            if (newContentWrapper === null)
             {
-                oldContentWrapper.empty();
+                oldContentWrapper.innerHTML = '';
                 return;
             }
 
-            oldPageNavWrapper.html(newPageNavWrapper.html());
-            oldContentWrapper.html(newContentWrapper.html());
+            oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
+            oldContentWrapper.innerHTML = newContentWrapper.innerHTML;
 
             if (this.inOverlay)
             {
                 return;
             }
 
-            var $finalUrlInput = $result.find('input[type="hidden"][name="final_url"]');
-            if (!$finalUrlInput.length)
+            var finalUrlInput = XF.findRelativeIf('input[type="hidden"][name="final_url"]', result);
+            if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');
                 return;
             }
 
-            var finalUrl = $finalUrlInput.val();
+            var finalUrl = finalUrlInput.value;
             if (!finalUrl)
             {
                 console.error('No final URL available.');
@@ -164,7 +180,7 @@ var SV = window.SV || {};
         /**
          * @param {Boolean} logNotFound
          *
-         * @returns {null|{length}|*|jQuery|HTMLElement}
+         * @returns {null|HTMLElement}
          */
         getPageNavWrapper: function(logNotFound)
         {
@@ -179,8 +195,9 @@ var SV = window.SV || {};
                 return null;
             }
 
-            var pageNavWrapper = this.$target.find(this.options.pageNavWrapper);
-            if (!pageNavWrapper.length)
+            var thisTarget = this.$target ? this.$target.get(0) : this.target,
+                pageNavWrapper = XF.findRelativeIf(this.options.pageNavWrapper, thisTarget);
+            if (pageNavWrapper === null)
             {
                 if (logNotFound)
                 {
@@ -196,13 +213,15 @@ var SV = window.SV || {};
         /**
          * @param {Boolean} logNotFound
          *
-         * @returns {null|{length}|*|jQuery|HTMLElement}
+         * @returns {null|HTMLElement}
          */
         getContentWrapper: function(logNotFound)
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
-            var contentWrapper = this.$target.find(this.options.contentWrapper);
-            if (!contentWrapper.length)
+
+            var thisTarget = this.$target ? this.$target.get(0) : this.target,
+                contentWrapper = XF.findRelativeIf(this.options.contentWrapper, thisTarget);
+            if (contentWrapper === null)
             {
                 if (logNotFound)
                 {
@@ -217,5 +236,4 @@ var SV = window.SV || {};
     });
 
     XF.Element.register('sv-dropdown-submit', 'SV.DropdownSubmit');
-}
-(jQuery, window, document);
+})(window, document)
