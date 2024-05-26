@@ -1,5 +1,5 @@
 // noinspection JSUnusedLocalSymbols
-(function ($, window, document, _undefined)
+;((window, document) =>
 {
     "use strict";
 
@@ -8,7 +8,10 @@
             'activateTab': 'svStandardLib_activateTab'
         },
 
-        options: $.extend({}, XF.Tabs.prototype.options, {
+        // With 2.2 support
+        options: (typeof $ !== "undefined") ? $.extend({}, XF.Tabs.prototype.options, {
+            svStoreSelectedTabInputName: null
+        }) : XF.extendObject(true, XF.Tabs.prototype.options, {
             svStoreSelectedTabInputName: null
         }),
 
@@ -19,22 +22,47 @@
             this.handleStoringOfSelectedTabIfNeeded(offset);
         },
 
+        /**
+         * @returns {HTMLElement}
+         *
+         * @private
+         */
         _getHiddenInput: function ()
         {
-            var $form = this.$target.closest('form'),
-                finalInputSelector = '[name="' + XF.htmlspecialchars(this.options.svStoreSelectedTabInputName.toString()) + '"]',
-                $hiddenInput = XF.findRelativeIf(finalInputSelector, $form);
+            var target = this.$target ? this.$target.get(0) : this.target,
+                form = XF.findRelativeIf('form', target),
+                escapedInputName = XF.htmlspecialchars(this.options.svStoreSelectedTabInputName.toString()),
+                finalInputSelector = '[name="' + escapedInputName + '"]',
+                hiddenInput = XF.findRelativeIf(finalInputSelector, form);
 
-            if (!$hiddenInput.length)
+            if (hiddenInput !== null && (typeof hiddenInput.get === "function") && !hiddenInput.length) // if running XF 2.2 and no element found with the selector
             {
-                $('<input />', {
-                    type: 'hidden',
-                    name: XF.htmlspecialchars(this.options.svStoreSelectedTabInputName),
-                    value: ''
-                }).appendTo($form);
+                hiddenInput = null
             }
 
-            return XF.findRelativeIf(finalInputSelector, $form);
+            if (hiddenInput === null)
+            {
+                if (typeof XF.createElement === "function")
+                {
+                    hiddenInput = XF.createElement('input', {
+                        type: 'hidden',
+                        name: escapedInputName,
+                        value: ''
+                    })
+                }
+                else // jQuery - XF 2.2
+                {
+                    hiddenInput = $('<input />', {
+                        type: 'hidden',
+                        name: escapedInputName,
+                        value: ''
+                    }).get(0)
+                }
+
+                form.append(hiddenInput)
+            }
+
+            return XF.findRelativeIf(finalInputSelector, form);
         },
 
         /**
@@ -47,16 +75,20 @@
                 return;
             }
 
-            var $tab = this.$tabs.eq(offset),
-                $pane = this.$panes.eq(offset);
-            if (!$tab.length || !$pane.length)
+            var tab = this.tabs[offset],
+                pane = this.panes[offset];
+            if ((tab === null) || (pane === null))
             {
                 return;
             }
 
-            var selectedTab = $tab.is('[id]') ? $tab.attr('id') : '';
+            var selectedTab = '';
+            if (tab.hasAttribute('id'))
+            {
+                selectedTab = tab.getAttribute('id')
+            }
 
-            this._getHiddenInput().val(selectedTab);
+            this._getHiddenInput().value = selectedTab
         }
     });
-} (jQuery, window, document));
+})(window, document)

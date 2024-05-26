@@ -11,6 +11,9 @@ class Templater extends XFCP_Templater
         'SV/StandardLib' => [
             'sv/lib/storage.js' => [
                 ['dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
+            ],
+            'sv/lib/xf/core/structure.js' => [
+                ['dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
             ]
         ]
     ];
