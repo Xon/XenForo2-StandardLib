@@ -148,7 +148,7 @@ var SV = window.SV || {};
                 return;
             }
 
-            var finalUrlInput = result.querySelector('input[type="hidden"][name="final_url"]')
+            var finalUrlInput = tmpResult.querySelector('input[type="hidden"][name="final_url"]')
             if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');
