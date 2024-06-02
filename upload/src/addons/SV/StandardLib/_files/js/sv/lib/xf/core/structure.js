@@ -1,7 +1,16 @@
 // noinspection JSUnusedLocalSymbols
+var SV = window.SV || {};
+SV.StandardLib = SV.StandardLib || {};
+SV.StandardLib.XF = SV.StandardLib.XF || {};
+SV.StandardLib.XF.Tabs = SV.StandardLib.XF.Tabs || {};
+
 ;((window, document) =>
 {
     "use strict";
+
+    SV.StandardLib.XF.Tabs.BaseOpts = {
+        svStoreSelectedTabInputName: null
+    }
 
     XF.Tabs = XF.extend(XF.Tabs, {
         __backup: {
@@ -9,11 +18,9 @@
         },
 
         // With 2.2 support
-        options: (typeof $ !== "undefined") ? $.extend({}, XF.Tabs.prototype.options, {
-            svStoreSelectedTabInputName: null
-        }) : XF.extendObject(true, XF.Tabs.prototype.options, {
-            svStoreSelectedTabInputName: null
-        }),
+        options: (typeof $ !== "undefined")
+            ? $.extend({}, XF.Tabs.prototype.options, SV.StandardLib.XF.Tabs.BaseOpts)
+            : XF.extendObject(true, XF.Tabs.prototype.options, SV.StandardLib.XF.Tabs.BaseOpts),
 
         activateTab: function(offset)
         {
