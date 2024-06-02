@@ -138,14 +138,14 @@ var SV = window.SV || {};
                 return;
             }
 
-            var $finalUrlInput = $result.find('input[type="hidden"][name="final_url"]');
-            if (!$finalUrlInput.length)
+            var finalUrlInput = result.querySelector('input[type="hidden"][name="final_url"]')
+            if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');
                 return;
             }
 
-            var finalUrl = $finalUrlInput.val();
+            var finalUrl = finalUrlInput.value;
             if (!finalUrl)
             {
                 console.error('No final URL available.');
@@ -169,34 +169,44 @@ var SV = window.SV || {};
 
         shimDynamicPageNav: function()
         {
-            var $pageNavWrapper = this.getPageNavWrapper();
-            if (!$pageNavWrapper)
+            var pageNavWrapper = this.getPageNavWrapper();
+            if (!pageNavWrapper)
             {
                 return;
             }
 
-            $pageNavWrapper.find('.pageNav a[href]').on('click', XF.proxy(this, 'ajaxLoadNewPage'));
-            XF.activate($pageNavWrapper);
+            if (typeof XF.on === "function")
+            {
+                XF.on(pageNavWrapper.querySelectorAll('.pageNav a[href]'), 'click', this.ajaxLoadNewPage.bind(this))
+            }
+            else // XF 2.2
+            {
+                $(pageNavWrapper).find('.pageNav a[href]').on('click', XF.proxy(this, 'ajaxLoadNewPage'));
+            }
+
+            XF.activate(pageNavWrapper);
         },
 
         shimDynamicContent: function()
         {
-            var $contentWrapper = this.getContentWrapper();
-            if (!$contentWrapper)
+            var contentWrapper = this.getContentWrapper();
+            if (!contentWrapper)
             {
                 return;
             }
 
-            XF.activate($contentWrapper);
+            XF.activate(contentWrapper);
         },
 
         /**
-         * @param {jQuery} e
-         * @return number
+         *
+         * @param {HTMLElement} e
+         *
+         * @returns {number|number|number}
          */
-        getPageFromAhref: function ($e)
+        getPageFromAhref: function (e)
         {
-            var url = $e.attr('href');
+            var url = e.getAttribute('href');
             if (!url) {
                 return 1;
             }
@@ -216,17 +226,14 @@ var SV = window.SV || {};
         ajaxLoadNewPage: function(e)
         {
             e.preventDefault();
-            var $e = $(e.target);
-            var page = this.getPageFromAhref($e);
-            if (page != this.lastPageSelected)
+            var page = this.getPageFromAhref(e.target);
+            if (page !== this.lastPageSelected)
             {
                 this.lastPageSelected = page;
                 this.resetPage = false;
                 try
                 {
-                    var url = $e.attr('href');
-
-                    XF.ajax('GET', url, {}, XF.proxy(this, '_paginationAjaxResponse'));
+                    XF.ajax('GET', e.target.getAttribute('href'), {}, XF.proxy(this, '_paginationAjaxResponse'));
                 }
                 finally
                 {
@@ -253,7 +260,8 @@ var SV = window.SV || {};
                 return null;
             }
 
-            var pageNavWrapper = this.$target.find(this.options.pageNavWrapper);
+            var thisTarget = this.target ? this.target : this.$target.get(0),
+                pageNavWrapper = thisTarget.querySelector(this.options.pageNavWrapper)
             if (!pageNavWrapper.length)
             {
                 if (logNotFound)

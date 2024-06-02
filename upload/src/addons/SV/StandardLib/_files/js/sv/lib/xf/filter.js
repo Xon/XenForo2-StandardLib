@@ -1,9 +1,24 @@
 var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
+SV.StandardLib.XF = SV.StandardLib.XF || {};
+SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
 
-(function($, window, document, _undefined)
+;((window, document) =>
 {
     "use strict";
+
+    SV.StandardLib.XF.Filter.BaseOpts = {
+        svLoadInOverlay: true,
+        pageNavWrapper: '.block-outer--page-nav-wrapper',
+        searchTarget: '.userList',
+        searchRow: '.userList-row',
+        searchRowGroup: null,
+        searchLimit: '.username',
+        noResultsFormat: '<div class="blockMessage js-filterNoResults">%s</div>',
+        globalFind: true,
+        perPageDropdown: 'select[name="per_page"]',
+        perPageCookiePrefix: null
+    }
 
     SV.StandardLib.DynamicFilter = XF.extend(XF.Filter, {
         __backup: {
@@ -14,18 +29,10 @@ SV.StandardLib = SV.StandardLib || {};
             '_filterAjaxResponse': 'svLib__filterAjaxResponse'
         },
 
-        options: $.extend({}, XF.Filter.prototype.options, {
-            svLoadInOverlay: true,
-            pageNavWrapper: '.block-outer--page-nav-wrapper',
-            searchTarget: '.userList',
-            searchRow: '.userList-row',
-            searchRowGroup: null,
-            searchLimit: '.username',
-            noResultsFormat: '<div class="blockMessage js-filterNoResults">%s</div>',
-            globalFind: true,
-            perPageDropdown: 'select[name="per_page"]',
-            perPageCookiePrefix: null
-        }),
+        // With 2.2 support
+        options: (typeof $ !== "undefined")
+            ? $.extend({}, XF.Filter.prototype.options, SV.StandardLib.XF.Filter.BaseOpts)
+            : XF.extendObject(true, XF.Filter.prototype.options, SV.StandardLib.XF.Filter.BaseOpts),
 
         resetPage: true,
         skipUpdate: false,
@@ -44,6 +51,7 @@ SV.StandardLib = SV.StandardLib || {};
 
         init: function ()
         {
+            var thisTarget = this.target ? this.target : this.$target.get(0);
             this.inOverlay = this.$target.parents('.overlay-container').length  !== 0;
 
             if (!this.options.ajax) {
@@ -181,14 +189,14 @@ SV.StandardLib = SV.StandardLib || {};
                 return;
             }
 
-            var $finalUrlInput = $result.find('input[type="hidden"][name="final_url"]');
-            if (!$finalUrlInput.length)
+            var finalUrlInput = result.querySelector('input[type="hidden"][name="final_url"]');
+            if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');
                 return;
             }
 
-            var finalUrl = $finalUrlInput.val();
+            var finalUrl = finalUrlInput.value;
             if (!finalUrl)
             {
                 console.error('No final URL available.');
@@ -237,23 +245,32 @@ SV.StandardLib = SV.StandardLib || {};
 
         shimDynamicPageNav: function()
         {
-            var $pageNavWrapper = this.getPageNavWrapper();
-            if (!$pageNavWrapper)
+            var pageNavWrapper = this.getPageNavWrapper();
+            if (!pageNavWrapper)
             {
                 return;
             }
 
-            $pageNavWrapper.find('.pageNav a[href]').on('click', XF.proxy(this, 'ajaxLoadNewPage'));
-            XF.activate($pageNavWrapper);
+            if (typeof XF.on === "function")
+            {
+                XF.on(pageNavWrapper.querySelectorAll('.pageNav a[href]'), 'click', this.ajaxLoadNewPage.bind(this))
+            }
+            else // XF 2.2
+            {
+                $(pageNavWrapper).find('.pageNav a[href]').on('click', XF.proxy(this, 'ajaxLoadNewPage'));
+            }
+
+            XF.activate(pageNavWrapper);
         },
 
         /**
-         * @param {jQuery} e
-         * @return number
+         * @param {HTMLElement} e
+         *
+         * @returns {number|number|number}
          */
-        getPageFromAhref: function ($e)
+        getPageFromAhref: function (e)
         {
-            var url = $e.attr('href');
+            var url = e.getAttribute('href');
             if (!url) {
                 return 1;
             }
@@ -273,7 +290,8 @@ SV.StandardLib = SV.StandardLib || {};
         ajaxLoadNewPage: function(e)
         {
             e.preventDefault();
-            var page = this.getPageFromAhref($(e.target));
+
+            var page = this.getPageFromAhref(e.target);
             if (page != this.svLastPageSelected)
             {
                 this.svLastPageSelected = page;
@@ -308,10 +326,10 @@ SV.StandardLib = SV.StandardLib || {};
                 return null;
             }
 
-            var oldPageNavWrapper = this.options.globalFind
-                ? $(this.options.pageNavWrapper)
-                : this.$target.find(this.options.pageNavWrapper)
-            ;
+            var thisTarget = this.target ? this.target : this.$target.get(0),
+                oldPageNavWrapper = this.options.globalFind
+                    ? document.querySelector((this.options.pageNavWrapper))
+                    : thisTarget.querySelector((this.options.pageNavWrapper));
             if (!oldPageNavWrapper.length)
             {
                 if (logNotFound)
@@ -353,5 +371,4 @@ SV.StandardLib = SV.StandardLib || {};
     });
 
     XF.Element.register('sv-dynamic-filter', 'SV.StandardLib.DynamicFilter');
-}
-(jQuery, window, document));
+})(window, document)
