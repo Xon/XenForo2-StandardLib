@@ -31,7 +31,7 @@ var SV = window.SV || {};
                 return null;
             }
 
-            var finalUrlInput = XF.findRelativeIf('input[type="hidden"][name="final_url"]', thisTarget);
+            var finalUrlInput = thisTarget.querySelector('input[type="hidden"][name="final_url"]');
             if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');
@@ -47,7 +47,7 @@ var SV = window.SV || {};
 
             this.finalUrl = finalUrl;
 
-            this.perPageDropdown = XF.findRelativeIf(this.options.perPageDropdown, thisTarget);
+            this.perPageDropdown = thisTarget.querySelector(this.options.perPageDropdown);
             if (this.perPageDropdown.length)
             {
                 if (typeof this.perPageDropdown.on !== "undefined") // XF 2.2 only
@@ -148,7 +148,7 @@ var SV = window.SV || {};
                 return;
             }
 
-            var finalUrlInput = XF.findRelativeIf('input[type="hidden"][name="final_url"]', result);
+            var finalUrlInput = result.querySelector('input[type="hidden"][name="final_url"]')
             if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');
@@ -196,7 +196,7 @@ var SV = window.SV || {};
             }
 
             var thisTarget = this.$target ? this.$target.get(0) : this.target,
-                pageNavWrapper = XF.findRelativeIf(this.options.pageNavWrapper, thisTarget);
+                pageNavWrapper = thisTarget.querySelector((this.options.pageNavWrapper));
             if (pageNavWrapper === null)
             {
                 if (logNotFound)
@@ -220,7 +220,7 @@ var SV = window.SV || {};
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
 
             var thisTarget = this.$target ? this.$target.get(0) : this.target,
-                contentWrapper = XF.findRelativeIf(this.options.contentWrapper, thisTarget);
+                contentWrapper = thisTarget.querySelector((this.options.contentWrapper));
             if (contentWrapper === null)
             {
                 if (logNotFound)
