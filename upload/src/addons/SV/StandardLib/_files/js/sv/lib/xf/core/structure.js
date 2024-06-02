@@ -29,8 +29,8 @@
          */
         _getHiddenInput: function ()
         {
-            var target = this.$target ? this.$target.get(0) : this.target,
-                form = XF.findRelativeIf('form', target),
+            var thisTarget = this.$target ? this.$target.get(0) : this.target,
+                form = thisTarget.closest('form'),
                 escapedInputName = XF.htmlspecialchars(this.options.svStoreSelectedTabInputName.toString()),
                 finalInputSelector = '[name="' + escapedInputName + '"]',
                 hiddenInput = XF.findRelativeIf(finalInputSelector, form);
