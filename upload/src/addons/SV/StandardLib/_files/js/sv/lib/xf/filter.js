@@ -52,7 +52,7 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
         init: function ()
         {
             var thisTarget = this.target ? this.target : this.$target.get(0);
-            this.inOverlay = this.$target.parents('.overlay-container').length  !== 0;
+            this.inOverlay = XF.findRelativeIf('< .overlay-container', thisTarget) !== null;
 
             if (!this.options.ajax) {
                 console.error('No filter AJAX URL input was provided.');
@@ -66,11 +66,18 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
                 existingPage = this.getPageFromAhref($pageNavWrapper.find('.pageNav-page--current > a').first());
             }
             this.svLastPageSelected = (typeof existingPage === 'number') ? existingPage : 1;
-
-            this.svPerPageDropdown = this.$target.find(this.options.perPageDropdown);
+            
+            this.svPerPageDropdown = thisTarget.querySelector(this.options.perPageDropdown);
             if (this.svPerPageDropdown.length)
             {
-                this.svPerPageDropdown.on('change', XF.proxy(this, 'svPerPageChange'));
+                if (typeof this.svPerPageDropdown.on !== "undefined") // XF 2.2 only
+                {
+                    this.svPerPageDropdown.on('change', XF.proxy(this, 'svPerPageChange'));
+                }
+                else
+                {
+                    XF.on(this.svPerPageDropdown, 'change', this.svPerPageChange.bind(this));
+                }
             }
 
             this.skipUpdate = true;
@@ -134,7 +141,8 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
                 }
             };
 
-            if (currentPage != 1) {
+            if (currentPage != 1)
+            {
                 data['page'] = currentPage;
             }
 
@@ -154,14 +162,13 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
         _filterAjaxResponse: function(result)
         {
             var filter = this.xhrFilter,
-                $existingRows = this._getSearchRows()
-            ;
+                existingRows = this._getSearchRows();
             if (!filter.text)
             {
-                if ($existingRows)
+                if (existingRows)
                 {
-                    $existingRows.remove();
-                    $existingRows = null;
+                    existingRows.remove();
+                    existingRows = null;
                 }
             }
 
@@ -173,15 +180,24 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
                 return;
             }
 
-            var $result = $($.parseHTML(result.html.content)),
-                newPageNavWrapper = $result.find(this.options.pageNavWrapper);
-            if (!newPageNavWrapper.length)
+            var tmpResult;
+            if (typeof $ !== "undefined") // XF 2.2 and earlier
+            {
+                tmpResult = $($.parseHTML(result.html.content));
+            }
+            else
+            {
+                tmpResult = XF.createElementFromString(result.html.content.trim());
+            }
+
+            var newPageNavWrapper = XF.findRelativeIf(this.options.contentWrapper, tmpResult);
+            if (newPageNavWrapper === null)
             {
                 oldPageNavWrapper.empty();
                 return;
             }
 
-            oldPageNavWrapper.html(newPageNavWrapper.html());
+            oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
             this.shimDynamicPageNav();
 
             if (this.inOverlay)
@@ -189,7 +205,7 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
                 return;
             }
 
-            var finalUrlInput = result.querySelector('input[type="hidden"][name="final_url"]');
+            var finalUrlInput = tmpResult.querySelector('input[type="hidden"][name="final_url"]');
             if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');

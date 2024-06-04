@@ -19,7 +19,8 @@ var SV = window.SV || {};
 
         init: function()
         {
-            this.inOverlay = this.$target.parents('.overlay-container').length  !== 0;
+            var thisTarget = this.target ? this.target : this.$target.get(0);
+            this.inOverlay = XF.findRelativeIf('< .overlay-container', thisTarget) !== null;
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
             if (!this.options.contentWrapper)
             {
@@ -31,14 +32,14 @@ var SV = window.SV || {};
                 return null;
             }
 
-            var $finalUrlInput = this.$target.find('input[type="hidden"][name="final_url"]');
-            if (!$finalUrlInput.length)
+            var finalUrlInput = thisTarget.querySelector('input[type="hidden"][name="final_url"]')
+            if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');
                 return;
             }
 
-            var finalUrl = $finalUrlInput.val();
+            var finalUrl = finalUrlInput.value;
             if (!finalUrl)
             {
                 console.error('No final URL available.');
@@ -57,10 +58,17 @@ var SV = window.SV || {};
 
             this.shimDynamicPageNav();
 
-            this.perPageDropdown = this.$target.find(this.options.perPageDropdown);
-            if (this.perPageDropdown.length)
+            this.perPageDropdown = thisTarget.querySelector(this.options.perPageDropdown)
+            if (this.perPageDropdown !== null)
             {
-                this.perPageDropdown.on('change', XF.proxy(this, 'perPageChange'));
+                if (typeof this.perPageDropdown.on !== "undefined") // XF 2.2 only
+                {
+                    this.perPageDropdown.on('change', XF.proxy(this, 'perPageChange'));
+                }
+                else
+                {
+                    XF.on(this.perPageDropdown, 'change', this.perPageChange.bind(this));
+                }
             }
         },
 
@@ -76,7 +84,7 @@ var SV = window.SV || {};
 
         perPageOnTimer: function()
         {
-            var value = this.perPageDropdown.val();
+            var value = this.perPageDropdown.value;
 
             if (!value)
             {
@@ -93,7 +101,7 @@ var SV = window.SV || {};
             }
 
             var currentUrl = new Url(this.finalUrl);
-            currentUrl.query['per_page'] = this.perPageDropdown.val()
+            currentUrl.query['per_page'] = this.perPageDropdown.value;
 
             XF.ajax('GET', currentUrl.toString(), {}, XF.proxy(this, '_paginationAjaxResponse'));
         },
@@ -112,25 +120,34 @@ var SV = window.SV || {};
                 return;
             }
 
-            var $result = $($.parseHTML(result.html.content)),
-                newPageNavWrapper = $result.find(this.options.pageNavWrapper),
-                newContentWrapper = $result.find(this.options.contentWrapper);
-            if (!newPageNavWrapper.length)
+            var tmpResult;
+            if (typeof $ !== "undefined") // XF 2.2 and earlier
+            {
+                tmpResult = $($.parseHTML(result.html.content));
+            }
+            else
+            {
+                tmpResult = XF.createElementFromString(result.html.content.trim());
+            }
+
+            var newPageNavWrapper = XF.findRelativeIf(this.options.pageNavWrapper, tmpResult),
+                newContentWrapper = XF.findRelativeIf(this.options.contentWrapper, tmpResult);
+            if (newPageNavWrapper === null)
             {
                 oldPageNavWrapper.empty();
                 return;
             }
 
-            if (!newContentWrapper.length)
+            if (newContentWrapper === null)
             {
                 oldContentWrapper.empty();
                 return;
             }
 
-            oldPageNavWrapper.html(newPageNavWrapper.html());
+            oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
             this.shimDynamicPageNav();
 
-            oldContentWrapper.html(newContentWrapper.html());
+            oldContentWrapper.innerHTML = newContentWrapper.innerHTML;
             this.shimDynamicContent();
 
             if (this.inOverlay)
@@ -138,7 +155,7 @@ var SV = window.SV || {};
                 return;
             }
 
-            var finalUrlInput = result.querySelector('input[type="hidden"][name="final_url"]')
+            var finalUrlInput = tmpResult.querySelector('input[type="hidden"][name="final_url"]')
             if (finalUrlInput === null)
             {
                 console.error('No final URL input was provided.');

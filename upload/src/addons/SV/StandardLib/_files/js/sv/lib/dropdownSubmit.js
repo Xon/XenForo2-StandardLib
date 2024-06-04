@@ -48,7 +48,7 @@ var SV = window.SV || {};
             this.finalUrl = finalUrl;
 
             this.perPageDropdown = thisTarget.querySelector(this.options.perPageDropdown);
-            if (this.perPageDropdown.length)
+            if (this.perPageDropdown !== null)
             {
                 if (typeof this.perPageDropdown.on !== "undefined") // XF 2.2 only
                 {
