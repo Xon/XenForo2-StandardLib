@@ -60,15 +60,19 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
             }
 
             var existingPage = null,
-                $pageNavWrapper = this.getPageNavWrapper();
-            if ($pageNavWrapper)
+                pageNavWrapper = this.getPageNavWrapper();
+            if (pageNavWrapper)
             {
-                existingPage = this.getPageFromAhref($pageNavWrapper.find('.pageNav-page--current > a').first());
+                var currentPageLink = pageNavWrapper.querySelector('.pageNav-page--current > a');
+                if (currentPageLink)
+                {
+                    existingPage = this.getPageFromAhref(currentPageLink);
+                }
             }
             this.svLastPageSelected = (typeof existingPage === 'number') ? existingPage : 1;
-            
+
             this.svPerPageDropdown = thisTarget.querySelector(this.options.perPageDropdown);
-            if (this.svPerPageDropdown.length)
+            if (this.svPerPageDropdown !== null)
             {
                 if (typeof this.svPerPageDropdown.on !== "undefined") // XF 2.2 only
                 {
@@ -104,7 +108,7 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
 
         svPerPageOnTimer: function()
         {
-            var value = this.svPerPageDropdown.val();
+            var value = this.svPerPageDropdown.value;
 
             if (!value)
             {
@@ -150,7 +154,7 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
             if (this.svPerPageDropdown)
             {
                 var currentUrl = new Url(this.options.ajax);
-                currentUrl.query['per_page'] = this.svPerPageDropdown.val()
+                currentUrl.query['per_page'] = this.svPerPageDropdown.value;
 
                 finalUrl = currentUrl.toString();
             }
@@ -167,7 +171,11 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
             {
                 if (existingRows)
                 {
-                    existingRows.remove();
+                    for (const existingRow_ of existingRows)
+                    {
+                        existingRow_.remove();
+                    }
+
                     existingRows = null;
                 }
             }
@@ -269,7 +277,10 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
 
             if (typeof XF.on === "function")
             {
-                XF.on(pageNavWrapper.querySelectorAll('.pageNav a[href]'), 'click', this.ajaxLoadNewPage.bind(this))
+                for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href]'))
+                {
+                    XF.on(pageNavLink, 'click', this.ajaxLoadNewPage.bind(this))
+                }
             }
             else // XF 2.2
             {
@@ -346,11 +357,11 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
                 oldPageNavWrapper = this.options.globalFind
                     ? document.querySelector((this.options.pageNavWrapper))
                     : thisTarget.querySelector((this.options.pageNavWrapper));
-            if (!oldPageNavWrapper.length)
+            if (oldPageNavWrapper === null)
             {
                 if (logNotFound)
                 {
-                    console.error('No old pagination wrapper available');
+                    console.error('No old pagination wrapper available', oldPageNavWrapper);
                 }
 
                 return null;

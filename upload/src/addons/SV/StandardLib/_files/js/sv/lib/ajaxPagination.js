@@ -49,10 +49,14 @@ var SV = window.SV || {};
             this.finalUrl = finalUrl;
 
             var existingPage = null,
-                $pageNavWrapper = this.getPageNavWrapper();
-            if ($pageNavWrapper)
+                pageNavWrapper = this.getPageNavWrapper();
+            if (pageNavWrapper)
             {
-                existingPage = this.getPageFromAhref($pageNavWrapper.find('.pageNav-page--current > a').first());
+                var currentPageLink = pageNavWrapper.querySelector('.pageNav-page--current > a')
+                if (currentPageLink)
+                {
+                    existingPage = this.getPageFromAhref(currentPageLink);
+                }
             }
             this.lastPageSelected = (typeof existingPage === 'number') ? existingPage : 1;
 
@@ -194,7 +198,10 @@ var SV = window.SV || {};
 
             if (typeof XF.on === "function")
             {
-                XF.on(pageNavWrapper.querySelectorAll('.pageNav a[href]'), 'click', this.ajaxLoadNewPage.bind(this))
+                for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href]'))
+                {
+                    XF.on(pageNavLink, 'click', this.ajaxLoadNewPage.bind(this))
+                }
             }
             else // XF 2.2
             {
@@ -279,7 +286,7 @@ var SV = window.SV || {};
 
             var thisTarget = this.target ? this.target : this.$target.get(0),
                 pageNavWrapper = thisTarget.querySelector(this.options.pageNavWrapper)
-            if (!pageNavWrapper.length)
+            if (pageNavWrapper === null)
             {
                 if (logNotFound)
                 {
@@ -300,8 +307,9 @@ var SV = window.SV || {};
         getContentWrapper: function(logNotFound)
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
-            var contentWrapper = this.$target.find(this.options.contentWrapper);
-            if (!contentWrapper.length)
+            var thisTarget = this.target ? this.target : this.$target.get(0),
+                contentWrapper = thisTarget.querySelector(this.options.contentWrapper)
+            if (contentWrapper === null)
             {
                 if (logNotFound)
                 {
