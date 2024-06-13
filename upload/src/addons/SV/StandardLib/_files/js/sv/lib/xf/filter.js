@@ -2,6 +2,7 @@ var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
 SV.StandardLib.XF = SV.StandardLib.XF || {};
 SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
+SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
 ;((window, document) =>
 {
@@ -28,11 +29,7 @@ SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
             'update': 'svLib__update',
             '_filterAjaxResponse': 'svLib__filterAjaxResponse'
         },
-
-        // With 2.2 support
-        options: (typeof $ !== "undefined")
-            ? $.extend({}, XF.Filter.prototype.options, SV.StandardLib.XF.Filter.BaseOpts)
-            : XF.extendObject(true, XF.Filter.prototype.options, SV.StandardLib.XF.Filter.BaseOpts),
+        options: SV.extendObject({}, XF.Filter.prototype.options, SV.StandardLib.XF.Filter.BaseOpts),
 
         resetPage: true,
         skipUpdate: false,

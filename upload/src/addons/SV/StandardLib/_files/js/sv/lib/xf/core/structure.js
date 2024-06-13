@@ -3,6 +3,7 @@ var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
 SV.StandardLib.XF = SV.StandardLib.XF || {};
 SV.StandardLib.XF.Tabs = SV.StandardLib.XF.Tabs || {};
+SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
 ;((window, document) =>
 {
@@ -16,11 +17,7 @@ SV.StandardLib.XF.Tabs = SV.StandardLib.XF.Tabs || {};
         __backup: {
             'activateTab': 'svStandardLib_activateTab'
         },
-
-        // With 2.2 support
-        options: (typeof $ !== "undefined")
-            ? $.extend({}, XF.Tabs.prototype.options, SV.StandardLib.XF.Tabs.BaseOpts)
-            : XF.extendObject(true, XF.Tabs.prototype.options, SV.StandardLib.XF.Tabs.BaseOpts),
+        options: SV.extendObject({}, XF.Tabs.prototype.options, SV.StandardLib.XF.Tabs.BaseOpts),
 
         activateTab: function(offset)
         {
