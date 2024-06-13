@@ -1,0 +1,1 @@
+Only {maxItemCount} values can be added
