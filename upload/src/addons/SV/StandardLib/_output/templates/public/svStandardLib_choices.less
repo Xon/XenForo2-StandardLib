@@ -38,8 +38,8 @@
   display: block;
   width: 100%;
   padding: 10px;
-  border-bottom: 1px solid #ddd;
-  background-color: #fff;
+  border-bottom: 1px solid @xf-borderColor;
+  background-color: @xf-inputBgColor;
   margin: 0;
 }
 .choices[data-type*=select-one] .choices__button {
@@ -60,7 +60,7 @@
   opacity: 1;
 }
 .choices[data-type*=select-one] .choices__button:focus {
-  box-shadow: 0 0 0 2px #00bcd4;
+  box-shadow: 0 0 0 2px @xf-borderColorHighlight;
 }
 .choices[data-type*=select-one] .choices__item[data-value=""] .choices__button {
   display: none;
@@ -70,7 +70,7 @@
   height: 0;
   width: 0;
   border-style: solid;
-  border-color: #333 transparent transparent transparent;
+  border-color: @xf-borderColor transparent transparent transparent;
   border-width: 5px;
   position: absolute;
   right: 11.5px;
@@ -79,7 +79,7 @@
   pointer-events: none;
 }
 .choices[data-type*=select-one].is-open::after {
-  border-color: transparent transparent #333 transparent;
+  border-color: transparent transparent @xf-borderColor transparent;
   margin-top: -7.5px;
 }
 .choices[data-type*=select-one][dir=rtl]::after {
@@ -106,7 +106,7 @@
   margin-bottom: 0;
   margin-left: 8px;
   padding-left: 16px;
-  border-left: 1px solid #008fa1;
+  border-left: 1px solid @xf-borderColorFaint;
   background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjEiIGhlaWdodD0iMjEiIHZpZXdCb3g9IjAgMCAyMSAyMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSIjRkZGIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0yLjU5Mi4wNDRsMTguMzY0IDE4LjM2NC0yLjU0OCAyLjU0OEwuMDQ0IDIuNTkyeiIvPjxwYXRoIGQ9Ik0wIDE4LjM2NEwxOC4zNjQgMGwyLjU0OCAyLjU0OEwyLjU0OCAyMC45MTJ6Ii8+PC9nPjwvc3ZnPg==");
   background-size: 8px;
   width: 8px;
@@ -124,16 +124,16 @@
   display: inline-block;
   vertical-align: top;
   width: 100%;
-  background-color: #f9f9f9;
+  background-color: @xf-borderColor;
   padding: 7.5px 7.5px 3.75px;
-  border: 1px solid #ddd;
+  border: 1px solid @xf-borderColorFaint;
   border-radius: 2.5px;
   font-size: 0.875rem;
   min-height: 44px;
   overflow: hidden;
 }
 .is-focused .choices__inner, .is-open .choices__inner {
-  border-color: #b7b7b7;
+  border-color: @xf-borderColorHighlight;
 }
 .is-open .choices__inner {
   border-radius: 2.5px 2.5px 0 0;
@@ -172,9 +172,9 @@
   font-weight: 500;
   margin-right: 3.75px;
   margin-bottom: 3.75px;
-  background-color: #00bcd4;
-  border: 1px solid #00a5bb;
-  color: #fff;
+  background-color: @xf-contentBg;
+  border: 1px solid @xf-borderColor;
+  color: @xf-inputTextColor;
   word-break: break-all;
   box-sizing: border-box;
 }
@@ -187,11 +187,11 @@
 }
 .choices__list--multiple .choices__item.is-highlighted {
   background-color: @xf-contentHighlightBg;
-  border: 1px solid #008fa1;
+  border: 1px solid @xf-borderColorLight;
 }
 .is-disabled .choices__list--multiple .choices__item {
   color: @xf-textColorMuted;
-  border: 1px solid #919191;
+  border: 1px solid @xf-borderColorHeavy;
 }
 
 .choices__list--dropdown, .choices__list[aria-expanded] {
@@ -199,8 +199,8 @@
   z-index: 1;
   position: absolute;
   width: 100%;
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background-color: @xf-inputFocusBgColor;
+  border: 1px solid @xf-borderColor;
   top: 100%;
   margin-top: -1px;
   border-bottom-left-radius: 2.5px;
@@ -213,7 +213,7 @@
   visibility: visible;
 }
 .is-open .choices__list--dropdown, .is-open .choices__list[aria-expanded] {
-  border-color: #b7b7b7;
+  border-color: @xf-borderColor;
 }
 .is-flipped .choices__list--dropdown, .is-flipped .choices__list[aria-expanded] {
   top: auto;
@@ -261,7 +261,7 @@
   }
 }
 .choices__list--dropdown .choices__item--selectable.is-highlighted, .choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
-  background-color: #f2f2f2;
+  background-color: @xf-contentHighlightBg;
 }
 .choices__list--dropdown .choices__item--selectable.is-highlighted::after, .choices__list[aria-expanded] .choices__item--selectable.is-highlighted::after {
   opacity: 0.5;
@@ -286,8 +286,8 @@
   font-weight: 600;
   font-size: 0.75rem;
   padding: 10px;
-  border-bottom: 1px solid #f7f7f7;
-  color: gray;
+  border-bottom: 1px solid @xf-blockFooterBg;
+  color: @xf-blockFooterTextColor;
 }
 
 .choices__button {
@@ -307,7 +307,7 @@
 .choices__input {
   display: inline-block;
   vertical-align: baseline;
-  background-color: #f9f9f9;
+  background-color: @xf-inputBgColor;
   font-size: 0.875rem;
   margin-bottom: 5px;
   border: 0;
