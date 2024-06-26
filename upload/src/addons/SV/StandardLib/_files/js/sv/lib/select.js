@@ -1,7 +1,7 @@
 var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
 
-(function($)
+(function()
 {
     "use strict";
 
@@ -22,8 +22,9 @@ SV.StandardLib = SV.StandardLib || {};
 
         init: function()
         {
+            var field = this.target || this.$target.get(0);
             this.options.choices = this.phraseOptions(this.options.choices);
-            this.choices = new Choices(this.target || this.$target.get(0), this.options.choices);
+            this.choices = new Choices(field, this.options.choices);
         },
 
         phraseOptions: function(choices) {
@@ -49,4 +50,4 @@ SV.StandardLib = SV.StandardLib || {};
     });
 
     XF.Element.register('sv-choices', 'SV.StandardLib.Choices');
-}) (window.jQuery);
+}) ();
