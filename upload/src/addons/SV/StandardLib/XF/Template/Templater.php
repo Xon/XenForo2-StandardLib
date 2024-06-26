@@ -42,4 +42,22 @@ class Templater extends XFCP_Templater
 
         parent::includeJs($options);
     }
+
+    public function renderMacro($template, $name, array $arguments = [])
+    {
+        if (\XF::$versionId <= 2020000)
+        {
+            if (!$template)
+            {
+                $nameParts = explode('::', $name, 2);
+                if (count($nameParts) == 2)
+                {
+                    $template = $nameParts[0];
+                    $name = $nameParts[1];
+                }
+            }
+        }
+
+        return parent::renderMacro($template, $name, $arguments);
+    }
 }
