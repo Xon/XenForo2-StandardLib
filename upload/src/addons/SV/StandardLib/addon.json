@@ -3,7 +3,7 @@
     "title": "Standard Library",
     "description": "A number of helper utilities designed to ease add-on development",
     "version_id" : 2001210000,
-    "version_string": "1.21.0",
+    "version_string": "1.21.0 RC1",
     "dev": "Atelier Aphelion",
     "dev_url": "https://atelieraphelion.com/",
     "faq_url": "",
