@@ -67,7 +67,7 @@ class Helper extends Repository
                 return false;
             }
 
-            if ($targetVersion === $installedVersionId && in_array($operator, ['=', '<=', '<='], true))
+            if ($targetVersion === $installedVersionId && in_array($operator, ['=', '<=', '>='], true))
             {
                 return true;
             }
