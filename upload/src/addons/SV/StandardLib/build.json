@@ -4,8 +4,10 @@
         "js/sv/vendor"
     ],
     "minify": [
+        "js/sv/lib/select.js",
         "js/sv/lib/storage.js",
         "js/sv/lib/relative_timestamp.js",
+        "js/sv/lib/dropdownSubmit.js",
         "js/sv/lib/ajaxPagination.js",
         "js/sv/lib/xf/filter.js",
         "js/sv/lib/xf/core/structure.js"
