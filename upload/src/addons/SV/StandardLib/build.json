@@ -4,6 +4,7 @@
         "js/sv/vendor"
     ],
     "minify": [
+        "js/sv/vendor/choices/choices.js",
         "js/sv/lib/select.js",
         "js/sv/lib/storage.js",
         "js/sv/lib/relative_timestamp.js",
