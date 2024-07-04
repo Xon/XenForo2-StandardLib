@@ -260,6 +260,9 @@ var Choices = /** @class */function () {
     this._isSelectMultipleElement = passedElement.type === constants_1.SELECT_MULTIPLE_TYPE;
     this._isSelectElement = this._isSelectOneElement || this._isSelectMultipleElement;
     this.config.searchEnabled = this._isSelectMultipleElement || this.config.searchEnabled;
+    if (this._isSelectMultipleElement && this.config.maxItemCount === 1 && userConfig.pseudoMultiSelectForSingle === undefined) {
+      this.config.pseudoMultiSelectForSingle = true;
+    }
     if (!['auto', 'always'].includes("".concat(this.config.renderSelectedChoices))) {
       this.config.renderSelectedChoices = 'auto';
     }
@@ -1046,6 +1049,12 @@ var Choices = /** @class */function () {
     if (!choice.selected && !choice.disabled) {
       var canAddItem = this._canAddItem(activeItems, choice.value);
       if (canAddItem.response) {
+        if (this.config.pseudoMultiSelectForSingle) {
+          var lastItem = activeItems[activeItems.length - 1];
+          if (lastItem) {
+              this._removeItem(lastItem);
+          }
+        }
         this._addItem({
           value: choice.value,
           label: choice.label,
@@ -1060,7 +1069,7 @@ var Choices = /** @class */function () {
     }
     this.clearInput();
     // We want to close the dropdown if we are dealing with a single select box
-    if (hasActiveDropdown && this._isSelectOneElement) {
+    if (hasActiveDropdown && (this.config.pseudoMultiSelectForSingle || this._isSelectOneElement)) {
       this.hideDropdown(true);
       this.containerOuter.focus();
     }
@@ -1159,8 +1168,10 @@ var Choices = /** @class */function () {
       if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
         // If there is a max entry limit and we have reached that limit
         // don't update
+        if (!this.config.pseudoMultiSelectForSingle) {
         canAddItem = false;
         notice = typeof this.config.maxItemText === 'function' ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
+        }
       }
       if (!this.config.duplicateItemsAllowed && isDuplicateValue && canAddItem) {
         canAddItem = false;
@@ -2874,6 +2885,7 @@ exports.DEFAULT_CONFIG = {
   silent: false,
   renderChoiceLimit: -1,
   maxItemCount: -1,
+  pseudoMultiSelectForSingle: false,
   addItems: true,
   addItemFilter: null,
   removeItems: true,
