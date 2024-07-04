@@ -35,4 +35,5 @@ namespace SV\StandardLib\XF\Pub\Controller
 namespace SV\StandardLib\XF\Template
 {
 	class XFCP_Templater extends \XF\Template\Templater {}
+	class XFCP_TemplaterXF21Patch extends \XF\Template\Templater {}
 }

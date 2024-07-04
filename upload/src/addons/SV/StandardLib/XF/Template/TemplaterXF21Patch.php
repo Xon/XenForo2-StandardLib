@@ -9,6 +9,9 @@ if (\XF::$versionId < 2012000)
 {
     class TemplaterXF21Patch extends XFCP_TemplaterXF21Patch
     {
+        /**
+         * @noinspection PhpSignatureMismatchDuringInheritanceInspection
+         */
         public function callMacro($template, $name, array $arguments, array $globalVars)
         {
             if (\XF::$versionId <= 2020000)
