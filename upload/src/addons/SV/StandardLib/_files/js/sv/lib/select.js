@@ -2,7 +2,7 @@ var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
 SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
-(function($)
+(function()
 {
     "use strict";
 
@@ -97,4 +97,4 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
     });
 
     XF.Element.register('sv-choices', 'SV.StandardLib.Choices');
-}) (window.jQuery);
+}) ();

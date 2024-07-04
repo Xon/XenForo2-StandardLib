@@ -61,13 +61,13 @@ class Helper extends Repository
             {
                 $addons = $this->getAddonVersions();
                 $installedVersionId = $addons[$addonId] ?? null;
-                if ($installedVersionId === null)
-                {
-                    return false;
-                }
+            }
+            if ($installedVersionId === null)
+            {
+                return false;
             }
 
-            if ($targetVersion === $installedVersionId && in_array($operator, ['=', '<=', '<='], true))
+            if ($targetVersion === $installedVersionId && in_array($operator, ['=', '<=', '>='], true))
             {
                 return true;
             }
