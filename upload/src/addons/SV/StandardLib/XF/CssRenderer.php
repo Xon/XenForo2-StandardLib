@@ -47,7 +47,7 @@ class CssRenderer extends XFCP_CssRenderer
 
         preg_match('/color:\s*(.*?)\s*;?\s*}$/si', $css, $matches);
 
-        if ($forceDebug ||(\XF::options()->svAdvancedBbCodeLogLessFunc ?? false))
+        if ($forceDebug ||(\XF::options()->svLogLessFunc ?? false))
         {
             \XF::logError("parse_less_func({$value}), " . $css . ', matches:' . var_export($matches, true), true);
         }
