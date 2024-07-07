@@ -214,6 +214,10 @@ class TemplaterHelper
         {
             $this->addFunction('phrase_dynamic', 'fnPhraseDynamic');
         }
+        if (\XF::$versionId < 2030000)
+        {
+            $this->addFunction('property_variation', 'fnPropertyVariation');
+        }
         $this->addFunction('array_reverse', 'fnArrayReverse');
         $this->addFunction('sv_array_reverse', \XF::$debugMode ? 'fnArrayReverseOld' : 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
@@ -374,6 +378,20 @@ class TemplaterHelper
         $escape = false;
 
         return \XF::phrase($value);
+    }
+
+    public function fnPropertyVariation($templater, &$escape, $name, $variation, $fallback = null)
+    {
+        $escape = false;
+
+        $style = $this->templater->getStyle();
+
+        if (!$style)
+        {
+            return $fallback;
+        }
+
+        return $style->getProperty($name, $fallback);
     }
 
     /**
