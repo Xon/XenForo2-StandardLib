@@ -48,7 +48,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         init: function ()
         {
-            var thisTarget = this.target ? this.target : this.$target.get(0);
+            var thisTarget = this.target || this.$target.get(0);
             this.inOverlay = XF.findRelativeIf('< .overlay-container', thisTarget) !== null;
 
             if (!this.options.ajax) {
@@ -350,7 +350,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 return null;
             }
 
-            var thisTarget = this.target ? this.target : this.$target.get(0),
+            var thisTarget = this.target || this.$target.get(0),
                 oldPageNavWrapper = this.options.globalFind
                     ? document.querySelector((this.options.pageNavWrapper))
                     : thisTarget.querySelector((this.options.pageNavWrapper));

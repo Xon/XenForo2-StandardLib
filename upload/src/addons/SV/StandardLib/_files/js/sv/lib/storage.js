@@ -30,7 +30,7 @@ var SV = window.SV || {};
             options.defaultValue = !!options.defaultValue;
 
             // noinspection EqualityComparisonWithCoercionJS
-            var thisTarget = this.$target ? this.$target.get(0) : this.target,
+            var thisTarget = this.target || this.$target.get(0),
                 activeClass = thisTarget.classList.contains(options.activeClass);
             if (activeClass === options.defaultValue) {
                 this.storage.remove(
@@ -43,7 +43,7 @@ var SV = window.SV || {};
         updateStorage: function()
         {
             var options = this.options;
-            var thisTarget = this.$target ? this.$target.get(0) : this.target,
+            var thisTarget = this.target || this.$target.get(0),
                 activeClass = thisTarget.classList.contains(options.activeClass);
             if (activeClass === options.defaultValue) {
                 this.storage.remove(

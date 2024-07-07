@@ -33,7 +33,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
          */
         _getHiddenInput: function ()
         {
-            var thisTarget = this.$target ? this.$target.get(0) : this.target,
+            var thisTarget = this.target || this.$target.get(0),
                 form = thisTarget.closest('form'),
                 escapedInputName = XF.htmlspecialchars(this.options.svStoreSelectedTabInputName.toString()),
                 finalInputSelector = '[name="' + escapedInputName + '"]',

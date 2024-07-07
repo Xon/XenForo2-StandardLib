@@ -19,7 +19,7 @@ var SV = window.SV || {};
 
         init: function()
         {
-            var thisTarget = this.target ? this.target : this.$target.get(0);
+            var thisTarget = this.target || this.$target.get(0);
             this.inOverlay = XF.findRelativeIf('< .overlay-container', thisTarget) !== null;
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
             if (!this.options.contentWrapper)
@@ -284,7 +284,7 @@ var SV = window.SV || {};
                 return null;
             }
 
-            var thisTarget = this.target ? this.target : this.$target.get(0),
+            var thisTarget = this.target || this.$target.get(0),
                 pageNavWrapper = thisTarget.querySelector(this.options.pageNavWrapper)
             if (pageNavWrapper === null)
             {
@@ -307,7 +307,7 @@ var SV = window.SV || {};
         getContentWrapper: function(logNotFound)
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
-            var thisTarget = this.target ? this.target : this.$target.get(0),
+            var thisTarget = this.target || this.$target.get(0),
                 contentWrapper = thisTarget.querySelector(this.options.contentWrapper)
             if (contentWrapper === null)
             {
