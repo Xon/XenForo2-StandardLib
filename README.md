@@ -193,6 +193,7 @@ Absolute value
 ### Template Function: parse_less_func
 Similar to `parse_less_color`, except this allows parsing an arbitrary LESS expression.
 Enable the `svLogLessFunc` option to log debug information
+Does not return CSS variables like `parse_less_color` does.
 
 ### Template Function: phrase_dynamic
 Backport `phrase_dynamic` from XF2.2 to XF2.1
