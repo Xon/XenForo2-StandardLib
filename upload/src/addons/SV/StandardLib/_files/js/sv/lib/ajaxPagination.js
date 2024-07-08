@@ -67,7 +67,7 @@ var SV = window.SV || {};
             {
                 if (typeof this.perPageDropdown.on !== "undefined") // XF 2.2 only
                 {
-                    this.perPageDropdown.on('change', XF.proxy(this, 'perPageChange'));
+                    this.perPageDropdown.on('change', this.perPageChange.bind(this));
                 }
                 else
                 {
@@ -83,7 +83,7 @@ var SV = window.SV || {};
                 clearTimeout(this.changeTimer);
             }
 
-            this.changeTimer = setTimeout(XF.proxy(this, 'perPageOnTimer'), 200);
+            this.changeTimer = setTimeout(this.perPageOnTimer.bind(this), 200);
         },
 
         perPageOnTimer: function()
@@ -107,7 +107,7 @@ var SV = window.SV || {};
             var currentUrl = new Url(this.finalUrl);
             currentUrl.query['per_page'] = this.perPageDropdown.value;
 
-            XF.ajax('GET', currentUrl.toString(), {}, XF.proxy(this, '_paginationAjaxResponse'));
+            XF.ajax('GET', currentUrl.toString(), {}, this._paginationAjaxResponse.bind(this));
         },
 
         _paginationAjaxResponse: function(result)
@@ -205,7 +205,7 @@ var SV = window.SV || {};
             }
             else // XF 2.2
             {
-                $(pageNavWrapper).find('.pageNav a[href]').on('click', XF.proxy(this, 'ajaxLoadNewPage'));
+                $(pageNavWrapper).find('.pageNav a[href]').on('click', this.ajaxLoadNewPage.bind(this));
             }
 
             XF.activate(pageNavWrapper);
@@ -257,7 +257,7 @@ var SV = window.SV || {};
                 this.resetPage = false;
                 try
                 {
-                    XF.ajax('GET', e.target.getAttribute('href'), {}, XF.proxy(this, '_paginationAjaxResponse'));
+                    XF.ajax('GET', e.target.getAttribute('href'), {}, this._paginationAjaxResponse.bind(this));
                 }
                 finally
                 {

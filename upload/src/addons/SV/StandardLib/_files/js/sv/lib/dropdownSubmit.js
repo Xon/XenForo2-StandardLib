@@ -52,7 +52,7 @@ var SV = window.SV || {};
             {
                 if (typeof this.perPageDropdown.on !== "undefined") // XF 2.2 only
                 {
-                    this.perPageDropdown.on('change', XF.proxy(this, 'perPageChange'));
+                    this.perPageDropdown.on('change', this.perPageChange.bind(this));
                 }
                 else
                 {
@@ -74,7 +74,7 @@ var SV = window.SV || {};
                 this.xhr = null;
             }
 
-            this.changeTimer = setTimeout(XF.proxy(this, 'perPageOnTimer'), 200);
+            this.changeTimer = setTimeout(this.perPageOnTimer.bind(this), 200);
         },
 
         perPageOnTimer: function()
@@ -97,7 +97,7 @@ var SV = window.SV || {};
             var currentUrl = new Url(this.finalUrl);
             currentUrl.query['per_page'] = this.perPageDropdown.value;
 
-            this.xhr = XF.ajax('post', currentUrl.toString(), {}, XF.proxy(this, 'onLoad'));
+            this.xhr = XF.ajax('post', currentUrl.toString(), {}, this.onLoad.bind(this));
         },
 
         onLoad: function(result)

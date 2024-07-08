@@ -73,7 +73,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             {
                 if (typeof this.svPerPageDropdown.on !== "undefined") // XF 2.2 only
                 {
-                    this.svPerPageDropdown.on('change', XF.proxy(this, 'svPerPageChange'));
+                    this.svPerPageDropdown.on('change', this.svPerPageChange.bind(this));
                 }
                 else
                 {
@@ -100,7 +100,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 clearTimeout(this.svChangeTimer);
             }
 
-            this.svChangeTimer = setTimeout(XF.proxy(this, 'svPerPageOnTimer'), 200);
+            this.svChangeTimer = setTimeout(this.svPerPageOnTimer.bind(this), 200);
         },
 
         svPerPageOnTimer: function()
@@ -157,7 +157,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             this.xhrFilter = data['_xfFilter'];
-            XF.ajax('GET', finalUrl, data, XF.proxy(this, '_filterAjaxResponse'));
+            XF.ajax('GET', finalUrl, data, this._filterAjaxResponse.bind(this));
         },
 
         _filterAjaxResponse: function(result)
@@ -281,7 +281,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
             else // XF 2.2
             {
-                $(pageNavWrapper).find('.pageNav a[href]').on('click', XF.proxy(this, 'ajaxLoadNewPage'));
+                $(pageNavWrapper).find('.pageNav a[href]').on('click', this.ajaxLoadNewPage.bind(this));
             }
 
             XF.activate(pageNavWrapper);
