@@ -2,11 +2,13 @@ var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
 SV.StandardLib.XF = SV.StandardLib.XF || {};
 SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
+SV.$ = SV.$ || window.jQuery || null;
 SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
 ;((window, document) =>
 {
     "use strict";
+    var $ = SV.$;
 
     SV.StandardLib.XF.Filter.BaseOpts = {
         svLoadInOverlay: true,
@@ -27,7 +29,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             '_filterAjax': 'svLib__filterAjax',
             'filter': 'svLib__filter',
             'update': 'svLib__update',
-            '_filterAjaxResponse': 'svLib__filterAjaxResponse'
+            '_filterAjaxResponse': 'svLib__filterAjaxResponse',
+            '_appendRows': 'svLib__appendRows'
         },
         options: SV.extendObject({}, XF.Filter.prototype.options, SV.StandardLib.XF.Filter.BaseOpts),
 
@@ -57,9 +60,10 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             var existingPage = null,
-                pageNavWrapper = this.getPageNavWrapper();
-            if (pageNavWrapper)
+                pageNavWrappers = this.getPageNavWrappers();
+            if (pageNavWrappers !== null)
             {
+                var pageNavWrapper = pageNavWrappers[0];
                 var currentPageLink = pageNavWrapper.querySelector('.pageNav-page--current > a');
                 if (currentPageLink)
                 {
@@ -71,9 +75,9 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             this.svPerPageDropdown = thisTarget.querySelector(this.options.perPageDropdown);
             if (this.svPerPageDropdown !== null)
             {
-                if (typeof this.svPerPageDropdown.on !== "undefined") // XF 2.2 only
+                if (typeof XF.on !== "function") // XF 2.2
                 {
-                    this.svPerPageDropdown.on('change', this.svPerPageChange.bind(this));
+                    $(this.svPerPageDropdown).on('change', this.svPerPageChange.bind(this));
                 }
                 else
                 {
@@ -160,6 +164,51 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             XF.ajax('GET', finalUrl, data, this._filterAjaxResponse.bind(this));
         },
 
+        _appendRows: function(rows)
+        {
+            if (typeof XF.on !== "function") {
+                this.svLib__appendRows(rows);
+                return;
+            }
+            // XF2.3.0 bug workaround
+            // https://xenforo.com/community/threads/uncaught-in-promise-typeerror-lastrow-is-undefined.222125/
+            const existingRows = this.search.querySelectorAll(this.options.searchRow)
+            const lastRow = existingRows[existingRows.length - 1]
+            let lastRowContainer = null
+            const searchRowGroup = this.options.searchRowGroup
+
+            if (lastRow) {
+                if (searchRowGroup) {
+                    lastRowContainer = lastRow.closest(searchRowGroup)
+                }
+
+                if (!lastRowContainer && lastRow.matches('tr')) {
+                    lastRowContainer = lastRow.closest('tbody')
+                }
+
+                if (!lastRowContainer) {
+                    lastRowContainer = lastRow
+                }
+            }
+
+            if (lastRowContainer)
+            {
+                Array.from(rows)
+                    .reverse()
+                    .forEach((row) =>
+                    {
+                        lastRowContainer.insertAdjacentElement('afterend', row)
+                    })
+            }
+            else
+            {
+                const search = this.search;
+                rows.forEach(function (row) {
+                    search.append(row);
+                });
+            }
+        },
+
         _filterAjaxResponse: function(result)
         {
             var filter = this.xhrFilter,
@@ -179,30 +228,35 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             this.svLib__filterAjaxResponse(result);
 
-            var oldPageNavWrapper = this.getPageNavWrapper();
-            if (!oldPageNavWrapper)
+            var oldPageNavWrappers = this.getPageNavWrappers();
+            if (oldPageNavWrappers === null)
             {
                 return;
             }
 
             var tmpResult;
-            if (typeof $ !== "undefined") // XF 2.2 and earlier
+            if (typeof XF.createElementFromString === "undefined") // XF 2.2
             {
-                tmpResult = $($.parseHTML(result.html.content));
+                tmpResult = $.parseHTML('<div>' + result.html.content + '</div>');
+                tmpResult = tmpResult[0];
             }
             else
             {
                 tmpResult = XF.createElementFromString(result.html.content.trim());
             }
 
-            var newPageNavWrapper = XF.findRelativeIf(this.options.contentWrapper, tmpResult);
+            var newPageNavWrapper = tmpResult.querySelector(this.options.pageNavWrapper);
             if (newPageNavWrapper === null)
             {
-                oldPageNavWrapper.empty();
+                oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
+                    oldPageNavWrapper.innerHTML = '';
+                });
                 return;
             }
 
-            oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
+            oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
+                oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
+            });
             this.shimDynamicPageNav();
 
             if (this.inOverlay)
@@ -266,25 +320,27 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         shimDynamicPageNav: function()
         {
-            var pageNavWrapper = this.getPageNavWrapper();
-            if (!pageNavWrapper)
+            var pageNavWrappers = this.getPageNavWrappers();
+            if (pageNavWrappers === null)
             {
                 return;
             }
 
             if (typeof XF.on === "function")
             {
-                for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href]'))
-                {
-                    XF.on(pageNavLink, 'click', this.ajaxLoadNewPage.bind(this))
+                for (const pageNavWrapper of pageNavWrappers) {
+                    for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href]')) {
+                        XF.on(pageNavLink, 'click', this.ajaxLoadNewPage.bind(this))
+                    }
+                    XF.activate(pageNavWrapper);
                 }
             }
             else // XF 2.2
             {
-                $(pageNavWrapper).find('.pageNav a[href]').on('click', this.ajaxLoadNewPage.bind(this));
+                var $wrappers = $(pageNavWrappers);
+                $wrappers.find('.pageNav a[href]').on('click', this.ajaxLoadNewPage.bind(this));
+                XF.activate($wrappers);
             }
-
-            XF.activate(pageNavWrapper);
         },
 
         /**
@@ -332,12 +388,11 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         },
 
         /**
-         *
          * @param {Boolean} logNotFound
          *
-         * @returns {null|{length}|*|jQuery|HTMLElement}
+         * @returns {null|HTMLElement[]}
          */
-        getPageNavWrapper: function(logNotFound)
+        getPageNavWrappers: function(logNotFound)
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
             if (!this.options.pageNavWrapper)
@@ -351,20 +406,18 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             var thisTarget = this.target || this.$target.get(0),
-                oldPageNavWrapper = this.options.globalFind
-                    ? document.querySelector((this.options.pageNavWrapper))
-                    : thisTarget.querySelector((this.options.pageNavWrapper));
-            if (oldPageNavWrapper === null)
+                pageNavWrappers = thisTarget.querySelectorAll(this.options.pageNavWrapper);
+            if (pageNavWrappers === null || pageNavWrappers.length === 0)
             {
                 if (logNotFound)
                 {
-                    console.error('No old pagination wrapper available', oldPageNavWrapper);
+                    console.error('No old pagination wrapper available');
                 }
 
                 return null;
             }
 
-            return oldPageNavWrapper;
+            return pageNavWrappers;
         },
 
         /**
@@ -378,8 +431,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 return null;
             }
 
-            var pageNavWrapper = this.getPageNavWrapper(false);
-            if (!pageNavWrapper)
+            var pageNavWrappers = this.getPageNavWrappers(false);
+            if (pageNavWrappers === null)
             {
                 return null;
             }
