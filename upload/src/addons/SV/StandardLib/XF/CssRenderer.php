@@ -63,23 +63,24 @@ class CssRenderer extends XFCP_CssRenderer
      */
     protected function withSimpleLessParser(callable $func)
     {
-        $parser = $this->getSimpleLessParser();
+        $style = $this->style;
 
-        $isXF23 = \XF::$versionId > 2030000;
-        if ($isXF23)
+        $suppressVariations = \XF::$versionId > 2030000 && $style->isVariationsEnabled();
+        if ($suppressVariations)
         {
             $oldVariation = $this->style->getVariation();
-            $this->style->setVariation('default');
+            $style->setVariation('default');
         }
         try
         {
+            $parser = $this->getSimpleLessParser();
             return $func($parser);
         }
         finally
         {
-            if ($isXF23)
+            if ($suppressVariations)
             {
-                $this->style->setVariation($oldVariation);
+                $style->setVariation($oldVariation);
             }
         }
     }
