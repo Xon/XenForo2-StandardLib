@@ -50,7 +50,7 @@ SV.$ = SV.$ || window.jQuery || null;
             this.perPageDropdown = thisTarget.querySelector(this.options.perPageDropdown);
             if (this.perPageDropdown !== null)
             {
-                if (typeof XF.on === "undefined") // XF 2.2
+                if (typeof XF.on !== "function") // XF 2.2
                 {
                     $(this.perPageDropdown).on('change', this.perPageChange.bind(this));
                 }
