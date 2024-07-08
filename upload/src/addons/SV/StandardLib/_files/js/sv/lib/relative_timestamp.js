@@ -1,10 +1,12 @@
 // noinspection ES6ConvertVarToLetConst
 var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
+SV.$ = SV.$ || window.jQuery || null;
 
 (function()
 {
     "use strict";
+    var $ = SV.$;
 
     if (typeof moment === 'function')
     {
@@ -350,10 +352,10 @@ SV.StandardLib = SV.StandardLib || {};
                 return;
             }
 
-            if (XF.trigger) {
+            if (typeof XF.trigger === "function") {
                 XF.trigger(eventTarget, eventName);
             } else {
-                jQuery(eventTarget).trigger(eventName);
+                $(eventTarget).trigger(eventName);
             }
         }
     });

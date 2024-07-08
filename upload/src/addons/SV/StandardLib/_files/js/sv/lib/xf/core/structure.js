@@ -3,11 +3,13 @@ var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
 SV.StandardLib.XF = SV.StandardLib.XF || {};
 SV.StandardLib.XF.Tabs = SV.StandardLib.XF.Tabs || {};
+SV.$ = SV.$ || window.jQuery || null;
 SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
 ;((window, document) =>
 {
     "use strict";
+    var $ = SV.$;
 
     SV.StandardLib.XF.Tabs.BaseOpts = {
         svStoreSelectedTabInputName: null
@@ -37,12 +39,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 form = thisTarget.closest('form'),
                 escapedInputName = XF.htmlspecialchars(this.options.svStoreSelectedTabInputName.toString()),
                 finalInputSelector = '[name="' + escapedInputName + '"]',
-                hiddenInput = XF.findRelativeIf(finalInputSelector, form);
-
-            if (hiddenInput !== null && (typeof hiddenInput.get === "function") && !hiddenInput.length) // if running XF 2.2 and no element found with the selector
-            {
-                hiddenInput = null
-            }
+                hiddenInput = form.querySelector(finalInputSelector);
 
             if (hiddenInput === null)
             {
@@ -66,7 +63,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 form.append(hiddenInput)
             }
 
-            return XF.findRelativeIf(finalInputSelector, form);
+            return form.querySelector(finalInputSelector);
         },
 
         /**
