@@ -20,7 +20,7 @@ var SV = window.SV || {};
         init: function()
         {
             var thisTarget = this.target || this.$target.get(0);
-            this.inOverlay = XF.findRelativeIf('< .overlay-container', thisTarget) !== null;
+            this.inOverlay = thisTarget.closest('.overlay-container') !== null;
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
             if (!this.options.contentWrapper)
             {

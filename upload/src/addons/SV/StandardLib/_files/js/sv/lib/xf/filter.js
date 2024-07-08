@@ -49,7 +49,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         init: function ()
         {
             var thisTarget = this.target || this.$target.get(0);
-            this.inOverlay = XF.findRelativeIf('< .overlay-container', thisTarget) !== null;
+            this.inOverlay = thisTarget.closest('.overlay-container') !== null;
 
             if (!this.options.ajax) {
                 console.error('No filter AJAX URL input was provided.');
