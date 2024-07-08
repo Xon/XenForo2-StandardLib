@@ -1,11 +1,11 @@
 var SV = window.SV || {};
+SV.$ = SV.$ || window.jQuery || null;
 
 ;((window, document) =>
 {
     "use strict";
 
-    // ################################## TICKET MANAGE HANDLER ###########################################
-
+    var $ = SV.$;
     SV.DropdownSubmit = XF.Element.newHandler({
         options: {
             pageNavWrapper: '.block-outer--page-nav-wrapper',
@@ -50,9 +50,9 @@ var SV = window.SV || {};
             this.perPageDropdown = thisTarget.querySelector(this.options.perPageDropdown);
             if (this.perPageDropdown !== null)
             {
-                if (typeof this.perPageDropdown.on !== "undefined") // XF 2.2 only
+                if (typeof XF.on === "undefined") // XF 2.2
                 {
-                    this.perPageDropdown.on('change', this.perPageChange.bind(this));
+                    $(this.perPageDropdown).on('change', this.perPageChange.bind(this));
                 }
                 else
                 {
@@ -104,8 +104,8 @@ var SV = window.SV || {};
         {
             this.xhr = null;
 
-            var oldPageNavWrapper = this.getPageNavWrapper();
-            if (oldPageNavWrapper === null)
+            var oldPageNavWrappers = this.getPageNavWrappers(false);
+            if (oldPageNavWrappers === null)
             {
                 return;
             }
@@ -117,30 +117,34 @@ var SV = window.SV || {};
             }
 
             var tmpResult;
-            if (typeof $ !== "undefined") // XF 2.2 and earlier
+            if (typeof XF.createElementFromString === "undefined") // XF 2.2
             {
-                tmpResult = $($.parseHTML(result.html.content));
+                tmpResult = $.parseHTML('<div>' + result.html.content + '</div>');
+                tmpResult = tmpResult[0];
             }
             else
             {
                 tmpResult = XF.createElementFromString(result.html.content.trim());
             }
 
-            var newPageNavWrapper = XF.findRelativeIf(this.options.pageNavWrapper, tmpResult),
-                newContentWrapper = XF.findRelativeIf(this.options.contentWrapper, tmpResult);
+            var newPageNavWrapper = tmpResult.querySelector(this.options.pageNavWrapper),
+                newContentWrapper = tmpResult.querySelector(this.options.contentWrapper);
             if (newPageNavWrapper === null)
             {
-                oldPageNavWrapper.innerHTML = '';
+                oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
+                    oldPageNavWrapper.innerHTML = '';
+                });
                 return;
             }
-
             if (newContentWrapper === null)
             {
                 oldContentWrapper.innerHTML = '';
                 return;
             }
 
-            oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
+            oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
+                oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
+            });
             oldContentWrapper.innerHTML = newContentWrapper.innerHTML;
 
             if (this.inOverlay)
@@ -180,9 +184,9 @@ var SV = window.SV || {};
         /**
          * @param {Boolean} logNotFound
          *
-         * @returns {null|HTMLElement}
+         * @returns {null|HTMLElement[]}
          */
-        getPageNavWrapper: function(logNotFound)
+        getPageNavWrappers: function(logNotFound)
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
             if (!this.options.pageNavWrapper)
@@ -196,8 +200,8 @@ var SV = window.SV || {};
             }
 
             var thisTarget = this.target || this.$target.get(0),
-                pageNavWrapper = thisTarget.querySelector((this.options.pageNavWrapper));
-            if (pageNavWrapper === null)
+                pageNavWrappers = thisTarget.querySelectorAll(this.options.pageNavWrapper);
+            if (pageNavWrappers === null || pageNavWrappers.length === 0)
             {
                 if (logNotFound)
                 {
@@ -207,7 +211,7 @@ var SV = window.SV || {};
                 return null;
             }
 
-            return pageNavWrapper;
+            return pageNavWrappers;
         },
 
         /**
