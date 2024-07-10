@@ -20,23 +20,26 @@ class Templater extends XFCP_Templater
 
     public function includeJs(array $options)
     {
-        $tmpOptions = array_replace([
-            'src'   => null,
-            'defer' => true,
-            'addon' => null,
-            'min'   => null,
-            'dev'   => null,
-            'prod'  => null,
-            'root'  => false,
-        ], $options);
-
-        $addOnJsMap = $this->svIncludeJsMap[$tmpOptions['addon']] ?? [];
-        $extraIncludeJsArr = $addOnJsMap[$tmpOptions['src']] ?? [];
-        if (is_array($extraIncludeJsArr))
+        if (\XF::$versionId >= 2030000)
         {
-            foreach ($extraIncludeJsArr AS $extraIncludeJs)
+            $tmpOptions = array_replace([
+                'src'   => null,
+                'defer' => true,
+                'addon' => null,
+                'min'   => null,
+                'dev'   => null,
+                'prod'  => null,
+                'root'  => false,
+            ], $options);
+
+            $addOnJsMap = $this->svIncludeJsMap[$tmpOptions['addon']] ?? [];
+            $extraIncludeJsArr = $addOnJsMap[$tmpOptions['src']] ?? [];
+            if (is_array($extraIncludeJsArr))
             {
-                parent::includeJs($extraIncludeJs);
+                foreach ($extraIncludeJsArr as $extraIncludeJs)
+                {
+                    parent::includeJs($extraIncludeJs);
+                }
             }
         }
 
