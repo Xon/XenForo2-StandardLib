@@ -76,9 +76,9 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 return;
             }
 
-            var tab = this.tabs[offset],
-                pane = this.panes[offset];
-            if ((tab === null) || (pane === null))
+            var tab = this.tabs ? this.tabs[offset] : this.$tabs.eq(offset).get(0),
+                pane = this.panes ? this.panes[offset] : this.$panes.eq(offset).get(0);
+            if (!tab || !pane)
             {
                 return;
             }
