@@ -1,21 +1,25 @@
+<xf:macro name="choices_global_setup">
+	<script>
+	var SV = window.SV || {};
+	SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
+	SV.extendObject(XF.phrases, {
+		choices_loadingText: "{{ phrase('loading...')|escape('js') }}",
+		choices_noResultsText: "{{ phrase('no_results_found')|escape('js') }}",
+		choices_noChoicesText: "{{ phrase('(none)')|escape('js') }}",
+		choices_itemSelectText: "{{ phrase('choices_itemSelectText')|escape('js') }}",
+		choices_uniqueItemText: "{{ phrase('choices_uniqueItemText')|escape('js') }}",
+		choices_customAddItemText: "{{ phrase('choices_customAddItemText')|escape('js') }}",
+		choices_addItemText: "{{ phrase('choices_addItemText')|escape('js') }}",
+		choices_maxItemText: "{{ phrase('choices_maxItemText')|escape('js') }}"
+	});
+	</script>
+</xf:macro>
+
 <xf:macro name="choices_setup">
 	<xf:js src="sv/vendor/choices/choices.js" min="1" addon="SV/StandardLib" />
 	<xf:js src="sv/lib/select.js" min="1" addon="SV/StandardLib" />
 	<xf:css src="svStandardLib_choices.less" />
-<xf:js>
-var SV = window.SV || {};
-SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
-SV.extendObject(XF.phrases, {
-	choices_loadingText: "{{ phrase('loading...')|escape('js') }}",
-    choices_noResultsText: "{{ phrase('no_results_found')|escape('js') }}",
-    choices_noChoicesText: "{{ phrase('(none)')|escape('js') }}",
-    choices_itemSelectText: "{{ phrase('choices_itemSelectText')|escape('js') }}",
-    choices_uniqueItemText: "{{ phrase('choices_uniqueItemText')|escape('js') }}",
-    choices_customAddItemText: "{{ phrase('choices_customAddItemText')|escape('js') }}",
-    choices_addItemText: "{{ phrase('choices_addItemText')|escape('js') }}",
-    choices_maxItemText: "{{ phrase('choices_maxItemText')|escape('js') }}"
-});
-</xf:js>
+	<xf:page option="svChoices_global_setup" value="{{ 1 }}" />
 </xf:macro>
 
 <xf:macro name="render_prefix_filter"

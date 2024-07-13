@@ -1,0 +1,9 @@
+{
+    "template": "helper_js_global",
+    "description": "Add choices.js phrases (if required)",
+    "execution_order": 7915,
+    "enabled": true,
+    "action": "str_replace",
+    "find": "<!--XF:JS-->",
+    "replace": "$0\n<xf:if is=\"$__globals.svChoices_global_setup\">\n<xf:macro name=\"svStandardLib_macros::choices_global_setup\" />\n</xf:if>"
+}
