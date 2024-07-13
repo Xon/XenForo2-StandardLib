@@ -285,9 +285,6 @@
 }
 
 .choices__button {
-  text-indent: -9999px;
-  -webkit-appearance: none;
-          appearance: none;
   border: 0;
   background-color: transparent;
   background-repeat: no-repeat;
@@ -341,10 +338,13 @@
 	
 	.choices__item
 	{
-		.choices__button
+		.choices__button:after
 		{
 			color: @xf-textColorMuted;
 			font-size: @xf-fontSizeSmall;
+			<xf:if is="$xf.versionId < 2030000">
+			.m-faBase();
+			</xf:if>
 			.m-faContent(@fa-var-times-circle);
 			vertical-align: middle;
 			margin-left: @xf-paddingSmall;

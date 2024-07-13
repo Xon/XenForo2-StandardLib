@@ -53,6 +53,12 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                         '{value}': value
                     });
                 },
+                removeItemIconText: '',
+                removeItemLabelText: function (value) {
+                    return XF.phrase('choices_removeItem', {
+                        '{value}': value
+                    });
+                },
                 maxItemText: function (maxItemCount) {
                     return XF.phrase('choices_maxItemText', {
                         '{maxItemCount}': maxItemCount
