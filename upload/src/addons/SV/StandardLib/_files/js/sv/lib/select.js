@@ -42,25 +42,25 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getChoicesPhrases: function() {
             return {
-                loadingText: XF.phrase('choices_loadingText'),
-                noResultsText: XF.phrase('choices_noResultsText'),
-                noChoicesText: XF.phrase('choices_noChoicesText'),
-                itemSelectText: XF.phrase('choices_itemSelectText'),
-                uniqueItemText: XF.phrase('choices_uniqueItemText'),
-                customAddItemText: XF.phrase('choices_customAddItemText'),
+                loadingText: XF.phrase('svChoices_loadingText'),
+                noResultsText: XF.phrase('svChoices_noResultsText'),
+                noChoicesText: XF.phrase('svChoices_noChoicesText'),
+                itemSelectText: XF.phrase('svChoices_itemSelectText'),
+                uniqueItemText: XF.phrase('svChoices_uniqueItemText'),
+                customAddItemText: XF.phrase('svChoices_customAddItemText'),
                 addItemText: function (value) {
-                    return XF.phrase('choices_addItemText', {
+                    return XF.phrase('svChoices_addItemText', {
                         '{value}': value
                     });
                 },
                 removeItemIconText: '',
                 removeItemLabelText: function (value) {
-                    return XF.phrase('choices_removeItemLabel', {
+                    return XF.phrase('svChoices_removeItemLabel', {
                         '{value}': value
                     });
                 },
                 maxItemText: function (maxItemCount) {
-                    return XF.phrase('choices_maxItemText', {
+                    return XF.phrase('svChoices_maxItemText', {
                         '{maxItemCount}': maxItemCount
                     });
                 }
