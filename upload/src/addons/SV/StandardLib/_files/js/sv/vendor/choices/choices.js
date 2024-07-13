@@ -2964,11 +2964,11 @@ exports.DEFAULT_CONFIG = {
   addItemText: function (value) {
     return "Press Enter to add <b>\"".concat((0, utils_1.sanitise)(value), "\"</b>");
   },
-  removeItemIconText: function (value) {
+  removeItemIconText: function () {
     return "Remove item";
   },
   removeItemLabelText: function (value) {
-    return "Remove item: ".concat((0, utils_1.sanitise)(value), "");
+    return "Remove item: ".concat((0, utils_1.sanitise)(value));
   },
   maxItemText: function (maxItemCount) {
     return "Only ".concat(maxItemCount, " values can be added");
