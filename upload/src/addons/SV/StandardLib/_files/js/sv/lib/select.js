@@ -55,7 +55,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 },
                 removeItemIconText: '',
                 removeItemLabelText: function (value) {
-                    return XF.phrase('choices_removeItem', {
+                    return XF.phrase('choices_removeItemLabel', {
                         '{value}': value
                     });
                 },
