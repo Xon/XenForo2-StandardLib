@@ -1878,8 +1878,10 @@ var Choices = /** @class */function () {
     this.containerOuter.wrap(this.containerInner.element);
     if (this._isSelectOneElement) {
       this.input.placeholder = this.config.searchPlaceholderValue || '';
-    } else if (this._placeholderValue) {
-      this.input.placeholder = this._placeholderValue;
+    } else {
+      if (this._placeholderValue) {
+        this.input.placeholder = this._placeholderValue;
+      }
       this.input.setWidth();
     }
     this.containerOuter.element.appendChild(this.containerInner.element);
@@ -4182,7 +4184,12 @@ var templates = {
       disabled = _a.disabled;
     var opt = new Option(label, value, false, active);
     if (customProperties) {
-      opt.dataset.customProperties = "".concat(customProperties);
+      for (var prop in customProperties) {
+        if (Object.prototype.hasOwnProperty.call(customProperties, prop)) {
+          opt.dataset.customProperties = JSON.stringify(customProperties);
+          break;
+        }
+      }
     }
     opt.disabled = !!disabled;
     return opt;
