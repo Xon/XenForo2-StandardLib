@@ -1,1 +1,0 @@
-Press Enter to add <b>{value}</b>
