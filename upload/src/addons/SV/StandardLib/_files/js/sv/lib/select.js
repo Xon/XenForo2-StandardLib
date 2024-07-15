@@ -20,12 +20,10 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             choicesCustomProperties: null
         },
         choices: null,
-        storedChoicesConfig: null,
 
         init: function()
         {
-            let config = this.getChoicesConfig()
-            this.choices = new Choices(this.target || this.$target.get(0), config);
+            this.choices = new Choices(this.target || this.$target.get(0), this.getChoicesConfig());
         },
 
         getItemChoices: function ()
@@ -57,7 +55,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                             label: option.text,
                             disabled: option.disabled,
                             selected: option.selected,
-                            customProperties: XF.extendObject(option.dataset)
+                            customProperties: SV.extendObject(option.dataset)
                         })
                     })
 
@@ -70,7 +68,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                         label: optionOrOptionGroup.text,
                         disabled: optionOrOptionGroup.disabled,
                         selected: optionOrOptionGroup.selected,
-                        customProperties: XF.extendObject(optionOrOptionGroup.dataset)
+                        customProperties: SV.extendObject(optionOrOptionGroup.dataset)
                     })
                 }
 
@@ -84,34 +82,34 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getChoicesConfig: function ()
         {
-            if (this.storedChoicesConfig === null)
-            {
-                this.storedChoicesConfig = SV.extendObject({}, {
-                    maxItemCount: this.options.choicesMaxItemCount,
-                    removeItemButton: this.options.choicesRemoveItemButton,
-                    allowHTML: this.options.choicesAllowHTML,
-                    shouldSort: this.options.choicesShouldSort,
-                    shouldSortItems: this.options.choicesShouldSortItems,
-                    editItems: this.options.choicesEditItems,
-                    resetScrollPosition: this.options.choicesResetScrollPosition,
-                    renderSelectedChoices: this.options.choicesRenderSelectedChoices,
-                    renderChoiceLimit: this.options.choicesRenderChoiceLimit,
-                    callbackOnInit: this.choicesInitCallback.bind(this),
-                    callbackOnCreateTemplates: this.choicesCreateTemplatesCallback.bind(this)
-                }, this.getItemChoices(), this.getChoicesPhrases(), this.getChoicesClassNames())
-            }
-
-            return this.storedChoicesConfig
+            var self = this;
+            return SV.extendObject({}, {
+                maxItemCount: this.options.choicesMaxItemCount,
+                removeItemButton: this.options.choicesRemoveItemButton,
+                allowHTML: this.options.choicesAllowHTML,
+                shouldSort: this.options.choicesShouldSort,
+                shouldSortItems: this.options.choicesShouldSortItems,
+                editItems: this.options.choicesEditItems,
+                resetScrollPosition: this.options.choicesResetScrollPosition,
+                renderSelectedChoices: this.options.choicesRenderSelectedChoices,
+                renderChoiceLimit: this.options.choicesRenderChoiceLimit,
+                callbackOnInit: function () {
+                    return self.choicesInitCallback.call(self, this);
+                },
+                callbackOnCreateTemplates: function (template) {
+                    return self.choicesCreateTemplatesCallback.call(self, this, template);
+                }
+            }, this.getItemChoices(), this.getChoicesPhrases(), this.getChoicesClassNames());
         },
 
-        choicesInitCallback: function ()
+        choicesInitCallback: function (choices)
         {
             //I exist because I must.
         },
 
-        choicesCreateTemplatesCallback: function (template)
+        choicesCreateTemplatesCallback: function (choices, template)
         {
-            let config = this.getChoicesConfig()
+            let config = choices.config;
 
             return {
                 item: ({ classNames }, data) =>
