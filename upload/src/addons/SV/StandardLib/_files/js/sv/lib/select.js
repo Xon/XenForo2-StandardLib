@@ -16,28 +16,292 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             choicesEditItems: false,
             choicesResetScrollPosition: false,
             choicesRenderSelectedChoices: 'always',//'auto'
-            choicesRenderChoiceLimit: false
+            choicesRenderChoiceLimit: false,
+            choicesCustomProperties: null
         },
         choices: null,
+        storedChoicesConfig: null,
 
         init: function()
         {
-            this.choices = new Choices(this.target || this.$target.get(0), this.getChoicesOptions());
+            let config = this.getChoicesConfig()
+            this.choices = new Choices(this.target || this.$target.get(0), config);
         },
 
-        getChoicesOptions: function ()
+        getItemChoices: function ()
         {
-            return SV.extendObject({}, {
-                maxItemCount: this.options.choicesMaxItemCount,
-                removeItemButton: this.options.choicesRemoveItemButton,
-                allowHTML: this.options.choicesAllowHTML,
-                shouldSort: this.options.choicesShouldSort,
-                shouldSortItems: this.options.choicesShouldSortItems,
-                editItems: this.options.choicesEditItems,
-                resetScrollPosition: this.options.choicesResetScrollPosition,
-                renderSelectedChoices: this.options.choicesRenderSelectedChoices,
-                renderChoiceLimit: this.options.choicesRenderChoiceLimit
-            }, this.getChoicesPhrases(), this.getChoicesClassNames())
+            let itemChoices = [],
+                theTarget = this.target || this.$target.get(0)
+
+            theTarget.querySelectorAll(':scope > *').forEach((optionOrOptionGroup) =>
+            {
+                if (optionOrOptionGroup.tagName.toLowerCase().trim() === 'optgroup')
+                {
+                    let groupedChoices = {
+                        label: optionOrOptionGroup.label,
+                        disabled: optionOrOptionGroup.disabled,
+                        choices: []
+                    }
+
+                    //@todo: does group has customProperties support?
+                    let optGroupCustomProps = SV.extendObject(optionOrOptionGroup.dataset)
+                    if (typeof optGroupCustomProps.id !== "undefined")
+                    {
+                        groupedChoices.id = optGroupCustomProps.id
+                        delete optGroupCustomProps.id
+                    }
+
+                    optionOrOptionGroup.querySelectorAll('option').forEach((option) => {
+                        groupedChoices.choices.push({
+                            value: option.value,
+                            label: option.text,
+                            disabled: option.disabled,
+                            selected: option.selected,
+                            customProperties: XF.extendObject(option.dataset)
+                        })
+                    })
+
+                    itemChoices.push(groupedChoices)
+                }
+                else
+                {
+                    itemChoices.push({
+                        value: optionOrOptionGroup.value,
+                        label: optionOrOptionGroup.text,
+                        disabled: optionOrOptionGroup.disabled,
+                        selected: optionOrOptionGroup.selected,
+                        customProperties: XF.extendObject(optionOrOptionGroup.dataset)
+                    })
+                }
+
+                optionOrOptionGroup.remove()
+            })
+
+            return {
+                choices: itemChoices
+            }
+        },
+
+        getChoicesConfig: function ()
+        {
+            if (this.storedChoicesConfig === null)
+            {
+                this.storedChoicesConfig = SV.extendObject({}, {
+                    maxItemCount: this.options.choicesMaxItemCount,
+                    removeItemButton: this.options.choicesRemoveItemButton,
+                    allowHTML: this.options.choicesAllowHTML,
+                    shouldSort: this.options.choicesShouldSort,
+                    shouldSortItems: this.options.choicesShouldSortItems,
+                    editItems: this.options.choicesEditItems,
+                    resetScrollPosition: this.options.choicesResetScrollPosition,
+                    renderSelectedChoices: this.options.choicesRenderSelectedChoices,
+                    renderChoiceLimit: this.options.choicesRenderChoiceLimit,
+                    callbackOnInit: this.choicesInitCallback.bind(this),
+                    callbackOnCreateTemplates: this.choicesCreateTemplatesCallback.bind(this)
+                }, this.getItemChoices(), this.getChoicesPhrases(), this.getChoicesClassNames())
+            }
+
+            return this.storedChoicesConfig
+        },
+
+        choicesInitCallback: function ()
+        {
+            //I exist because I must.
+        },
+
+        choicesCreateTemplatesCallback: function (template)
+        {
+            let config = this.getChoicesConfig()
+
+            return {
+                item: ({ classNames }, data) =>
+                {
+                    let allowHTML = config.allowHTML,
+                        item = classNames.item,
+                        button = classNames.button,
+                        highlightedState = classNames.highlightedState,
+                        itemSelectable = classNames.itemSelectable,
+                        placeholder = classNames.placeholder
+
+                    let id = data.id,
+                        value = data.value,
+                        label = data.label,
+                        customProperties = data.customProperties,
+                        active = data.active,
+                        disabled = data.disabled,
+                        highlighted = data.highlighted,
+                        isPlaceholder = data.placeholder
+
+                    let labelClass = typeof data.customProperties.labelClass !== "undefined" ? data.customProperties.labelClass : null,
+                        wrapSpan = null
+                    if (labelClass !== null)
+                    {
+                        wrapSpan = document.createElement('span')
+                        wrapSpan.className = "".concat(data.customProperties.labelClass, "")
+                    }
+
+                    let div = document.createElement('div')
+                    div.className = item
+                    if (wrapSpan)
+                    {
+                        if (allowHTML)
+                        {
+                            wrapSpan.innerHTML = label
+                        }
+                        else
+                        {
+                            wrapSpan.innerText = label
+                        }
+                        div.innerHTML = wrapSpan.outerHTML
+                    }
+                    else
+                    {
+                        if (allowHTML)
+                        {
+                            div.innerHTML = label
+                        }
+                        else
+                        {
+                            div.innerText = label
+                        }
+                    }
+
+                    Object.assign(div.dataset, {
+                        item: '',
+                        id: id,
+                        value: value,
+                        customProperties: customProperties
+                    });
+
+                    if (active)
+                    {
+                        div.setAttribute('aria-selected', 'true');
+                    }
+
+                    if (disabled)
+                    {
+                        div.setAttribute('aria-disabled', 'true');
+                    }
+
+                    if (isPlaceholder)
+                    {
+                        div.classList.add(placeholder);
+                    }
+                    div.classList.add(highlighted ? highlightedState : itemSelectable);
+
+                    if (config.removeItemButton)
+                    {
+                        if (disabled)
+                        {
+                            div.classList.remove(itemSelectable);
+                        }
+                        div.dataset.deletable = '';
+                        let REMOVE_ITEM_ICON = typeof config.removeItemIconText === 'function' ? config.removeItemIconText(value) : config.removeItemIconText;
+                        let REMOVE_ITEM_LABEL = typeof config.removeItemLabelText === 'function' ? config.removeItemLabelText(value) : config.removeItemLabelText;
+
+                        let removeButton = document.createElement('button')
+                        removeButton.type = 'button'
+                        removeButton.className = button
+                        if (allowHTML)
+                        {
+                            removeButton.innerHTML = REMOVE_ITEM_ICON
+                        }
+                        else
+                        {
+                            removeButton.innerText = REMOVE_ITEM_ICON
+                        }
+
+                        removeButton.setAttribute('aria-label', REMOVE_ITEM_LABEL);
+                        removeButton.dataset.button = '';
+                        div.appendChild(removeButton);
+                    }
+
+                    return div;
+                },
+
+                choice: ({ classNames }, data) =>
+                {
+                    let allowHTML = config.allowHTML,
+                        item = classNames.item,
+                        itemChoice = classNames.itemChoice,
+                        itemSelectable = classNames.itemSelectable,
+                        selectedState = classNames.selectedState,
+                        itemDisabled = classNames.itemDisabled,
+                        placeholder = classNames.placeholder
+
+                    let id = data.id,
+                        value = data.value,
+                        label = data.label,
+                        groupId = data.groupId,
+                        elementId = data.elementId,
+                        isDisabled = data.disabled,
+                        isSelected = data.selected,
+                        isPlaceholder = data.placeholder
+
+                    let labelClass = typeof data.customProperties.labelClass !== "undefined" ? data.customProperties.labelClass : null,
+                        wrapSpan = null
+                    if (labelClass !== null)
+                    {
+                        wrapSpan = document.createElement('span')
+                        wrapSpan.className = "".concat(data.customProperties.labelClass, "")
+                    }
+
+                    let div = document.createElement('div')
+                    div.id = elementId
+                    div.className = "".concat(item, " ").concat(itemChoice)
+                    if (wrapSpan)
+                    {
+                        if (allowHTML)
+                        {
+                            wrapSpan.innerHTML = label
+                        }
+                        else
+                        {
+                            wrapSpan.innerText = label
+                        }
+                        div.innerHTML = wrapSpan.outerHTML
+                    }
+                    else
+                    {
+                        if (allowHTML)
+                        {
+                            div.innerHTML = label
+                        }
+                        else
+                        {
+                            div.innerText = label
+                        }
+                    }
+
+                    if (isSelected)
+                    {
+                        div.classList.add(selectedState)
+                    }
+                    if (isPlaceholder) {
+                        div.classList.add(placeholder)
+                    }
+                    div.setAttribute('role', groupId && groupId > 0 ? 'treeitem' : 'option')
+                    Object.assign(div.dataset, {
+                        choice: '',
+                        id: id,
+                        value: value,
+                        selectText: config.itemSelectText
+                    })
+
+                    if (isDisabled)
+                    {
+                        div.classList.add(itemDisabled)
+                        div.dataset.choiceDisabled = ''
+                        div.setAttribute('aria-disabled', 'true')
+                    }
+                    else
+                    {
+                        div.classList.add(itemSelectable)
+                        div.dataset.choiceSelectable = ''
+                    }
+                    return div
+                }
+            };
         },
 
         getChoicesPhrases: function() {
