@@ -93,6 +93,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 resetScrollPosition: this.options.choicesResetScrollPosition,
                 renderSelectedChoices: this.options.choicesRenderSelectedChoices,
                 renderChoiceLimit: this.options.choicesRenderChoiceLimit,
+                pseudoMultiSelectForSingle: this.options.choicesMaxItemCount === 1,
                 callbackOnInit: function () {
                     return self.choicesInitCallback.call(self, this);
                 },

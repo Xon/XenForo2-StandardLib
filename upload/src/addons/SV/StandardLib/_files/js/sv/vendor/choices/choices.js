@@ -260,10 +260,14 @@ var Choices = /** @class */function () {
     this._isSelectOneElement = passedElement.type === constants_1.SELECT_ONE_TYPE;
     this._isSelectMultipleElement = passedElement.type === constants_1.SELECT_MULTIPLE_TYPE;
     this._isSelectElement = this._isSelectOneElement || this._isSelectMultipleElement;
-    this.config.searchEnabled = this._isSelectMultipleElement || this.config.searchEnabled;
-    if (this._isSelectMultipleElement && this.config.maxItemCount === 1 && userConfig.pseudoMultiSelectForSingle === undefined) {
-      this.config.pseudoMultiSelectForSingle = true;
+    if (this.config.maxItemCount !== 1) {
+      this.config.pseudoMultiSelectForSingle = false;
     }
+    if (this.config.pseudoMultiSelectForSingle) {
+      this._isSelectOneElement = false;
+      this._isSelectMultipleElement = true;
+    }
+    this.config.searchEnabled = this._isSelectMultipleElement || this.config.searchEnabled;
     if (!['auto', 'always'].includes("".concat(this.config.renderSelectedChoices))) {
       this.config.renderSelectedChoices = 'auto';
     }
