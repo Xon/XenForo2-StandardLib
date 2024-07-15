@@ -1333,7 +1333,7 @@ var Choices = /** @class */function () {
       case ENTER_KEY:
         return this._onEnterKey(event, activeItems, hasActiveDropdown);
       case ESC_KEY:
-        return this._onEscapeKey(hasActiveDropdown);
+        return this._onEscapeKey(event, hasActiveDropdown);
       case UP_KEY:
       case PAGE_UP_KEY:
       case DOWN_KEY:
@@ -1427,8 +1427,9 @@ var Choices = /** @class */function () {
       event.preventDefault();
     }
   };
-  Choices.prototype._onEscapeKey = function (hasActiveDropdown) {
+  Choices.prototype._onEscapeKey = function (event, hasActiveDropdown) {
     if (hasActiveDropdown) {
+      event.stopPropagation();
       this.hideDropdown(true);
       this.containerOuter.focus();
     }
