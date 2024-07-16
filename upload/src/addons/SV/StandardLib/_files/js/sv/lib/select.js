@@ -1,10 +1,12 @@
 var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
+SV.$ = SV.$ || window.jQuery || null;
 SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
 (function()
 {
     "use strict";
+    var $ = SV.$;
 
     SV.StandardLib.Choices = XF.Element.newHandler({
         options: {
@@ -25,60 +27,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         init: function()
         {
             this.choices = new Choices(this.target || this.$target.get(0), this.getChoicesConfig());
-        },
-
-        getItemChoices: function ()
-        {
-            let itemChoices = [],
-                theTarget = this.target || this.$target.get(0)
-
-            theTarget.querySelectorAll(':scope > *').forEach((optionOrOptionGroup) =>
-            {
-                if (optionOrOptionGroup.tagName.toLowerCase().trim() === 'optgroup')
-                {
-                    let groupedChoices = {
-                        label: optionOrOptionGroup.label,
-                        disabled: optionOrOptionGroup.disabled,
-                        choices: []
-                    }
-
-                    //@todo: does group has customProperties support?
-                    let optGroupCustomProps = SV.extendObject(optionOrOptionGroup.dataset)
-                    if (typeof optGroupCustomProps.id !== "undefined")
-                    {
-                        groupedChoices.id = optGroupCustomProps.id
-                        delete optGroupCustomProps.id
-                    }
-
-                    optionOrOptionGroup.querySelectorAll('option').forEach((option) => {
-                        groupedChoices.choices.push({
-                            value: option.value,
-                            label: option.text,
-                            disabled: option.disabled,
-                            selected: option.selected,
-                            customProperties: SV.extendObject(option.dataset)
-                        })
-                    })
-
-                    itemChoices.push(groupedChoices)
-                }
-                else
-                {
-                    itemChoices.push({
-                        value: optionOrOptionGroup.value,
-                        label: optionOrOptionGroup.text,
-                        disabled: optionOrOptionGroup.disabled,
-                        selected: optionOrOptionGroup.selected,
-                        customProperties: SV.extendObject(optionOrOptionGroup.dataset)
-                    })
-                }
-
-                optionOrOptionGroup.remove()
-            })
-
-            return {
-                choices: itemChoices
-            }
+            this.initChoicesEvents()
         },
 
         getChoicesConfig: function ()
@@ -97,10 +46,11 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 renderChoiceLimit: this.options.choicesRenderChoiceLimit,
                 pseudoMultiSelectForSingle: this.options.choicesMaxItemCount === 1,
                 placeholderValue: placeholder !== '' ? placeholder : null,
-            }, this.getItemChoices(), this.getChoicesPhrases(), this.getChoicesClassNames());
+            }, this.getChoicesPhrases(), this.getChoicesClassNames());
         },
 
-        getChoicesPhrases: function() {
+        getChoicesPhrases: function()
+        {
             return {
                 loadingText: XF.phrase('svChoices_loadingText'),
                 noResultsText: XF.phrase('svChoices_noResultsText'),
@@ -140,7 +90,56 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                     ],
                 }
             }
-        }
+        },
+
+        initChoicesEvents: function ()
+        {
+            if (!this.choices)
+            {
+                console.error('Choices not setup.')
+                return;
+            }
+
+            let passedElement = this.choices.passedElement.element;
+
+            if (typeof XF.on !== "function") // XF 2.2
+            {
+                var $target = $(passedElement);
+                $target.on('addItem', this.choicesOnAddItem.bind(this));
+                $target.on('removeItem', this.choicesOnRemoveItem.bind(this));
+                $target.on('choice', this.choicesOnChoice.bind(this));
+                $target.on('showDropdown', this.choicesOnShowDropdown.bind(this));
+                $target.on('hideDropdown', this.choicesOnHideDropdown.bind(this));
+            }
+            else
+            {
+                XF.on(passedElement, 'addItem', this.choicesOnAddItem.bind(this));
+                XF.on(passedElement, 'removeItem', this.choicesOnRemoveItem.bind(this));
+                XF.on(passedElement, 'choice', this.choicesOnChoice.bind(this));
+                XF.on(passedElement, 'showDropdown', this.choicesOnShowDropdown.bind(this));
+                XF.on(passedElement, 'hideDropdown', this.choicesOnHideDropdown.bind(this));
+            }
+        },
+
+        choicesOnAddItem: function (event)
+        {
+        },
+
+        choicesOnRemoveItem: function (event)
+        {
+        },
+
+        choicesOnChoice: function ()
+        {
+        },
+
+        choicesOnShowDropdown: function ()
+        {
+        },
+
+        choicesOnHideDropdown: function (event)
+        {
+        },
     });
 
     XF.Element.register('sv-choices', 'SV.StandardLib.Choices');
