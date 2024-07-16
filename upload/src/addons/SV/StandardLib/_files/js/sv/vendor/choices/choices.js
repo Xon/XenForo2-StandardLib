@@ -2899,7 +2899,7 @@ var WrappedSelect = /** @class */function (_super) {
       selected: !!option.selected,
       disabled: option.disabled || this.element.disabled,
       placeholder: option.value === '' || option.hasAttribute('placeholder'),
-      labelClass: typeof option.dataset.labelClass !== 'undefined' ? option.dataset.labelClass : undefined,
+      labelClass: typeof option.dataset.labelClass !== 'undefined' ? option.dataset.labelClass.split(' ') : undefined,
       labelDescription: typeof option.dataset.labelDescription !== 'undefined' ? option.dataset.labelDescription : undefined,
       customProperties: (0, utils_1.parseCustomProperties)(option.dataset.customProperties)
     };
@@ -4137,7 +4137,7 @@ var templates = {
     var div = Object.assign(document.createElement('div'), {
       className: (0, utils_1.getClassNames)(item).join(' ')
     });
-    if (typeof labelClass === 'string') {
+    if (typeof labelClass === 'string' || Array.isArray(labelClass)) {
       var spanLabel = Object.assign(document.createElement('span'), (_c = {}, _c[allowHTML ? 'innerHTML' : 'innerText'] = label, _c.className = (0, utils_1.getClassNames)(labelClass).join(' '), _c));
       div.appendChild(spanLabel);
     } else if (allowHTML) {
@@ -4243,16 +4243,20 @@ var templates = {
       id: elementId,
       className: "".concat((0, utils_1.getClassNames)(item).join(' '), " ").concat((0, utils_1.getClassNames)(itemChoice).join(' '))
     });
-    if (typeof labelClass === 'string') {
+    var descId = "".concat(elementId, "-description");
+    if (typeof labelClass === 'string' || Array.isArray(labelClass)) {
       var spanLabel = Object.assign(document.createElement('span'), (_c = {}, _c[allowHTML ? 'innerHTML' : 'innerText'] = label, _c.className = (0, utils_1.getClassNames)(labelClass).join(' '), _c));
+      spanLabel.setAttribute('aria-describedby', descId);
       div.appendChild(spanLabel);
     } else if (allowHTML) {
       div.innerHTML = label;
+      div.setAttribute('aria-describedby', descId);
     } else {
       div.innerText = label;
+      div.setAttribute('aria-describedby', descId);
     }
     if (typeof labelDescription === 'string') {
-      var spanDesc = Object.assign(document.createElement('span'), (_d = {}, _d[allowHTML ? 'innerHTML' : 'innerText'] = labelDescription, _d));
+      var spanDesc = Object.assign(document.createElement('span'), (_d = {}, _d[allowHTML ? 'innerHTML' : 'innerText'] = labelDescription, _d.id = descId, _d));
       (_e = spanDesc.classList).add.apply(_e, (0, utils_1.getClassNames)(description));
       div.appendChild(spanDesc);
     }
@@ -4337,8 +4341,12 @@ var templates = {
       active = _a.active,
       disabled = _a.disabled;
     var opt = new Option(label, value, false, active);
-    opt.dataset.labelClass = labelClass;
-    opt.dataset.labelDescription = labelDescription;
+    if (typeof labelClass !== 'undefined') {
+      opt.dataset.labelClass = (0, utils_1.getClassNames)(labelClass).join(' ');
+    }
+    if (typeof labelClass !== 'undefined') {
+      opt.dataset.labelDescription = labelDescription;
+    }
     if (customProperties) {
       for (var prop in customProperties) {
         if (Object.prototype.hasOwnProperty.call(customProperties, prop)) {
