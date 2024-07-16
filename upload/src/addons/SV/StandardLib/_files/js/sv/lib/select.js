@@ -83,8 +83,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getChoicesConfig: function ()
         {
-            var self = this,
-                field = this.target || this.$target.get(0),
+            var field = this.target || this.$target.get(0),
                 placeholder = this.options.placeholder || field.getAttribute('placeholder');
             return SV.extendObject({}, {
                 maxItemCount: this.options.choicesMaxItemCount,
@@ -98,213 +97,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 renderChoiceLimit: this.options.choicesRenderChoiceLimit,
                 pseudoMultiSelectForSingle: this.options.choicesMaxItemCount === 1,
                 placeholderValue: placeholder !== '' ? placeholder : null,
-                callbackOnInit: function () {
-                    return self.choicesInitCallback.call(self, this);
-                },
-                callbackOnCreateTemplates: function (template) {
-                    return self.choicesCreateTemplatesCallback.call(self, this, template);
-                }
             }, this.getItemChoices(), this.getChoicesPhrases(), this.getChoicesClassNames());
-        },
-
-        choicesInitCallback: function (choices)
-        {
-            //I exist because I must.
-        },
-
-        choicesCreateTemplatesCallback: function (choices, template)
-        {
-            let config = choices.config;
-
-            return {
-                item: ({ classNames }, data) =>
-                {
-                    let allowHTML = config.allowHTML,
-                        item = classNames.item,
-                        button = classNames.button,
-                        highlightedState = classNames.highlightedState,
-                        itemSelectable = classNames.itemSelectable,
-                        placeholder = classNames.placeholder
-
-                    let id = data.id,
-                        value = data.value,
-                        label = data.label,
-                        customProperties = data.customProperties,
-                        active = data.active,
-                        disabled = data.disabled,
-                        highlighted = data.highlighted,
-                        isPlaceholder = data.placeholder
-
-                    let labelClass = typeof data.customProperties.labelClass !== "undefined" ? data.customProperties.labelClass : null,
-                        wrapSpan = null
-                    if (labelClass !== null)
-                    {
-                        wrapSpan = document.createElement('span')
-                        wrapSpan.className = "".concat(data.customProperties.labelClass, "")
-                    }
-
-                    let div = document.createElement('div')
-                    div.className = item
-                    if (wrapSpan)
-                    {
-                        if (allowHTML)
-                        {
-                            wrapSpan.innerHTML = label
-                        }
-                        else
-                        {
-                            wrapSpan.innerText = label
-                        }
-                        div.innerHTML = wrapSpan.outerHTML
-                    }
-                    else
-                    {
-                        if (allowHTML)
-                        {
-                            div.innerHTML = label
-                        }
-                        else
-                        {
-                            div.innerText = label
-                        }
-                    }
-
-                    Object.assign(div.dataset, {
-                        item: '',
-                        id: id,
-                        value: value,
-                        customProperties: customProperties
-                    });
-
-                    if (active)
-                    {
-                        div.setAttribute('aria-selected', 'true');
-                    }
-
-                    if (disabled)
-                    {
-                        div.setAttribute('aria-disabled', 'true');
-                    }
-
-                    if (isPlaceholder)
-                    {
-                        div.classList.add(placeholder);
-                    }
-                    div.classList.add(highlighted ? highlightedState : itemSelectable);
-
-                    if (config.removeItemButton)
-                    {
-                        if (disabled)
-                        {
-                            div.classList.remove(itemSelectable);
-                        }
-                        div.dataset.deletable = '';
-                        let REMOVE_ITEM_ICON = typeof config.removeItemIconText === 'function' ? config.removeItemIconText(value) : config.removeItemIconText;
-                        let REMOVE_ITEM_LABEL = typeof config.removeItemLabelText === 'function' ? config.removeItemLabelText(value) : config.removeItemLabelText;
-
-                        let removeButton = document.createElement('button')
-                        removeButton.type = 'button'
-                        removeButton.className = button
-                        if (allowHTML)
-                        {
-                            removeButton.innerHTML = REMOVE_ITEM_ICON
-                        }
-                        else
-                        {
-                            removeButton.innerText = REMOVE_ITEM_ICON
-                        }
-
-                        removeButton.setAttribute('aria-label', REMOVE_ITEM_LABEL);
-                        removeButton.dataset.button = '';
-                        div.appendChild(removeButton);
-                    }
-
-                    return div;
-                },
-
-                choice: ({ classNames }, data) =>
-                {
-                    let allowHTML = config.allowHTML,
-                        item = classNames.item,
-                        itemChoice = classNames.itemChoice,
-                        itemSelectable = classNames.itemSelectable,
-                        selectedState = classNames.selectedState,
-                        itemDisabled = classNames.itemDisabled,
-                        placeholder = classNames.placeholder
-
-                    let id = data.id,
-                        value = data.value,
-                        label = data.label,
-                        groupId = data.groupId,
-                        elementId = data.elementId,
-                        isDisabled = data.disabled,
-                        isSelected = data.selected,
-                        isPlaceholder = data.placeholder
-
-                    let labelClass = typeof data.customProperties.labelClass !== "undefined" ? data.customProperties.labelClass : null,
-                        wrapSpan = null
-                    if (labelClass !== null)
-                    {
-                        wrapSpan = document.createElement('span')
-                        wrapSpan.className = "".concat(data.customProperties.labelClass, "")
-                    }
-
-                    let div = document.createElement('div')
-                    div.id = elementId
-                    div.className = "".concat(item, " ").concat(itemChoice)
-                    if (wrapSpan)
-                    {
-                        if (allowHTML)
-                        {
-                            wrapSpan.innerHTML = label
-                        }
-                        else
-                        {
-                            wrapSpan.innerText = label
-                        }
-                        div.innerHTML = wrapSpan.outerHTML
-                    }
-                    else
-                    {
-                        if (allowHTML)
-                        {
-                            div.innerHTML = label
-                        }
-                        else
-                        {
-                            div.innerText = label
-                        }
-                    }
-
-                    if (isSelected)
-                    {
-                        div.classList.add(selectedState)
-                    }
-                    if (isPlaceholder) {
-                        div.classList.add(placeholder)
-                    }
-                    div.setAttribute('role', groupId && groupId > 0 ? 'treeitem' : 'option')
-                    Object.assign(div.dataset, {
-                        choice: '',
-                        id: id,
-                        value: value,
-                        selectText: config.itemSelectText
-                    })
-
-                    if (isDisabled)
-                    {
-                        div.classList.add(itemDisabled)
-                        div.dataset.choiceDisabled = ''
-                        div.setAttribute('aria-disabled', 'true')
-                    }
-                    else
-                    {
-                        div.classList.add(itemSelectable)
-                        div.dataset.choiceSelectable = ''
-                    }
-                    return div
-                }
-            };
         },
 
         getChoicesPhrases: function() {
@@ -334,36 +127,12 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             };
         },
 
-        getChoicesClassNames: function (choices)
+        getChoicesClassNames: function ()
         {
             return {
                 classNames: {
                     containerOuter: 'inputGroup svChoices--inputGroup',
                     containerInner: 'input',
-                    input: 'choices__input',
-                    inputCloned: 'choices__input--cloned',
-                    list: 'choices__list',
-                    listItems: 'choices__list--multiple',
-                    listSingle: 'choices__list--single',
-                    listDropdown: 'choices__list--dropdown',
-                    item: 'choices__item',
-                    itemSelectable: 'choices__item--selectable',
-                    itemDisabled: 'choices__item--disabled',
-                    itemChoice: 'choices__item--choice',
-                    placeholder: 'choices__placeholder',
-                    group: 'choices__group',
-                    groupHeading: 'choices__heading',
-                    button: 'choices__button',
-                    activeState: 'is-active',
-                    focusState: 'is-focused',
-                    openState: 'is-open',
-                    disabledState: 'is-disabled',
-                    highlightedState: 'is-highlighted',
-                    selectedState: 'is-selected',
-                    flippedState: 'is-flipped',
-                    loadingState: 'is-loading',
-                    noResults: 'has-no-results',
-                    noChoices: 'has-no-choices'
                 }
             }
         }
