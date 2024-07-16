@@ -22,10 +22,10 @@
 							   label="{{ phrase('undelete') }}" />
 				</xf:radiorow>
 			<xf:else />
-				<xf:macro name="public:helper_action::delete_type" 
+				<xf:macro name="public:helper_action::delete_type"
 						  arg-canHardDelete="{$canHardDelete}" />
 			</xf:if>
-			
+
 			<xf:if is="$includeAuthorAlert">
 				<xf:macro name="public:helper_action::author_alert" />
 			</xf:if>

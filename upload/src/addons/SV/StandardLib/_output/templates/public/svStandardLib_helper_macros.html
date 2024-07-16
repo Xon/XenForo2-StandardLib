@@ -54,7 +54,7 @@
 
 	<div class="inputGroup-container inputGroup-containerSvStandardLibDateTime">
 		<div class="inputGroup">
-			<xf:macro name="date_time_wrapper" 
+			<xf:macro name="date_time_wrapper"
 					  arg-name="{$name}[ymd]"
 					  arg-weekStart="{{ $xf.language.week_start }}"
 					  arg-readOnly="{{ $readOnly }}"
@@ -140,7 +140,7 @@
 		  arg-maximumDateParts="{{ 0 }}"
 		  arg-countUp="{{ false }}"><xf:trim>
 	<xf:macro name="relative_timestamp_prerequisites" />
-	
+
 	<span {{ $class is not empty ? 'class="' . $class|for_attr . '" ' : ''}}data-xf-init="sv-standard-lib--relative-timestamp"
 		  data-count-up="{{ $countUp ? 'true' : 'false' }}"
 		  data-timestamp="{$otherTimestamp}"
