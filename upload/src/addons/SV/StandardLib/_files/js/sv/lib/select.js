@@ -8,6 +8,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
     SV.StandardLib.Choices = XF.Element.newHandler({
         options: {
+            placeholder: null,
             choicesMaxItemCount: -1,
             choicesRemoveItemButton: true,
             choicesAllowHTML: true,
@@ -82,7 +83,9 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getChoicesConfig: function ()
         {
-            var self = this;
+            var self = this,
+                field = this.target || this.$target.get(0),
+                placeholder = this.options.placeholder || field.getAttribute('placeholder');
             return SV.extendObject({}, {
                 maxItemCount: this.options.choicesMaxItemCount,
                 removeItemButton: this.options.choicesRemoveItemButton,
@@ -94,6 +97,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 renderSelectedChoices: this.options.choicesRenderSelectedChoices,
                 renderChoiceLimit: this.options.choicesRenderChoiceLimit,
                 pseudoMultiSelectForSingle: this.options.choicesMaxItemCount === 1,
+                placeholderValue: placeholder !== '' ? placeholder : null,
                 callbackOnInit: function () {
                     return self.choicesInitCallback.call(self, this);
                 },
