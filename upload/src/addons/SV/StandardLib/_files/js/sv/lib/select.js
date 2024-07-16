@@ -26,11 +26,11 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         init: function()
         {
-            this.choices = new Choices(this.target || this.$target.get(0), this.getChoicesConfig());
-            this.initChoicesEvents()
+            this.choices = new Choices(this.target || this.$target.get(0), this.getConfig());
+            this.initEvents();
         },
 
-        getChoicesConfig: function ()
+        getConfig: function ()
         {
             var field = this.target || this.$target.get(0),
                 placeholder = this.options.placeholder || field.getAttribute('placeholder');
@@ -46,10 +46,10 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 renderChoiceLimit: this.options.choicesRenderChoiceLimit,
                 pseudoMultiSelectForSingle: this.options.choicesMaxItemCount === 1,
                 placeholderValue: placeholder !== '' ? placeholder : null,
-            }, this.getChoicesPhrases(), this.getChoicesClassNames());
+            }, this.getPhrases(), this.getClassNames());
         },
 
-        getChoicesPhrases: function()
+        getPhrases: function()
         {
             return {
                 loadingText: XF.phrase('svChoices_loadingText'),
@@ -77,7 +77,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             };
         },
 
-        getChoicesClassNames: function ()
+        getClassNames: function ()
         {
             return {
                 classNames: {
@@ -92,7 +92,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
         },
 
-        initChoicesEvents: function ()
+        initEvents: function ()
         {
             if (!this.choices)
             {
@@ -105,39 +105,39 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             if (typeof XF.on !== "function") // XF 2.2
             {
                 var $target = $(passedElement);
-                $target.on('addItem', this.choicesOnAddItem.bind(this));
-                $target.on('removeItem', this.choicesOnRemoveItem.bind(this));
-                $target.on('choice', this.choicesOnChoice.bind(this));
-                $target.on('showDropdown', this.choicesOnShowDropdown.bind(this));
-                $target.on('hideDropdown', this.choicesOnHideDropdown.bind(this));
+                $target.on('addItem', this.onAddItem.bind(this));
+                $target.on('removeItem', this.onRemoveItem.bind(this));
+                $target.on('choice', this.onChoice.bind(this));
+                $target.on('showDropdown', this.onShowDropdown.bind(this));
+                $target.on('hideDropdown', this.onHideDropdown.bind(this));
             }
             else
             {
-                XF.on(passedElement, 'addItem', this.choicesOnAddItem.bind(this));
-                XF.on(passedElement, 'removeItem', this.choicesOnRemoveItem.bind(this));
-                XF.on(passedElement, 'choice', this.choicesOnChoice.bind(this));
-                XF.on(passedElement, 'showDropdown', this.choicesOnShowDropdown.bind(this));
-                XF.on(passedElement, 'hideDropdown', this.choicesOnHideDropdown.bind(this));
+                XF.on(passedElement, 'addItem', this.onAddItem.bind(this));
+                XF.on(passedElement, 'removeItem', this.onRemoveItem.bind(this));
+                XF.on(passedElement, 'choice', this.onChoice.bind(this));
+                XF.on(passedElement, 'showDropdown', this.onShowDropdown.bind(this));
+                XF.on(passedElement, 'hideDropdown', this.onHideDropdown.bind(this));
             }
         },
 
-        choicesOnAddItem: function (event)
+        onAddItem: function (event)
         {
         },
 
-        choicesOnRemoveItem: function (event)
+        onRemoveItem: function (event)
         {
         },
 
-        choicesOnChoice: function ()
+        onChoice: function ()
         {
         },
 
-        choicesOnShowDropdown: function ()
+        onShowDropdown: function ()
         {
         },
 
-        choicesOnHideDropdown: function (event)
+        onHideDropdown: function (event)
         {
         },
     });
