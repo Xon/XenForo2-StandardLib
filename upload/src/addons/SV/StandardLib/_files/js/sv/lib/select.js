@@ -207,7 +207,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             let tempSelect = null
 
             let choices = [],
-                value = []
+                values = []
 
             if (event.html instanceof HTMLDivElement)
             {
@@ -240,7 +240,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
                         if (!optionOrOptgroup.disabled && optionOrOptgroup.selected)
                         {
-                            value.push(optionOrOptgroup.value)
+                            values.push(optionOrOptgroup.value)
                         }
                     }
                     else if (optionOrOptgroup instanceof HTMLOptGroupElement)
@@ -265,14 +265,14 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
                             if (!option.disabled && option.selected)
                             {
-                                value.push(option.value)
+                                values.push(option.value)
                             }
                         })
                     }
                 })
             }
 
-            this.choices.clearStore().setChoices(choices)
+            this.choices.clearStore().setChoices(choices).setChoiceByValue(values)
 
             //@todo: select items
         }
