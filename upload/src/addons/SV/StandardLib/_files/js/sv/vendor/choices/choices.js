@@ -2901,7 +2901,7 @@ var WrappedSelect = /** @class */function (_super) {
       value: option.value,
       label: option.innerHTML,
       selected: !!option.selected,
-      disabled: option.disabled || this.element.disabled,
+      disabled: option.disabled,
       placeholder: option.value === '' || option.hasAttribute('placeholder'),
       labelClass: typeof option.dataset.labelClass !== 'undefined' ? option.dataset.labelClass.split(' ') : undefined,
       labelDescription: typeof option.dataset.labelDescription !== 'undefined' ? option.dataset.labelDescription : undefined,
