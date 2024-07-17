@@ -84,10 +84,12 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             return {
                 classNames: {
                     containerOuter: [
+                        'choices',
                         'inputGroup',
                         'svChoices--inputGroup',
                     ],
                     containerInner: [
+                        'choices__inner',
                         'input',
                     ],
                 }
