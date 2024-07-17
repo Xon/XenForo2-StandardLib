@@ -125,7 +125,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             let item = event.detail,
                 customProperties = item.customProperties
-            if (customProperties !== 'undefined')
+            if (typeof customProperties !== 'undefined')
             {
                 if (customProperties.clears === true)
                 {
