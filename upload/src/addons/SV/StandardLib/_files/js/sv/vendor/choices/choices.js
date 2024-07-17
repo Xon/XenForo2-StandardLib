@@ -265,16 +265,15 @@ var Choices = /** @class */function () {
       throw TypeError('Expected one of the following types text|select-one|select-multiple');
     }
     this._isTextElement = passedElement.type === constants_1.TEXT_TYPE;
-    this._isSelectOneElement = passedElement.type === constants_1.SELECT_ONE_TYPE;
-    this._isSelectMultipleElement = passedElement.type === constants_1.SELECT_MULTIPLE_TYPE;
-    this._isSelectElement = this._isSelectOneElement || this._isSelectMultipleElement;
-    if (this.config.maxItemCount !== 1) {
+    if (this._isTextElement || this.config.maxItemCount !== 1) {
       this.config.pseudoMultiSelectForSingle = false;
     }
     if (this.config.pseudoMultiSelectForSingle) {
-      this._isSelectOneElement = false;
-      this._isSelectMultipleElement = true;
+        passedElement.setAttribute('multiple', 'multiple');
     }
+    this._isSelectOneElement = passedElement.type === constants_1.SELECT_ONE_TYPE;
+    this._isSelectMultipleElement = passedElement.type === constants_1.SELECT_MULTIPLE_TYPE;
+    this._isSelectElement = this._isSelectOneElement || this._isSelectMultipleElement;
     this.config.searchEnabled = this._isSelectMultipleElement || this.config.searchEnabled;
     if (!['auto', 'always'].includes("".concat(this.config.renderSelectedChoices))) {
       this.config.renderSelectedChoices = 'auto';
