@@ -127,30 +127,18 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 customProperties = item.customProperties
             if (typeof customProperties !== 'undefined')
             {
-                if (customProperties.clears === true)
+                if (customProperties.clears)
                 {
                     this.choices.removeActiveItems(item.id)
                 }
                 else
                 {
-                    event.target.querySelectorAll('option').forEach((option) =>
+                    this.choices._currentState.items.forEach((option) =>
                     {
-                        if (typeof option.dataset.customProperties !== 'undefined')
+                        var customProperties = option.customProperties;
+                        if (typeof customProperties === 'object' && customProperties.clears)
                         {
-                            let customProps;
-                            try
-                            {
-                                customProps = SV.extendObject(JSON.parse(option.dataset.customProperties))
-                            }
-                            catch (e)
-                            {
-                                customProps = {}
-                            }
-
-                            if (customProps.clears)
-                            {
-                                this.choices.removeActiveItemsByValue(option.value)
-                            }
+                            this.choices.removeActiveItemsByValue(option.value);
                         }
                     })
                 }
