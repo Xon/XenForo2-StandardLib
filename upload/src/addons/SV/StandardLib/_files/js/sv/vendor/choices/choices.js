@@ -2143,21 +2143,22 @@ var Choices = /** @class */function () {
     }
   };
   Choices.prototype._generatePlaceholderValue = function () {
+    var _a = this.config,
+        placeholder = _a.placeholder,
+        placeholderValue = _a.placeholderValue;
+    if (!placeholder) {
+      return null;
+    }
     if (this._isSelectElement && this.passedElement.placeholderOption) {
       var placeholderOption = this.passedElement.placeholderOption;
       return placeholderOption ? placeholderOption.text : null;
     }
-    var _a = this.config,
-      placeholder = _a.placeholder,
-      placeholderValue = _a.placeholderValue;
     var dataset = this.passedElement.element.dataset;
-    if (placeholder) {
-      if (placeholderValue) {
-        return placeholderValue;
-      }
-      if (dataset.placeholder) {
-        return dataset.placeholder;
-      }
+    if (placeholderValue) {
+      return placeholderValue;
+    }
+    if (dataset.placeholder) {
+      return dataset.placeholder;
     }
     return null;
   };
