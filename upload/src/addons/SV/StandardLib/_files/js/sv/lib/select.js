@@ -45,6 +45,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 renderSelectedChoices: this.options.choicesRenderSelectedChoices,
                 renderChoiceLimit: this.options.choicesRenderChoiceLimit,
                 pseudoMultiSelectForSingle: this.options.choicesMaxItemCount === 1,
+                placeholder: placeholder !== '',
                 placeholderValue: placeholder !== '' ? placeholder : null,
             }, this.getPhrases(), this.getClassNames());
         },
