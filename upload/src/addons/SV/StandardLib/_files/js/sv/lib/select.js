@@ -33,7 +33,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         getConfig: function ()
         {
             var field = this.target || this.$target.get(0),
-                placeholder = this.options.placeholder || field.getAttribute('placeholder');
+                placeholderValue = this.options.placeholder || field.getAttribute('placeholder'),
+                placeholder = !!placeholder;
             return SV.extendObject({}, {
                 maxItemCount: this.options.choicesMaxItemCount,
                 removeItemButton: this.options.choicesRemoveItemButton,
@@ -45,8 +46,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 renderSelectedChoices: this.options.choicesRenderSelectedChoices,
                 renderChoiceLimit: this.options.choicesRenderChoiceLimit,
                 pseudoMultiSelectForSingle: this.options.choicesMaxItemCount === 1,
-                placeholder: placeholder !== '',
-                placeholderValue: placeholder !== '' ? placeholder : null,
+                placeholder: placeholder,
+                placeholderValue: placeholder ? placeholderValue : null,
             }, this.getPhrases(), this.getClassNames());
         },
 
