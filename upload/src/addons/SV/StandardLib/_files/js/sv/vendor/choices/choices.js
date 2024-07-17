@@ -2144,8 +2144,8 @@ var Choices = /** @class */function () {
   };
   Choices.prototype._generatePlaceholderValue = function () {
     var _a = this.config,
-        placeholder = _a.placeholder,
-        placeholderValue = _a.placeholderValue;
+      placeholder = _a.placeholder,
+      placeholderValue = _a.placeholderValue;
     if (!placeholder) {
       return null;
     }
