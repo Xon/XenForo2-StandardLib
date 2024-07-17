@@ -20,7 +20,6 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             resetScrollPosition: false,
             renderSelectedChoices: 'always',//'auto'
             renderChoiceLimit: false,
-            customProperties: null,
             appendGroupInSearch: false,
         },
         choices: null,
