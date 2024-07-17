@@ -26,7 +26,6 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         init: function()
         {
-            XF.uniqueId(this.target || this.$target) // to make it easier to debug
             this.choices = new Choices(this.target || this.$target.get(0), this.getConfig());
             this.initEvents();
         },
