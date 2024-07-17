@@ -26,6 +26,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         init: function()
         {
+            XF.uniqueId(this.target || this.$target) // to make it easier to debug
             this.choices = new Choices(this.target || this.$target.get(0), this.getConfig());
             this.initEvents();
         },
@@ -125,17 +126,55 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         onAddItem: function (event)
         {
+            if (this.choices === null)
+            {
+                console.error('Choices not setup.')
+                return;
+            }
+
+            let item = event.detail,
+                customProperties = item.customProperties
+            if (customProperties !== 'undefined')
+            {
+                if (customProperties.clears === true)
+                {
+                    this.choices.removeActiveItems(item.id)
+                }
+                else
+                {
+                    event.target.querySelectorAll('option').forEach((option) =>
+                    {
+                        if (typeof option.dataset.customProperties !== 'undefined')
+                        {
+                            let customProps;
+                            try
+                            {
+                                customProps = SV.extendObject(JSON.parse(option.dataset.customProperties))
+                            }
+                            catch (e)
+                            {
+                                customProps = {}
+                            }
+
+                            if (customProps.clears)
+                            {
+                                this.choices.removeActiveItemsByValue(option.value)
+                            }
+                        }
+                    })
+                }
+            }
         },
 
         onRemoveItem: function (event)
         {
         },
 
-        onChoice: function ()
+        onChoice: function (event)
         {
         },
 
-        onShowDropdown: function ()
+        onShowDropdown: function (event)
         {
         },
 
