@@ -269,7 +269,7 @@ var Choices = /** @class */function () {
       this.config.pseudoMultiSelectForSingle = false;
     }
     if (this.config.pseudoMultiSelectForSingle) {
-        passedElement.setAttribute('multiple', 'multiple');
+      passedElement.setAttribute('multiple', 'multiple');
     }
     this._isSelectOneElement = passedElement.type === constants_1.SELECT_ONE_TYPE;
     this._isSelectMultipleElement = passedElement.type === constants_1.SELECT_MULTIPLE_TYPE;
