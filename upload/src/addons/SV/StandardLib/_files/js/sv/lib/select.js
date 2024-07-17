@@ -36,18 +36,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             var field = this.target || this.$target.get(0),
                 placeholderValue = this.options.placeholder || field.getAttribute('placeholder'),
                 placeholder = !!placeholder;
-            return SV.extendObject({}, {
-                maxItemCount: this.options.maxItemCount,
-                removeItemButton: this.options.removeItemButton,
-                allowHTML: this.options.allowHTML,
-                shouldSort: this.options.shouldSort,
-                shouldSortItems: this.options.shouldSortItems,
-                editItems: this.options.editItems,
-                resetScrollPosition: this.options.resetScrollPosition,
-                renderSelectedChoices: this.options.renderSelectedChoices,
-                renderChoiceLimit: this.options.renderChoiceLimit,
-                pseudoMultiSelectForSingle: this.options.maxItemCount === 1,
-                appendGroupInSearch: this.options.appendGroupInSearch,
+            return SV.extendObject({}, this.options, {
                 placeholder: placeholder,
                 placeholderValue: placeholder ? placeholderValue : null,
             }, this.getPhrases(), this.getClassNames());
