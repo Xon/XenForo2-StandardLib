@@ -112,6 +112,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 $target.on('hideDropdown', this.onHideDropdown.bind(this));
                 $target.on('control:enabled', this.onControlEnabled.bind(this));
                 $target.on('control:disabled', this.onControlDisabled.bind(this));
+                $target.on('refreshChoices', this.onRefreshChoices.bind(this));
             }
             else
             {
@@ -122,6 +123,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 XF.on(passedElement, 'hideDropdown', this.onHideDropdown.bind(this));
                 XF.on(passedElement, 'control:enabled', this.onControlEnabled.bind(this));
                 XF.on(passedElement, 'control:disabled', this.onControlDisabled.bind(this));
+                XF.on(passedElement, 'refreshChoices', this.onRefreshChoices.bind(this));
             }
         },
 
@@ -192,13 +194,95 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             this.choices.disable()
         },
+
+        onRefreshChoices: function (event)
+        {
+            if (!this.choices)
+            {
+                console.error('Choices not setup.')
+                return
+            }
+
+            /** @type HTMLSelectElement **/
+            let tempSelect = null
+
+            let choices = [],
+                value = []
+
+            if (event.html instanceof HTMLDivElement)
+            {
+                tempSelect = event.html.querySelector('select')
+            }
+            else if (event.html instanceof HTMLSelectElement)
+            {
+                tempSelect = event.html
+            }
+            else if (event.listRaw instanceof Object)
+            {
+                choices = event.listRaw
+            }
+
+            if (tempSelect !== null)
+            {
+                tempSelect.querySelectorAll('*').forEach((optionOrOptgroup) =>
+                {
+                    if (optionOrOptgroup instanceof HTMLOptionElement)
+                    {
+                        choices.push({
+                            value: optionOrOptgroup.value,
+                            label: optionOrOptgroup.text,
+                            labelClass: typeof optionOrOptgroup.dataset.labelClass !== 'undefined' ? optionOrOptgroup.dataset.labelClass : null,
+                            labelDescription: typeof optionOrOptgroup.dataset.labelDescription !== 'undefined' ? optionOrOptgroup.dataset.labelDescription : null,
+                            customProperties: typeof optionOrOptgroup.dataset.customProperties !== 'undefined' ? JSON.parse(optionOrOptgroup.dataset.customProperties) : [],
+                            disabled: optionOrOptgroup.disabled,
+                            selected: optionOrOptgroup.selected
+                        })
+
+                        if (!optionOrOptgroup.disabled && optionOrOptgroup.selected)
+                        {
+                            value.push(optionOrOptgroup.value)
+                        }
+                    }
+                    else if (optionOrOptgroup instanceof HTMLOptGroupElement)
+                    {
+                        let groupedChoices = {
+                            label: optionOrOptgroup.label,
+                            disabled: optionOrOptgroup.disabled,
+                            choices: []
+                        }
+
+                        optionOrOptgroup.querySelectorAll('option').forEach((option) =>
+                        {
+                            groupedChoices.choices.push({
+                                value: option.value,
+                                label: option.text,
+                                labelClass: typeof option.dataset.labelClass !== 'undefined' ? option.dataset.labelClass : null,
+                                labelDescription: typeof option.dataset.labelDescription !== 'undefined' ? option.dataset.labelDescription : null,
+                                customProperties: typeof option.dataset.customProperties !== 'undefined' ? JSON.parse(option.dataset.customProperties) : [],
+                                disabled: option.disabled,
+                                selected: option.selected
+                            })
+
+                            if (!option.disabled && option.selected)
+                            {
+                                value.push(option.value)
+                            }
+                        })
+                    }
+                })
+            }
+
+            this.choices.clearStore().setChoices(choices)
+
+            //@todo: select items
+        }
     });
 
     SV.StandardLib.ChoicesLoader = XF.Element.newHandler({
         options: {
             listenTo: '',
             initUpdate: true,
-            href: true
+            href: ''
         },
 
         init ()
@@ -207,6 +291,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             if (!theTarget.matches('select'))
             {
                 console.error('Must trigger on select')
+                return
             }
 
             if (this.options.href)
@@ -255,33 +340,15 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             {
                 const select = this.target || this.$target.get(0)
 
-                // @todo: XF 2.3 compatibility
                 XF.setupHtmlInsert(data.html, html =>
                 {
-                    const val = select.value
-
-                    if (html instanceof HTMLSelectElement)
+                    if (typeof XF.trigger !== 'function') // XF 2.2
                     {
-                        select.innerHTML = ''
-                        select.append(...Array.from(html.children))
-
-                        let hasValue = false
-                        const options = select.querySelectorAll('option')
-
-                        options.forEach((option) =>
-                        {
-                            if (option.value === val)
-                            {
-                                select.value = val
-                                hasValue = true
-                            }
-                        })
-                        if (!hasValue)
-                        {
-                            select.value = options[0].value
-                        }
-
-                        return true
+                        $(select).trigger('refreshChoices', [html])
+                    }
+                    else
+                    {
+                        XF.trigger(select, XF.customEvent('refreshChoices', {html}))
                     }
                 })
             }
