@@ -22,11 +22,16 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             renderChoiceLimit: false,
             appendGroupInSearch: false,
         },
+        initialValue: null,
+        form: null,
         choices: null,
 
         init: function()
         {
-            this.choices = new Choices(this.target || this.$target.get(0), this.getConfig());
+            let theTarget = this.target || this.target(0)
+            this.form = theTarget.closest('form')
+            this.initialValue = theTarget.value
+            this.choices = new Choices(theTarget, this.getConfig());
             this.initEvents();
         },
 
@@ -100,10 +105,17 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 return;
             }
 
+            let form = this.form
             let passedElement = this.choices.passedElement.element;
 
             if (typeof XF.on !== "function") // XF 2.2
             {
+                let $form = $(form)
+                if ($form.length)
+                {
+                    $form.on('ajax-submit:complete', this.onFormReset.bind(this))
+                }
+
                 var $target = $(passedElement);
                 $target.on('addItem', this.onAddItem.bind(this));
                 $target.on('removeItem', this.onRemoveItem.bind(this));
@@ -116,6 +128,11 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
             else
             {
+                if (form instanceof HTMLFormElement)
+                {
+                    XF.on(form, 'ajax-submit:complete', this.onFormReset.bind(this))
+                }
+
                 XF.on(passedElement, 'addItem', this.onAddItem.bind(this));
                 XF.on(passedElement, 'removeItem', this.onRemoveItem.bind(this));
                 XF.on(passedElement, 'choice', this.onChoice.bind(this));
@@ -273,8 +290,18 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             this.choices.clearStore().setChoices(choices).setChoiceByValue(values)
+        },
 
-            //@todo: select items
+        onFormReset: function ()
+        {
+            if (!this.choices)
+            {
+                console.error('No choices setup.')
+                return
+            }
+
+            //@todo: check why initial state is always empty
+            this.choices._onFormReset()
         }
     });
 
