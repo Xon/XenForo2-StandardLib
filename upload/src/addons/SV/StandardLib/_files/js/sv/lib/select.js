@@ -11,16 +11,17 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
     SV.StandardLib.Choices = XF.Element.newHandler({
         options: {
             placeholder: null,
-            choicesMaxItemCount: -1,
-            choicesRemoveItemButton: true,
-            choicesAllowHTML: true,
-            choicesShouldSort: false,
-            choicesShouldSortItems: false,
-            choicesEditItems: false,
-            choicesResetScrollPosition: false,
-            choicesRenderSelectedChoices: 'always',//'auto'
-            choicesRenderChoiceLimit: false,
-            choicesCustomProperties: null
+            maxItemCount: -1,
+            removeItemButton: true,
+            allowHTML: true,
+            shouldSort: false,
+            shouldSortItems: false,
+            editItems: false,
+            resetScrollPosition: false,
+            renderSelectedChoices: 'always',//'auto'
+            renderChoiceLimit: false,
+            customProperties: null,
+            appendGroupInSearch: false,
         },
         choices: null,
 
@@ -36,16 +37,17 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 placeholderValue = this.options.placeholder || field.getAttribute('placeholder'),
                 placeholder = !!placeholder;
             return SV.extendObject({}, {
-                maxItemCount: this.options.choicesMaxItemCount,
-                removeItemButton: this.options.choicesRemoveItemButton,
-                allowHTML: this.options.choicesAllowHTML,
-                shouldSort: this.options.choicesShouldSort,
-                shouldSortItems: this.options.choicesShouldSortItems,
-                editItems: this.options.choicesEditItems,
-                resetScrollPosition: this.options.choicesResetScrollPosition,
-                renderSelectedChoices: this.options.choicesRenderSelectedChoices,
-                renderChoiceLimit: this.options.choicesRenderChoiceLimit,
-                pseudoMultiSelectForSingle: this.options.choicesMaxItemCount === 1,
+                maxItemCount: this.options.maxItemCount,
+                removeItemButton: this.options.removeItemButton,
+                allowHTML: this.options.allowHTML,
+                shouldSort: this.options.shouldSort,
+                shouldSortItems: this.options.shouldSortItems,
+                editItems: this.options.editItems,
+                resetScrollPosition: this.options.resetScrollPosition,
+                renderSelectedChoices: this.options.renderSelectedChoices,
+                renderChoiceLimit: this.options.renderChoiceLimit,
+                pseudoMultiSelectForSingle: this.options.maxItemCount === 1,
+                appendGroupInSearch: this.options.appendGroupInSearch,
                 placeholder: placeholder,
                 placeholderValue: placeholder ? placeholderValue : null,
             }, this.getPhrases(), this.getClassNames());
