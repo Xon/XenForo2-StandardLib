@@ -30,6 +30,11 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             this.initEvents();
         },
 
+        reset: function()
+        {
+            this.choices._onFormReset();
+        },
+
         getConfig: function ()
         {
             var field = this.target || this.$target.get(0),

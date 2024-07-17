@@ -372,6 +372,8 @@ var Choices = /** @class */function () {
     }
     // Let's go
     this.init();
+    // preserve the state after setup for form reset
+    this._initialState = this._currentState;
   }
   Object.defineProperty(Choices, "defaults", {
     get: function () {
@@ -1658,6 +1660,8 @@ var Choices = /** @class */function () {
   };
   Choices.prototype._onFormReset = function () {
     this._store.dispatch((0, misc_1.resetTo)(this._initialState));
+    this.clearInput();
+    this.hideDropdown();
   };
   Choices.prototype._highlightChoice = function (el) {
     var _a;
