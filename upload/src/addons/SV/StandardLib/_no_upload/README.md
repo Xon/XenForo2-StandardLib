@@ -123,15 +123,34 @@ For static analysis and IDE, `$obj` will have the type `\XF\Repository\User`
 
 Enrich a select box with [choices.js](https://github.com/Xon/Choices.js). 
 
+Single select example:
 ```html
 <xf:macro template="svStandardLib_macros" name="choices_setup" />
 
-<xf:selectrow label="Select row example" name="select_row_example"
+<xf:selectrow name="select_row_example"
+              label="{{ phrase('example') }}"
               data-xf-init="sv-choices"
               data-placeholder="{{ phrase('example')|for_attr }}"
-              data-max-item-count="1">
+              value="2">
     <xf:option value="1">Option 1</xf:option>
-    <xf:option value="2" selected="true">Option 2</xf:option>
+    <xf:option value="2">Option 2</xf:option>
+    <xf:option value="3">Option 3</xf:option>
+</xf:selectrow>
+```
+
+Multi-select example:
+```html
+<xf:macro template="svStandardLib_macros" name="choices_setup" />
+
+<xf:selectrow name="select_row_example"
+              label="{{ phrase('example') }}"
+              data-xf-init="sv-choices"
+              data-placeholder="{{ phrase('example')|for_attr }}"
+              data-max-item-count="2"
+              multiple="multiple"
+              value="{{ [1,2] }}">
+    <xf:option value="1">Option 1</xf:option>
+    <xf:option value="2">Option 2</xf:option>
     <xf:option value="3">Option 3</xf:option>
 </xf:selectrow>
 ```
