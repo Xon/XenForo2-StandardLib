@@ -41,12 +41,15 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         {
             var field = this.target || this.$target.get(0),
                 placeholderValue = this.options.placeholder || field.getAttribute('placeholder'),
-                placeholder = !!placeholder;
-            return SV.extendObject({}, this.options, {
+                placeholder = !!placeholder,
+                config = SV.extendObject({}, this.options, {
                 pseudoMultiSelectForSingle: this.options.maxItemCount === 1,
                 placeholder: placeholder,
                 placeholderValue: placeholder ? placeholderValue : null,
             }, this.getPhrases(), this.getClassNames());
+            delete config.resetOnSubmit;
+
+            return config;
         },
 
         getPhrases: function()
