@@ -28,7 +28,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         init: function()
         {
-            let theTarget = this.target || this.target(0)
+            let theTarget = this.target || this.$target.get(0);
             this.form = theTarget.closest('form')
             this.initialValue = theTarget.value
             this.choices = new Choices(theTarget, this.getConfig());
