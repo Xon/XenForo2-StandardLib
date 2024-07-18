@@ -220,7 +220,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             this.choices.disable()
         },
 
-        onRefreshChoices: function (event)
+        onRefreshChoices: function (event, html, listRaw)
         {
             if (!this.choices)
             {
@@ -228,23 +228,26 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 return
             }
 
+            const workingHtml = typeof event.html === 'undefined' ? html : event.html
+            const workingListRaw = typeof event.listRaw === 'undefined' ? listRaw : event.listRaw
+
             /** @type HTMLSelectElement **/
             let tempSelect = null
 
             let choices = [],
                 values = []
 
-            if (event.html instanceof HTMLDivElement)
+            if (workingHtml instanceof HTMLDivElement)
             {
-                tempSelect = event.html.querySelector('select')
+                tempSelect = workingHtml.querySelector('select')
             }
-            else if (event.html instanceof HTMLSelectElement)
+            else if (workingHtml instanceof HTMLSelectElement)
             {
-                tempSelect = event.html
+                tempSelect = workingHtml
             }
-            else if (event.listRaw instanceof Object)
+            else if (workingListRaw instanceof Object)
             {
-                choices = event.listRaw
+                choices = workingListRaw
             }
 
             if (tempSelect !== null)
@@ -395,7 +398,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 {
                     if (typeof XF.trigger !== 'function') // XF 2.2
                     {
-                        $(select).trigger('refreshChoices', [html])
+                        $(select).trigger('refreshChoices', [html.get(0)])
                     }
                     else
                     {
