@@ -92,6 +92,12 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }, this.getPhrases(), this.getClassNames());
             delete config.resetOnSubmit;
 
+            if (!config.pseudoMultiSelectForSingle && !field.getAttribute('multiple') && config.maxItemCount === -1)
+            {
+                config.pseudoMultiSelectForSingle = true;
+                config.maxItemCount = this.options.maxItemCount = 1;
+            }
+
             return config;
         },
 
