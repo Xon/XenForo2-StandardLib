@@ -49,7 +49,7 @@
 	display: inline-block;
 	vertical-align: middle;
 	border-radius: 20px;
-	padding: @xf-paddingSmall @xf-paddingLarge;
+	padding: @xf-paddingSmall @xf-paddingSmall;
 	font-size: 0.75rem;
 	font-weight: 500;
 	margin-right: 3.75px;
@@ -59,9 +59,6 @@
 	font-size: 15px;
 	border-radius: @xf-borderRadiusMedium;
 	.xf-chip();
-}
-.choices__list--multiple .choices__item[data-deletable] {
-  padding-right: 5px;
 }
 [dir=rtl] .choices__list--multiple .choices__item {
   margin-right: 0;
@@ -219,6 +216,14 @@
   opacity: 0.5;
 }
 
+.choices__list--dropdown,
+.choices__list[aria-expanded],
+.is-open .choices__list--dropdown,
+.is-open .choices__list[aria-expanded]
+{
+  width: max-content;
+}
+
 .svChoices--inputGroup
 {
 	position: relative;
@@ -251,6 +256,10 @@
 
 	.choices__item
 	{
+		.choices__button
+		{
+			padding-left:0;
+		}
 		.choices__button:after
 		{
 			color: @xf-textColorMuted;
@@ -258,7 +267,6 @@
 			.m-faBase();
 			</xf:if>
 			.m-faContent(@fa-var-times-circle);
-			margin-left: @xf-paddingSmall;
 			transition: all .2s ease-in;
 
 			&:hover

@@ -3030,6 +3030,7 @@ exports.DEFAULT_CONFIG = {
   addItemFilter: null,
   removeItems: true,
   removeItemButton: false,
+  removeItemButtonAlignLeft: false,
   editItems: false,
   allowHTML: true,
   duplicateItemsAllowed: true,
@@ -4122,6 +4123,7 @@ var templates = {
   item: function (_a, _b, removeItemButton) {
     var _c, _d, _e, _f, _g;
     var allowHTML = _a.allowHTML,
+      removeItemButtonAlignLeft = _a.removeItemButtonAlignLeft,
       _h = _a.classNames,
       item = _h.item,
       button = _h.button,
@@ -4180,7 +4182,11 @@ var templates = {
       }, _g[allowHTML ? 'innerHTML' : 'innerText'] = REMOVE_ITEM_ICON, _g));
       removeButton.setAttribute('aria-label', REMOVE_ITEM_LABEL);
       removeButton.dataset.button = '';
-      div.appendChild(removeButton);
+      if (removeItemButtonAlignLeft) {
+        div.insertAdjacentElement('afterbegin', removeButton);
+      } else {
+        div.appendChild(removeButton);
+      }
     }
     return div;
   },

@@ -21,6 +21,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             renderSelectedChoices: 'always',//'auto'
             renderChoiceLimit: false,
             appendGroupInSearch: false,
+            removeItemButtonAlignLeft: true,
         },
         initialValue: null,
         form: null,
