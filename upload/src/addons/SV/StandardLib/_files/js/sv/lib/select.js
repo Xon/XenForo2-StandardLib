@@ -143,7 +143,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         getClassNames: function ()
         {
             // This classes should match public:svStandardLib_macros::choices_static_render
-            return {
+            var classnames = {
                 classNames: {
                     containerOuter: [
                         'choices',
@@ -155,7 +155,14 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                         'input',
                     ],
                 }
+            };
+
+            if (XF.phrases['svChoices_itemSelectText'])
+            {
+                classnames.classNames.containerOuter.push('svChoices--select-prompt');
             }
+
+            return classnames;
         },
 
         initEvents: function ()

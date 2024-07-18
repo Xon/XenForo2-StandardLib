@@ -118,29 +118,38 @@
 [dir=rtl] .choices__list--dropdown .choices__item, [dir=rtl] .choices__list[aria-expanded] .choices__item {
   text-align: right;
 }
-@media (min-width: 640px) {
-  .choices__list--dropdown .choices__item--selectable, .choices__list[aria-expanded] .choices__item--selectable {
-    padding-right: 100px;
-  }
-  .choices__list--dropdown .choices__item--selectable::after, .choices__list[aria-expanded] .choices__item--selectable::after {
-    content: attr(data-select-text);
-    font-size: 0.75rem;
-    opacity: 0;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  [dir=rtl] .choices__list--dropdown .choices__item--selectable, [dir=rtl] .choices__list[aria-expanded] .choices__item--selectable {
-    text-align: right;
-    padding-left: 100px;
-    padding-right: 10px;
-  }
-  [dir=rtl] .choices__list--dropdown .choices__item--selectable::after, [dir=rtl] .choices__list[aria-expanded] .choices__item--selectable::after {
-    right: auto;
-    left: 10px;
-  }
+
+@media (min-width: 640px)
+{
+	.svChoices--select-prompt
+	{
+		.choices__list--dropdown .choices__item--selectable, .choices__list[aria-expanded] .choices__item--selectable {
+			padding-right: 100px;
+		}
+		.choices__list--dropdown .choices__item--selectable::after, 
+		.choices__list[aria-expanded] .choices__item--selectable::after {
+			content: attr(data-select-text);
+			font-size: 0.75rem;
+			opacity: 0;
+			position: absolute;
+			right: 10px;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+		[dir=rtl] .choices__list--dropdown .choices__item--selectable, 
+		[dir=rtl] .choices__list[aria-expanded] .choices__item--selectable {
+			text-align: right;
+			padding-left: 100px;
+			padding-right: 10px;
+		}
+		[dir=rtl] .choices__list--dropdown .choices__item--selectable::after, 
+		[dir=rtl] .choices__list[aria-expanded] .choices__item--selectable::after {
+			right: auto;
+			left: 10px;
+		}
+	}
 }
+
 .choices__list--dropdown .choices__item--selectable.is-highlighted, .choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
   background-color: @xf-contentHighlightBg;
 }
