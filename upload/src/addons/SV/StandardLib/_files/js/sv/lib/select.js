@@ -41,7 +41,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         {
             var field = this.target || this.$target.get(0),
                 placeholderValue = this.options.placeholder || field.getAttribute('placeholder'),
-                placeholder = !!placeholder,
+                placeholder = !!placeholderValue,
                 config = SV.extendObject({}, this.options, {
                 pseudoMultiSelectForSingle: this.options.maxItemCount === 1,
                 placeholder: placeholder,
