@@ -56,12 +56,6 @@ class Templater extends XFCP_Templater
 
     public function formSelect(array $controlOptions, array $choices)
     {
-        if ($controlOptions['skip-rendering'] ?? false)
-        {
-            unset($controlOptions['skip-rendering']);
-            return parent::formSelect($controlOptions, $choices);
-        }
-
         $value = $controlOptions['value'] ?? null;
         if (!is_array($value) && !is_string($value) && $value !== null)
         {
@@ -69,7 +63,7 @@ class Templater extends XFCP_Templater
         }
 
         $init = explode(' ', $controlOptions['data-xf-init'] ?? '');
-        if (!in_array('sv-choices', $init, true) || in_array('sv-choices-loader', $init, true))
+        if (!in_array('sv-choices', $init, true))
         {
             return parent::formSelect($controlOptions, $choices);
         }
@@ -78,6 +72,17 @@ class Templater extends XFCP_Templater
         if (stripos($class, 'u-noJsOnly') === false)
         {
             $controlOptions['class'] = $class . ' u-noJsOnly';
+        }
+
+        if (in_array('sv-choices-loader', $init, true))
+        {
+            return parent::formSelect($controlOptions, $choices);
+        }
+
+        if ($controlOptions['skip-rendering'] ?? false)
+        {
+            unset($controlOptions['skip-rendering']);
+            return parent::formSelect($controlOptions, $choices);
         }
 
         $name = $controlOptions['name'];
