@@ -109,7 +109,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 let $form = $(form)
                 if ($form.length)
                 {
-                    $form.on('ajax-submit:complete', this.onFormReset.bind(this))
+                    //$form.on('ajax-submit:complete', this.onFormReset.bind(this))
+                    $form.on('ajax-submit:response', this.afterFormSubmit.bind(this))
                 }
 
                 var $target = $(passedElement);
@@ -126,7 +127,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             {
                 if (form instanceof HTMLFormElement)
                 {
-                    XF.on(form, 'ajax-submit:complete', this.onFormReset.bind(this))
+                    //XF.on(form, 'ajax-submit:complete', this.onFormReset.bind(this))
+                    XF.on(form, 'ajax-submit:response', this.afterFormSubmit.bind(this))
                 }
 
                 XF.on(passedElement, 'addItem', this.onAddItem.bind(this));
@@ -286,6 +288,23 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             this.choices.clearStore().setChoices(choices).setChoiceByValue(values)
+        },
+
+        afterFormSubmit: function(e, data)
+        {
+            data = data || e.data // XF2.2 compat
+            if (data.errors || data.status !== 'ok')
+            {
+                return;
+            }
+
+            if (!this.choices)
+            {
+                console.error('No choices setup.')
+                return
+            }
+
+            this.choices._onFormReset()
         },
 
         onFormReset: function ()
