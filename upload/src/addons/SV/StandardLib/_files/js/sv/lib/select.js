@@ -101,32 +101,42 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             return config;
         },
 
+        getPhrase: function(name, vars)
+        {
+            var phrase = XF.phrases[name];
+            if (phrase && vars)
+            {
+                phrase = XF.stringTranslate(phrase, vars);
+            }
+            return phrase || '';
+        },
+
         getPhrases: function()
         {
             // These phrases should match public:svStandardLib_macros::choices_static_render
             return {
-                loadingText: XF.phrase('svChoices_loadingText'),
-                noResultsText: XF.phrase('svChoices_noResultsText'),
-                noChoicesText: XF.phrase('svChoices_noChoicesText'),
-                itemSelectText: XF.phrase('svChoices_itemSelectText'),
-                uniqueItemText: XF.phrase('svChoices_uniqueItemText'),
-                customAddItemText: XF.phrase('svChoices_customAddItemText'),
+                loadingText: this.getPhrase('svChoices_loadingText'),
+                noResultsText: this.getPhrase('svChoices_noResultsText'),
+                noChoicesText: this.getPhrase('svChoices_noChoicesText'),
+                itemSelectText: this.getPhrase('svChoices_itemSelectText'),
+                uniqueItemText: this.getPhrase('svChoices_uniqueItemText'),
+                customAddItemText: this.getPhrase('svChoices_customAddItemText'),
                 addItemText: function (value) {
-                    return XF.phrase('svChoices_addItemText', {
+                    return this.getPhrase('svChoices_addItemText', {
                         '{value}': value
-                    });
-                },
+                    }, '');
+                }.bind(this),
                 removeItemIconText: '',
                 removeItemLabelText: function (value) {
-                    return XF.phrase('svChoices_removeItemLabel', {
+                    return this.getPhrase('svChoices_removeItemLabel', {
                         '{value}': value
-                    });
-                },
+                    }, '');
+                }.bind(this),
                 maxItemText: function (maxItemCount) {
-                    return XF.phrase('svChoices_maxItemText', {
+                    return this.getPhrase('svChoices_maxItemText', {
                         '{maxItemCount}': maxItemCount
-                    });
-                }
+                    }, '');
+                }.bind(this)
             };
         },
 
