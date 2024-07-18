@@ -373,7 +373,7 @@ var Choices = /** @class */function () {
     // Let's go
     this.init();
     // preserve the state after setup for form reset
-    this._initialState = this._currentState;
+    this._initialState = (0, utils_1.cloneObject)(this._currentState);
   }
   Object.defineProperty(Choices, "defaults", {
     get: function () {
@@ -4154,7 +4154,7 @@ var templates = {
     Object.assign(div.dataset, {
       item: '',
       id: id,
-      value: value,
+      value: value
     });
     if (typeof labelClass !== 'undefined' && labelClass) {
       div.dataset.labelClass = (0, utils_1.getClassNames)(labelClass).join(' ');
