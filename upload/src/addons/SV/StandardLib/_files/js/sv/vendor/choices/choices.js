@@ -4155,10 +4155,21 @@ var templates = {
       item: '',
       id: id,
       value: value,
-      labelClass: labelClass,
-      labelDescription: labelDescription,
-      customProperties: customProperties
     });
+    if (typeof labelClass !== 'undefined' && labelClass) {
+      div.dataset.labelClass = (0, utils_1.getClassNames)(labelClass).join(' ');
+    }
+    if (typeof labelDescription !== 'undefined' && labelDescription) {
+      div.dataset.labelDescription = labelDescription;
+    }
+    if (typeof customProperties !== 'undefined' && customProperties) {
+      for (var prop in customProperties) {
+        if (Object.prototype.hasOwnProperty.call(customProperties, prop)) {
+          div.dataset.customProperties = JSON.stringify(customProperties);
+          break;
+        }
+      }
+    }
     if (active) {
       div.setAttribute('aria-selected', 'true');
     }
@@ -4281,10 +4292,14 @@ var templates = {
       choice: '',
       id: id,
       value: value,
-      labelClass: labelClass,
-      labelDescription: labelDescription,
       selectText: selectText
     });
+    if (typeof labelClass !== 'undefined' && labelClass) {
+      div.dataset.labelClass = (0, utils_1.getClassNames)(labelClass).join(' ');
+    }
+    if (typeof labelDescription !== 'undefined' && labelDescription) {
+      div.dataset.labelDescription = labelDescription;
+    }
     if (isDisabled) {
       (_h = div.classList).add.apply(_h, (0, utils_1.getClassNames)(itemDisabled));
       div.dataset.choiceDisabled = '';
@@ -4351,10 +4366,10 @@ var templates = {
       active = _a.active,
       disabled = _a.disabled;
     var opt = new Option(label, value, false, active);
-    if (typeof labelClass !== 'undefined') {
+    if (typeof labelClass !== 'undefined' && labelClass) {
       opt.dataset.labelClass = (0, utils_1.getClassNames)(labelClass).join(' ');
     }
-    if (typeof labelClass !== 'undefined') {
+    if (typeof labelDescription !== 'undefined' && labelDescription) {
       opt.dataset.labelDescription = labelDescription;
     }
     if (customProperties) {
