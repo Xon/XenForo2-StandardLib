@@ -117,7 +117,27 @@ $obj = Helper::repository(\XF\Repository\User::class);
 ```
 For static analysis and IDE, `$obj` will have the type `\XF\Repository\User`
 
-## Template additions
+# Template additions
+
+## choices.js integration
+
+Enrich a select box with [choices.js](https://github.com/Xon/Choices.js). 
+
+```html
+<xf:macro template="svStandardLib_macros" name="choices_setup" />
+
+<xf:selectrow label="Select row example" name="select_row_example"
+              data-xf-init="sv-choices"
+              data-choices-max-item-count="1">
+    <xf:option value="1">Option 1</xf:option>
+    <xf:option value="2" selected="true">Option 2</xf:option>
+    <xf:option value="3">Option 3</xf:option>
+</xf:selectrow>
+```
+
+The initial structure is pre-rendered to reduce/prevent page jank.
+To opt-out add the `skip-rendering="true"` attribute to the `<xf:select>` or `<xf:selectrow>` element
+
 
 ## ajax pagination
 
