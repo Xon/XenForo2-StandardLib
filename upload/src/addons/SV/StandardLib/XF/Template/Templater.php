@@ -97,7 +97,7 @@ class Templater extends XFCP_Templater
         $placeholder = $controlOptions['placeholder'] ?? $controlOptions['data-placeholder'] ?? '';
 
         $selectedChoices = [];
-        $i = 0;
+        $i = 1;
         $extractChoices = function (array $choices) use (&$i, &$extractChoices, &$selectedChoices, $value, $multiple) {
             foreach ($choices as $choice)
             {

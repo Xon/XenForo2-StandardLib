@@ -30,16 +30,16 @@
 	<div class="choices inputGroup svChoices--inputGroup" data-type="select-multiple" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false">
 		<div class="choices__inner input">
 			{$selectHtml|raw}
-			<div class="choices__list choices__list--multiple u-JsOnly">
-				<xf:foreach loop="$selectedChoices" key="$i" value="$choice">
+			<div class="choices__list choices__list--multiple u-JsOnly"><xf:trim>
+				<xf:foreach loop="$selectedChoices" key="$i" value="$choice"><xf:trim>
 					<div class="choices__item choices__item--selectable" data-item="" data-id="{$i}" data-value="{$choice.value}" aria-selected="true" data-deletable=""><button type="button" class="choices__button" aria-label="{{ phrase('svChoices.removeItemLabel', {'value': $choice.value} )|for_attr }}" data-button=""></button>{{
 						$choice.span
 						? '<span class="' . $choice.span .'">'. $choice.label .'</span>'
 						: $choice.label
 					}}</div>
-				</xf:foreach>
-			</div>
-			<input type="search" name="search_terms" class="choices__input choices__input--cloned u-JsOnly" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list" aria-label="null" {{$selectedChoices ? 'style="min-width: 1ch; width: '.($placeholder ? strlen($placeholder) : '1').'ch;"' : '' }} {{ $placeholder ? 'placeholder="' . $placeholder . '"' : '' }}>
+				</xf:trim></xf:foreach>
+			</xf:trim></div>
+			<input type="search" name="search_terms" class="choices__input choices__input--cloned u-JsOnly" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list" aria-label="null" {{$selectedChoices ? 'style="min-width: '.($placeholder ? 1 + strlen(trim($placeholder)) : '1').'ch; width: 1ch;"' : '' }} {{ $placeholder ? 'placeholder="' . $placeholder . '"' : '' }}>
 		</div>
 	</div>
 </xf:macro>
