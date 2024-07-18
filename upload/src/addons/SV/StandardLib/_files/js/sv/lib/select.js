@@ -10,6 +10,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
     SV.StandardLib.Choices = XF.Element.newHandler({
         options: {
+            resetOnSubmit: false,
             placeholder: null,
             maxItemCount: -1,
             removeItemButton: true,
@@ -106,11 +107,14 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             if (typeof XF.on !== "function") // XF 2.2
             {
-                let $form = $(form)
-                if ($form.length)
+                if (this.options.resetOnSubmit)
                 {
-                    //$form.on('ajax-submit:complete', this.onFormReset.bind(this))
-                    $form.on('ajax-submit:response', this.afterFormSubmit.bind(this))
+                    let $form = $(form)
+                    if ($form.length)
+                    {
+                        //$form.on('ajax-submit:complete', this.onFormReset.bind(this))
+                        $form.on('ajax-submit:response', this.afterFormSubmit.bind(this))
+                    }
                 }
 
                 var $target = $(passedElement);
@@ -125,10 +129,13 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
             else
             {
-                if (form instanceof HTMLFormElement)
+                if (this.options.resetOnSubmit)
                 {
-                    //XF.on(form, 'ajax-submit:complete', this.onFormReset.bind(this))
-                    XF.on(form, 'ajax-submit:response', this.afterFormSubmit.bind(this))
+                    if (form instanceof HTMLFormElement)
+                    {
+                        //XF.on(form, 'ajax-submit:complete', this.onFormReset.bind(this))
+                        XF.on(form, 'ajax-submit:response', this.afterFormSubmit.bind(this))
+                    }
                 }
 
                 XF.on(passedElement, 'addItem', this.onAddItem.bind(this));
