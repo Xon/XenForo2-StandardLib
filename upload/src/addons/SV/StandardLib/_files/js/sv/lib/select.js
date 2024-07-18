@@ -256,17 +256,18 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 {
                     if (optionOrOptgroup instanceof HTMLOptionElement)
                     {
+                        let isSelected = !!optionOrOptgroup.getAttribute('selected');
                         choices.push({
                             value: optionOrOptgroup.value,
                             label: optionOrOptgroup.text,
                             labelClass: typeof optionOrOptgroup.dataset.labelClass !== 'undefined' ? optionOrOptgroup.dataset.labelClass : null,
                             labelDescription: typeof optionOrOptgroup.dataset.labelDescription !== 'undefined' ? optionOrOptgroup.dataset.labelDescription : null,
                             customProperties: typeof optionOrOptgroup.dataset.customProperties !== 'undefined' ? JSON.parse(optionOrOptgroup.dataset.customProperties) : [],
-                            disabled: optionOrOptgroup.disabled,
-                            selected: optionOrOptgroup.selected
+                            disabled: !!optionOrOptgroup.disabled,
+                            selected: isSelected
                         })
 
-                        if (!optionOrOptgroup.disabled && optionOrOptgroup.selected)
+                        if (!optionOrOptgroup.disabled && isSelected)
                         {
                             values.push(optionOrOptgroup.value)
                         }
@@ -281,17 +282,18 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
                         optionOrOptgroup.querySelectorAll('option').forEach((option) =>
                         {
+                            let isSelected = !!option.getAttribute('selected');
                             groupedChoices.choices.push({
                                 value: option.value,
                                 label: option.text,
                                 labelClass: typeof option.dataset.labelClass !== 'undefined' ? option.dataset.labelClass : null,
                                 labelDescription: typeof option.dataset.labelDescription !== 'undefined' ? option.dataset.labelDescription : null,
                                 customProperties: typeof option.dataset.customProperties !== 'undefined' ? JSON.parse(option.dataset.customProperties) : [],
-                                disabled: option.disabled,
-                                selected: option.selected
+                                disabled: !!option.disabled,
+                                selected: isSelected
                             })
 
-                            if (!option.disabled && option.selected)
+                            if (!option.disabled && isSelected)
                             {
                                 values.push(option.value)
                             }
@@ -300,7 +302,11 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 })
             }
 
-            this.choices.clearStore().setChoices(choices).setChoiceByValue(values)
+            this.choices.clearStore().setChoices(choices);
+            if (values)
+            {
+                this.choices.setChoiceByValue(values);
+            }
         },
 
         afterFormSubmit: function(e, data)
