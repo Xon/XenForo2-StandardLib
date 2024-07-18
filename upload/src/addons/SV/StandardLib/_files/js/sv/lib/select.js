@@ -8,6 +8,49 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
     "use strict";
     var $ = SV.$;
 
+    var dynamicElements = Choices.prototype._createElements,
+        dynamicStructure = Choices.prototype._createStructure;
+    Choices.prototype._createElements = function () {
+        dynamicElements.call(this);
+
+        var el = this.passedElement.element;
+        this.isDynamicRendered = !el.dataset.rendered;
+        if (this.isDynamicRendered) {
+            return;
+        }
+        // patch the created items to link to the pre-rendered elements
+        var container = el.closest('.choices.svChoices--inputGroup')
+        this.containerOuter.element = container;
+        this.containerInner.element = container.querySelector('.choices__inner');
+        this.input.element = container.querySelector('input[name=search_terms]');
+        this.itemList.element = container.querySelector('.choices__list');
+    };
+
+    Choices.prototype._createStructure = function () {
+        if (this.isDynamicRendered) {
+            dynamicStructure.call(this);
+            return;
+        }
+
+        this.containerOuter.element.appendChild(this.dropdown.element);
+        if (!this._isTextElement) {
+            this.dropdown.element.appendChild(this.choiceList.element);
+        }
+        if (this._isSelectOneElement && this.config.searchEnabled) {
+            this.dropdown.element.insertBefore(this.input.element, this.dropdown.element.firstChild);
+        }
+        if (!this._isSelectOneElement) {
+            this.input.setWidth();
+        }
+        if (this._isSelectElement) {
+            this._highlightPosition = 0;
+            this._isSearching = false;
+            this._startLoading();
+            this._addPredefinedChoices(this._presetChoices);
+            this._stopLoading();
+        }
+    };
+
     SV.StandardLib.Choices = XF.Element.newHandler({
         options: {
             resetOnSubmit: false,
@@ -54,6 +97,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getPhrases: function()
         {
+            // These phrases should match public:svStandardLib_macros::choices_static_render
             return {
                 loadingText: XF.phrase('svChoices_loadingText'),
                 noResultsText: XF.phrase('svChoices_noResultsText'),
@@ -82,6 +126,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getClassNames: function ()
         {
+            // This classes should match public:svStandardLib_macros::choices_static_render
             return {
                 classNames: {
                     containerOuter: [
