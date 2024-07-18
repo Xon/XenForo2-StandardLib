@@ -128,7 +128,8 @@ Enrich a select box with [choices.js](https://github.com/Xon/Choices.js).
 
 <xf:selectrow label="Select row example" name="select_row_example"
               data-xf-init="sv-choices"
-              data-choices-max-item-count="1">
+              data-placeholder="{{ phrase('example')|for_attr }}"
+              data-max-item-count="1">
     <xf:option value="1">Option 1</xf:option>
     <xf:option value="2" selected="true">Option 2</xf:option>
     <xf:option value="3">Option 3</xf:option>
