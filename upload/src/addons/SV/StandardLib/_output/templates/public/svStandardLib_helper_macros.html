@@ -39,58 +39,39 @@
 		  arg-showSeconds="{{ true }}"
 		  arg-xfInit=""
 		  arg-allInputAttrsHtml=""
-		  arg-ymdInputAttrsHtml=""
-		  arg-hhInputAttrsHtml=""
-		  arg-mmInputAttrsHtml=""
-		  arg-ssInputAttrsHtml=""
+		  arg-dateInputAttrsHtml=""
+		  arg-timeInputAttrsHtml=""
 		  arg-tzInputAttrsHtml="">
 	<xf:css src="svStandardLib_helper_macros_date_time_input.less" />
 
-	<xf:set var="$selectedYMD" value="{{ $dateTimeArr.ymd ?: ($timestamp ? date($timestamp, 'picker') : '') }}" />
-	<xf:set var="$selectedHour" value="{{ $dateTimeArr.hh ?: ($timestamp ? time($timestamp, 'H') : 0) }}" />
-	<xf:set var="$selectedMinute" value="{{ $dateTimeArr.mm ?: ($timestamp ? time($timestamp, 'i') : 0) }}" />
-	<xf:set var="$selectedSecond" value="{{ $dateTimeArr.ss ?: ($timestamp ? time($timestamp, 's') : 0) }}" />
+	<xf:set var="$selectedDate" value="{{ $dateTimeArr.ymd ?: ($timestamp ? date($timestamp, 'Y-m-d') : '') }}" />
 	<xf:set var="$selectedTz" value="{{ $dateTimeArr.tz ?: $xf.visitor.timezone }}" />
+
+	<xf:if is="{{ ($dateTimeArr.hh !== null) || ($dateTimeArr.mm !== null) || ($dateTimeArr.ss !== null) }}">
+		<xf:set var="$selectedTime" value="{{ ($dateTimeArr.hh ?: '') . ':' . ($dateTimeArr.mm ?: '') . ':' . ($showSeconds ? ($dateTimeArr.ss ?: '') : '') }}" />
+	<xf:else />
+		<xf:set var="$selectedTime" value="{{ $timestamp ? time($timestamp, ('H:i' . ($showSeconds ? ':s' : ''))) : '' }}" />
+	</xf:if>
 
 	<div class="inputGroup-container inputGroup-containerSvStandardLibDateTime">
 		<div class="inputGroup">
-			<xf:macro name="date_time_wrapper"
+			<xf:macro name="base_date_time_input"
 					  arg-name="{$name}[ymd]"
-					  arg-weekStart="{{ $xf.language.week_start }}"
+					  arg-type="date"
 					  arg-readOnly="{{ $readOnly }}"
-					  arg-attrsHtml="{{ ' value="' . $selectedYMD . '" ' . $allInputAttrsHtml . $ymdInputAttrsHtml }}"
-					  />
+					  arg-value="{$selectedDate}"
+					  arg-attrsHtml="{{ $allInputAttrsHtml . $dateInputAttrsHtml }}" />
 
 			<span class="inputGroup-text">
 				{{ phrase('svStandardLib_at:') }}
 			</span>
-
-			<select class="input input--inline input--autoSize" name="{$name}[hh]" {{ $readOnly ? 'disabled="disabled"' : '' }} {{ $allInputAttrsHtml|raw }} {{ $hhInputAttrsHtml|raw }}>
-				<xf:foreach loop="{{ range(0, 23, 1) }}" value="$hour">
-					<xf:set var="$readableHour" value="{{ $hour|pad('0', 2) }}" />
-					<option value="{$hour}" {{ $readableHour === $selectedHour ? 'selected="selected"' : '' }}>{$readableHour}</option>
-				</xf:foreach>
-			</select>
-
-			<span class="inputGroup-text">:</span>
-
-			<select class="input input--inline input--autoSize" name="{$name}[mm]" {{ $readOnly ? 'disabled="disabled"' : '' }} {{ $allInputAttrsHtml|raw }} {{ $mmInputAttrsHtml|raw }}>
-				<xf:foreach loop="{{ range(0, 59, 1) }}" value="$minute">
-					<xf:set var="$readableMinute" value="{{ $minute|pad('0', 2) }}" />
-					<option value="{$minute}" {{ $readableMinute === $selectedMinute ? 'selected="selected"' : '' }}>{$readableMinute}</option>
-				</xf:foreach>
-			</select>
-
-			<xf:if is="$showSeconds">
-			<span class="inputGroup-text">:</span>
-
-			<select class="input input--inline input--autoSize" name="{$name}[ss]" {{ $readOnly ? 'disabled="disabled"' : '' }} {{ $allInputAttrsHtml|raw }}  {{ $ssInputAttrsHtml|raw }}>
-				<xf:foreach loop="{{ range(0, 59, 1) }}" value="$second">
-					<xf:set var="$readableSecond" value="{{ $second|pad('0', 2) }}" />
-					<option value="{$second}" {{ $readableSecond === $selectedSecond ? 'selected="selected"' : '' }}>{$readableSecond}</option>
-				</xf:foreach>
-			</select>
-			</xf:if>
+			
+			<xf:macro name="base_date_time_input"
+					  arg-name="{$name}[ymd]"
+					  arg-type="time"
+					  arg-readOnly="{{ $readOnly }}"
+					  arg-value="{$selectedTime}"
+					  arg-attrsHtml="{{ $allInputAttrsHtml . $timeInputAttrsHtml  . 'step="1"' }}" />
 		</div>
 
 		<div class="inputGroup">
@@ -103,27 +84,19 @@
 	</div>
 </xf:macro>
 
-<xf:macro name="date_time_wrapper"
+<xf:macro name="base_date_time_input"
 		  arg-name="!"
-		  arg-weekStart="!"
+		  arg-type="!"
+		  arg-value="{{ null }}"
 		  arg-readOnly="{{ false }}"
 		  arg-class=""
 		  arg-xfInit=""
-		  arg-attrsHtml=""
-		  >
-	<xf:if is="$xf.versionId >= 2020000">
-		<xf:js prod="xf/date_input-compiled.js" dev="vendor/pikaday/pikaday.js, xf/date_input.js" />
-		<xf:css src="core_pikaday.less" />
-	</xf:if>
-
-	<div class="inputGroup inputGroup--date inputGroup--joined inputDate">
-		<input type="text" class="input input--date {$class}" autocomplete="off" data-xf-init="date-input {$xfInit}"
-			data-week-start="{$weekStart}"
-			{{ $readOnly ? 'readonly' : '' }}
-			name="{$name}"
-			{$attrsHtml|raw} />
-		<span class="inputGroup-text inputDate-icon js-dateTrigger"></span>
-	</div>
+		  arg-attrsHtml="">
+	<input type="{$type}" {{ $value ? 'value="' . $value . '"' : '' }}
+		   class="input input--{$type} {$class}" autocomplete="off"
+		   {{ $readOnly ? 'readonly' : '' }}
+		   data-xf-init="{$xfInit}"
+		   {$attrsHtml|raw} />
 </xf:macro>
 
 <xf:macro name="relative_timestamp_prerequisites">
