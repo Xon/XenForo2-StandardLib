@@ -56,7 +56,7 @@
 	<div class="inputGroup-container inputGroup-containerSvStandardLibDateTime">
 		<div class="inputGroup">
 			<xf:macro name="base_date_time_input"
-					  arg-name="{$name}[ymd]"
+					  arg-name="{$name}[date]"
 					  arg-type="date"
 					  arg-readOnly="{{ $readOnly }}"
 					  arg-value="{$selectedDate}"
@@ -67,7 +67,7 @@
 			</span>
 			
 			<xf:macro name="base_date_time_input"
-					  arg-name="{$name}[ymd]"
+					  arg-name="{$name}[time]"
 					  arg-type="time"
 					  arg-readOnly="{{ $readOnly }}"
 					  arg-value="{$selectedTime}"
