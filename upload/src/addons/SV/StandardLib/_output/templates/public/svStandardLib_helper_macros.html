@@ -60,7 +60,7 @@
 					  arg-type="date"
 					  arg-readOnly="{{ $readOnly }}"
 					  arg-value="{$selectedDate}"
-					  arg-attrsHtml="{{ $allInputAttrsHtml . $dateInputAttrsHtml }}" />
+					  arg-attrsHtml="{{ $allInputAttrsHtml . ' ' . $dateInputAttrsHtml }}" />
 
 			<span class="inputGroup-text">
 				{{ phrase('svStandardLib_at:') }}
@@ -71,7 +71,7 @@
 					  arg-type="time"
 					  arg-readOnly="{{ $readOnly }}"
 					  arg-value="{$selectedTime}"
-					  arg-attrsHtml="{{ $allInputAttrsHtml . $timeInputAttrsHtml  . 'step="1"' }}" />
+					  arg-attrsHtml="{{ $allInputAttrsHtml . ' ' . $timeInputAttrsHtml .' ' . 'step="1"' }}" />
 		</div>
 
 		<div class="inputGroup">
