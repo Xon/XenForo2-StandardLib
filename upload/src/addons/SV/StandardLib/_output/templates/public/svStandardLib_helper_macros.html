@@ -92,7 +92,7 @@
 		  arg-class=""
 		  arg-xfInit=""
 		  arg-attrsHtml="">
-	<input type="{$type}" {{ $value ? 'value="' . $value . '"' : '' }}
+	<input type="{$type}" name="{$name}" {{ $value ? 'value="' . $value . '"' : '' }}
 		   class="input input--{$type} {$class}" autocomplete="off"
 		   {{ $readOnly ? 'readonly' : '' }}
 		   data-xf-init="{$xfInit}"
