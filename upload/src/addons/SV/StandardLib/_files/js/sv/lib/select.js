@@ -53,6 +53,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
     SV.StandardLib.Choices = XF.Element.newHandler({
         options: {
+            addChoices: false,
             resetOnSubmit: false,
             placeholder: null,
             maxItemCount: -1,
