@@ -49,6 +49,13 @@ class InputFilterer extends XFCP_InputFilterer
                     $dateParts = $value['date'];
                     $timeValue = $value['time'];
                     $tz = $value['tz'];
+
+                    $timeParts = explode(':', $timeValue, 3);
+                    if (count($timeParts) !== 3)
+                    {
+                        return 0;
+                    }
+                    [$hh, $mm, $ss] = $timeParts;
                 }
                 else if (array_key_exists('ymd', $value)
                          && array_key_exists('hh', $value)
@@ -58,7 +65,9 @@ class InputFilterer extends XFCP_InputFilterer
                 {
                     // old XF2.2 version, shim to new version
                     $dateParts = $value['ymd'];
-                    $timeValue = $value['hh'] . ':' . $value['mm'] . ':' . $value['ss'];
+                    $hh = $value['hh'];
+                    $mm = $value['mm'];
+                    $ss = $value['ss'];
                     $tz = $value['tz'];
                 }
                 else
@@ -66,7 +75,7 @@ class InputFilterer extends XFCP_InputFilterer
                     return 0;
                 }
 
-                if (!is_string($dateParts) || $dateParts === '' || !is_string($timeValue) || $timeValue === '')
+                if (!is_string($dateParts) || $dateParts === '')
                 {
                     return 0;
                 }
@@ -76,21 +85,9 @@ class InputFilterer extends XFCP_InputFilterer
                 {
                     return 0;
                 }
-                $timeParts = explode(':', $timeValue, 3);
-                if (count($timeParts) !== 3)
-                {
-                    return 0;
-                }
+                [$year, $month, $day] = $ymdParts;
 
-                /**
-                 * Daily reminder to wash your hands
-                 *
-                 * @param mixed    $int
-                 * @param int|null $min
-                 * @param int|null $max
-                 * @return int
-                 */
-                $intSanitizer = function ($int, $min, $max)
+                $intSanitizer = function ($int, ?int $min, ?int$max): int
                 {
                     if (!is_numeric($int))
                     {
@@ -98,11 +95,11 @@ class InputFilterer extends XFCP_InputFilterer
                     }
 
                     $int = (int) $int;
-                    if (is_int($min) && $int < $min)
+                    if ($min !== null && $int < $min)
                     {
                         $int = $min;
                     }
-                    else if (is_int($max) && $int > $max)
+                    else if ($max !== null && $int > $max)
                     {
                         $int = $max;
                     }
@@ -110,18 +107,12 @@ class InputFilterer extends XFCP_InputFilterer
                     return $int;
                 };
 
-                // php is somewhat smart and will move the y-m-d around to be valid
-                $ymdParts[0] = $intSanitizer($ymdParts[0], 1970, null);
-                $ymdParts[1] = $intSanitizer($ymdParts[1], 1, 12);
-                $ymdParts[2] = $intSanitizer($ymdParts[2], 1, 31);
-
-                $timeSanitizer = function (string $key) use(&$timeParts, &$intSanitizer)
-                {
-                    $timeParts[$key] = $intSanitizer($timeParts[$key], 0, null);
-                };
-                $timeSanitizer('hh'); // hours
-                $timeSanitizer('mm'); // minutes
-                $timeSanitizer('ss'); // seconds
+                $year = $intSanitizer($year, 1970, null);
+                $month = $intSanitizer($month, 1, 12);
+                $day = $intSanitizer($day, 1, 31);
+                $hh = $intSanitizer($hh, 0, 24);
+                $mm = $intSanitizer($mm, 0, 60);
+                $ss = $intSanitizer($ss, 0, 60);
 
                 if (is_string($tz))
                 {
@@ -139,8 +130,8 @@ class InputFilterer extends XFCP_InputFilterer
 
                 $dateTimeObj = new DateTime();
                 $dateTimeObj->setTimezone(new DateTimeZone($tz));
-                $dateTimeObj->setDate($ymdParts[0], $ymdParts[1], $ymdParts[2]);
-                $dateTimeObj->setTime($timeParts['hh'], $timeParts['mm'], $timeParts['ss']);
+                $dateTimeObj->setDate($year, $month, $day);
+                $dateTimeObj->setTime($hh, $mm, $ss);
 
                 return $dateTimeObj->getTimestamp();
         }
