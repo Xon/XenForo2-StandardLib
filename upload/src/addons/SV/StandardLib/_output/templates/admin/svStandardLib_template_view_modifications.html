@@ -6,7 +6,7 @@
 <xf:breadcrumb href="{{ link('templates/edit', $template, {'type': $template.type, 'style_id': $style.style_id}) }}">{$template.title}</xf:breadcrumb>
 
 <xf:css src="public:diff.less" />
-<xf:macro template="public:prism_macros" name="setup" />
+<xf:macro name="public:prism_macros::setup" />
 
 <xf:form action="{{ link('templates/view-modifications', $template, {'type': $template.type, 'style_id': $style.style_id, 'tab': $tab}) }}"
 		 class="block"

@@ -125,7 +125,7 @@ Enrich a select box with [choices.js](https://github.com/Xon/Choices.js).
 
 Single select example:
 ```html
-<xf:macro template="svStandardLib_macros" name="choices_setup" />
+<xf:macro name="svStandardLib_macros::choices_setup" />
 
 <xf:selectrow name="select_row_example"
               label="{{ phrase('example') }}"
@@ -140,7 +140,7 @@ Single select example:
 
 Multi-select example:
 ```html
-<xf:macro template="svStandardLib_macros" name="choices_setup" />
+<xf:macro name="svStandardLib_macros::choices_setup" />
 
 <xf:selectrow name="select_row_example"
               label="{{ phrase('example') }}"
@@ -253,8 +253,7 @@ Field name is set via `data-sv-store-selected-tab-input-name` added to the `data
 ### date_time_input macro
 Support for date/time/timezone input, returned as a unix timestamp
 ```html
-<xf:macro template="svStandardLib_helper_macros"
-          name="date_time_input{{ $asRow ? '_row' : '' }}"
+<xf:macro name="svStandardLib_helper_macros::date_time_input{{ $asRow ? '_row' : '' }}"
           arg-name="scheduled_start_date"
           arg-timestamp="{$xf.time}" />
 ```
