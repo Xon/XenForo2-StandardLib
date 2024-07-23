@@ -327,7 +327,7 @@ SV.$ = SV.$ || window.jQuery || null;
         getEventTarget: function ()
         {
             let eventTargetSelector = this.options.triggerEventOnSelector;
-            if (!eventTargetSelector.length)
+            if (!eventTargetSelector)
             {
                 return null; // eg: if dismiss button is not found, we do not want to click on the span itself
             }

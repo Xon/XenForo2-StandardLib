@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib\XF\Template;
 
+use XF\Mvc\Entity\Entity;
 use function array_filter;
 use function explode;
 use function in_array;
@@ -57,8 +58,10 @@ class Templater extends XFCP_Templater
     public function formSelect(array $controlOptions, array $choices)
     {
         $value = $controlOptions['value'] ?? null;
-        if (!is_array($value) && !is_string($value) && $value !== null)
+        if ($value instanceof Entity)
         {
+            // XF2.3 supports pulling attributes out of entities, for now skip
+            // $this->processEntityAttributes($controlOptions, false);
             return parent::formSelect($controlOptions, $choices);
         }
 
