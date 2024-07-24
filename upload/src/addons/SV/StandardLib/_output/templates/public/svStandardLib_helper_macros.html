@@ -156,7 +156,7 @@
 		  arg-xfInit=""
 		  arg-attrsHtml=""
 		  >
-	<xf:if is="$xf.versionId >= 2020000">
+	<xf:if is="$xf.versionId >= 2020000 && $xf.versionId < 2030000">
 		<xf:js prod="xf/date_input-compiled.js" dev="vendor/pikaday/pikaday.js, xf/date_input.js" />
 		<xf:css src="core_pikaday.less" />
 	</xf:if>
