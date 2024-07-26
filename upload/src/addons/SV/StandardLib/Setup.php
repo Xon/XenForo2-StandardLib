@@ -23,11 +23,11 @@ class Setup extends AbstractSetup
     public function uninstallStep1()// : void
     {
         /** @var Phrase[] $phrases */
-        $phrases = \XF::finder('XF:Phrase')
-                      ->where('language_id', '=', 0)
-                      ->where('addon_id', '=', 'SV/StandardLib')
-                      ->where('title', 'like', 'time.%')
-                      ->fetch();
+        $phrases = Helper::finder(\XF\Finder\Phrase::class)
+                         ->where('language_id', '=', 0)
+                         ->where('addon_id', '=', 'SV/StandardLib')
+                         ->where('title', 'like', 'time.%')
+                         ->fetch();
         foreach ($phrases as $phrase)
         {
             $phrase->addon_id = '';

@@ -308,8 +308,7 @@ trait InstallerHelper
             $titles[] = ['title', 'LIKE', $titlePattern];
         }
 
-        /** @var \XF\Finder\Phrase $phraseFinder */
-        $phraseFinder = \XF::finder('XF:Phrase');
+        $phraseFinder = Helper::finder(\XF\Finder\Phrase::class);
         /** @var Phrase[] $phrases */
         $phrases = $phraseFinder
             ->where('language_id', 0)
@@ -325,8 +324,8 @@ trait InstallerHelper
     protected function renameStyleProperty(string $old, string $new): void
     {
         /** @var StyleProperty $optionOld */
-        $optionOld = \XF::finder('XF:StyleProperty')->where('property_name', '=', $old)->fetchOne();
-        $optionNew = \XF::finder('XF:StyleProperty')->where('property_name', '=', $new)->fetchOne();
+        $optionOld = Helper::finder(\XF\Finder\StyleProperty::class)->where('property_name', '=', $old)->fetchOne();
+        $optionNew = Helper::finder(\XF\Finder\StyleProperty::class)->where('property_name', '=', $new)->fetchOne();
         if ($optionOld !== null && $optionNew === null)
         {
             if ($optionOld->hasBehavior('XF:DevOutputWritable'))
@@ -691,8 +690,7 @@ trait InstallerHelper
     {
         $es = Listener::getElasticsearchApi();
 
-        /** @var Configurer $configurer */
-        $configurer = \XF::service('XFES:Configurer', $es);
+        $configurer = Helper::service(Configurer::class, $es);
         $testError = null;
         $isOptimizable = false;
 
@@ -706,8 +704,7 @@ trait InstallerHelper
                 {
                     if ($es->indexExists())
                     {
-                        /** @var Optimizer $optimizer */
-                        $optimizer = \XF::service('XFES:Optimizer', $es);
+                        $optimizer = Helper::service(Optimizer::class, $es);
                         $isOptimizable = $optimizer->isOptimizable();
                     }
                     else
