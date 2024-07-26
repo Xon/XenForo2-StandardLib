@@ -13,8 +13,9 @@ use XF\Db\Schema\Column as DbColumnSchema;
 use XF\Db\Schema\Create;
 use XF\Db\SchemaManager;
 use XF\Entity\Option;
-use XF\Entity\Phrase;
+use XF\Entity\Phrase as PhraseEntity;
 use XF\Entity\StyleProperty;
+use XF\Finder\Phrase as PhraseFinder;
 use XF\PreEscaped;
 use XF\PrintableException;
 use XFES\Elasticsearch\Exception;
@@ -67,15 +68,13 @@ trait InstallerHelper
      */
     protected function addDefaultPhrase(string $title, string $value, bool $deOwn = true): void
     {
-        /** @var ?Phrase $phrase */
-        $phrase = \XF::app()->finder('XF:Phrase')
-                     ->where('title', '=', $title)
-                     ->where('language_id', '=', 0)
-                     ->fetchOne();
+        $phrase = Helper::finder(PhraseFinder::class)
+                        ->where('title', '=', $title)
+                        ->where('language_id', '=', 0)
+                        ->fetchOne();
         if ($phrase === null)
         {
-            /** @var Phrase $phrase */
-            $phrase = \XF::em()->create('XF:Phrase');
+            $phrase = Helper::createEntity(PhraseEntity::class);
             $phrase->language_id = 0;
             $phrase->title = $title;
             $phrase->phrase_text = $value;
@@ -240,7 +239,7 @@ trait InstallerHelper
             if ($results)
             {
                 $em = \XF::em();
-                /** @var Phrase[] $phrases */
+                /** @var PhraseEntity[] $phrases */
                 $phrases = \XF::em()->findByIds('XF:Phrase', \array_keys($results));
                 foreach ($results AS $phraseId => $oldTitle)
                 {
@@ -251,7 +250,7 @@ trait InstallerHelper
 
                         $db->beginTransaction();
 
-                        /** @var Phrase $newPhrase */
+                        /** @var PhraseEntity $newPhrase */
                         $newPhrase = $replace
                             ? $em->getFinder('XF:Phrase', false)
                                  ->where('title', '=', $newTitle)
@@ -308,8 +307,8 @@ trait InstallerHelper
             $titles[] = ['title', 'LIKE', $titlePattern];
         }
 
-        $phraseFinder = Helper::finder(\XF\Finder\Phrase::class);
-        /** @var Phrase[] $phrases */
+        $phraseFinder = Helper::finder(PhraseFinder::class);
+        /** @var PhraseEntity[] $phrases */
         $phrases = $phraseFinder
             ->where('language_id', 0)
             ->whereOr($titles)

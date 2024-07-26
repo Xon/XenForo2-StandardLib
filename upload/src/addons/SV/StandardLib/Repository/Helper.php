@@ -5,7 +5,7 @@ namespace SV\StandardLib\Repository;
 use SV\InstallerAppHelper\InstallAppBootstrap;
 use XF\Container;
 use XF\Entity\AddOn;
-use XF\Entity\User;
+use XF\Entity\User as UserEntity;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Repository;
 use XF\Util\File as FileUtil;
@@ -331,16 +331,16 @@ class Helper extends Repository
      * @param mixed|Entity|null $entity
      * @param string            $relationOrGetter
      * @param string            $backupColumn
-     * @return User|null
+     * @return UserEntity|null
      */
-    public function getUserEntity($entity, string $relationOrGetter = 'User', string $backupColumn = 'user_id'): ?User
+    public function getUserEntity($entity, string $relationOrGetter = 'User', string $backupColumn = 'user_id'): ?UserEntity
     {
         if (!($entity instanceof Entity))
         {
             return null;
         }
 
-        if ($entity instanceof User)
+        if ($entity instanceof UserEntity)
         {
             return $entity;
         }
@@ -348,7 +348,7 @@ class Helper extends Repository
         if ($entity->isValidGetter($relationOrGetter) || $entity->isValidRelation($relationOrGetter))
         {
             $user = $entity->get($relationOrGetter);
-            if ($user instanceof User)
+            if ($user instanceof UserEntity)
             {
                 return $user;
             }
@@ -356,8 +356,8 @@ class Helper extends Repository
 
         if ($entity->isValidColumn($backupColumn) || $entity->isValidGetter($backupColumn))
         {
-            /** @var User $user */
-            $user = \XF::app()->find('XF:User', $entity->get($backupColumn));
+            /** @var UserEntity|null $user */
+            $user = \SV\StandardLib\Helper::find(UserEntity::class, $entity->get($backupColumn));
 
             return $user;
         }
