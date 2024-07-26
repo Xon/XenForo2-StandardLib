@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpMissingParamTypeInspection
- */
 
 namespace SV\StandardLib\XF;
 
