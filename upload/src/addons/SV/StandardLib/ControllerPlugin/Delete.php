@@ -2,8 +2,9 @@
 
 namespace SV\StandardLib\ControllerPlugin;
 
+use SV\StandardLib\Helper;
 use XF\ControllerPlugin\AbstractPlugin;
-use XF\ControllerPlugin\InlineMod;
+use XF\ControllerPlugin\InlineMod as InlineModPlugin;
 use XF\Entity\Phrase;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Reply\AbstractReply;
@@ -94,9 +95,8 @@ class Delete extends AbstractPlugin
 						}
                         assert(method_exists($deleter, 'delete'));
 						$deleter->delete('hard', $reason);
-						
-						/** @var InlineMod $inlineModPlugin */
-						$inlineModPlugin = $this->plugin('XF:InlineMod');
+
+						$inlineModPlugin = Helper::plugin($this, InlineModPlugin::class);
 						$inlineModPlugin->clearIdFromCookie($contentType, $entityId);
 						
 						return $this->redirect($redirectLink);
@@ -138,9 +138,8 @@ class Delete extends AbstractPlugin
 				}
                 assert(method_exists($deleter, 'delete'));
 				$deleter->delete($type, $reason);
-				
-				/** @var InlineMod $inlineModPlugin */
-				$inlineModPlugin = $this->plugin('XF:InlineMod');
+
+				$inlineModPlugin = Helper::plugin($this, InlineModPlugin::class);
 				$inlineModPlugin->clearIdFromCookie($contentType, $entityId);
 				
 				return $this->redirect($redirectLink);

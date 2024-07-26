@@ -85,6 +85,7 @@ class CssRenderer extends XFCP_CssRenderer
         }
     }
 
+    /** @noinspection PhpUnnecessaryLocalVariableInspection */
     protected function svProcessLessVariablesToRaw(string $value): string
     {
         $value = preg_replace_callback(

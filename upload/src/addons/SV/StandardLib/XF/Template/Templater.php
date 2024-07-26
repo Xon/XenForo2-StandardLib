@@ -3,11 +3,9 @@
 namespace SV\StandardLib\XF\Template;
 
 use XF\Mvc\Entity\Entity;
-use function array_filter;
 use function explode;
 use function in_array;
 use function is_array;
-use function is_string;
 use function stripos;
 use function substr;
 

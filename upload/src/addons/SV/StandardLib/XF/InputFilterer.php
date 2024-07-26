@@ -12,7 +12,6 @@ use function array_key_exists;
 use function count;
 use function explode;
 use function is_array;
-use function is_int;
 use function is_numeric;
 use function is_string;
 

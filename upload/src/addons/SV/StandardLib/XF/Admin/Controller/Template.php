@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib\XF\Admin\Controller;
 
+use SV\StandardLib\Helper;
 use XF\Diff;
 use XF\Entity\TemplateModification;
 use XF\Mvc\Entity\ArrayCollection;
@@ -80,8 +81,7 @@ class Template extends XFCP_Template
         });
         $filtered = $filtered->toArray();
 
-        /** @var TemplateModificationRepo $templateModRepo */
-        $templateModRepo = $this->repository('XF:TemplateModification');
+        $templateModRepo = Helper::repository(TemplateModificationRepo::class);
         $templateStr = $templateModRepo->applyTemplateModifications(
             $template->template,
             $filtered,
@@ -148,9 +148,14 @@ class Template extends XFCP_Template
         );
     }
 
-    protected function getTemplateModificationFinderForSvStandardLib(string $type, string $template) : Finder
+    /**
+     * @param string $type
+     * @param string $template
+     * @return \XF\Finder\TemplateModification|Finder
+     */
+    protected function getTemplateModificationFinderForSvStandardLib(string $type, string $template)
     {
-        return $this->finder('XF:TemplateModification')
+        return Helper::finder(\XF\Finder\TemplateModification::class)
             ->where('type', $type)
             ->where('template', $template)
             ->whereAddOnActive()
