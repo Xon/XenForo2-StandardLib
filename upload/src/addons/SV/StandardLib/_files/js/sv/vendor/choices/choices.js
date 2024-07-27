@@ -21,7 +21,7 @@ return /******/ (function() { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.clearChoices = exports.activateChoices = exports.filterChoices = exports.addChoice = void 0;
+exports.clearChoices = exports.activateChoices = exports.filterChoices = exports.removeChoice = exports.addChoice = void 0;
 var constants_1 = __webpack_require__(883);
 var addChoice = function (_a) {
   var value = _a.value,
@@ -51,6 +51,13 @@ var addChoice = function (_a) {
   };
 };
 exports.addChoice = addChoice;
+var removeChoice = function (value) {
+  return {
+    type: constants_1.ACTION_TYPES.REMOVE_CHOICE,
+    value: value
+  };
+};
+exports.removeChoice = removeChoice;
 var filterChoices = function (results) {
   return {
     type: constants_1.ACTION_TYPES.FILTER_CHOICES,
@@ -755,6 +762,10 @@ var Choices = /** @class */function () {
       }
     });
     this._stopLoading();
+    return this;
+  };
+  Choices.prototype.removeChoice = function (value) {
+    this._store.dispatch((0, choices_1.removeChoice)(value));
     return this;
   };
   Choices.prototype.clearChoices = function () {
@@ -2964,6 +2975,7 @@ exports.EVENTS = {
 };
 exports.ACTION_TYPES = {
   ADD_CHOICE: 'ADD_CHOICE',
+  REMOVE_CHOICE: 'REMOVE_CHOICE',
   FILTER_CHOICES: 'FILTER_CHOICES',
   ACTIVATE_CHOICES: 'ACTIVATE_CHOICES',
   CLEAR_CHOICES: 'CLEAR_CHOICES',
@@ -3573,6 +3585,18 @@ function choices(state, action) {
           An active choice appears within the choice dropdown
         */
         return __spreadArray(__spreadArray([], state, true), [choice], false);
+      }
+    case "REMOVE_CHOICE":
+      {
+        var removeChoiceAction = action,
+          choiceValue_1 = removeChoiceAction.value,
+          choiceIndex = state.findIndex(function (choice) {
+            return choice.value === choiceValue_1;
+          });
+        if (choiceIndex !== -1) {
+          state = state.splice(choiceIndex, 1);
+        }
+        return state;
       }
     case 'ADD_ITEM':
       {
