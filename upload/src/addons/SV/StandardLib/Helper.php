@@ -185,8 +185,6 @@ class Helper
         return $entity;
     }
 
-
-
     /**
      * @template T of Entity
      * @param class-string<T> $identifier
