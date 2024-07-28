@@ -5,6 +5,7 @@ namespace SV\StandardLib;
 use SV\StandardLib\Repository\Permissions as PermissionsRepo;
 use XF\ControllerPlugin\AbstractPlugin;
 use XF\Mvc\Controller;
+use XF\Mvc\Entity\AbstractCollection;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Finder;
 use XF\Mvc\Entity\Repository;
@@ -165,9 +166,9 @@ class Helper
 
     /**
      * @template T of Entity
-     * @param class-string<T> $identifier
-     * @param int|string|array<int|string>      $id
-     * @param array           $with
+     * @param class-string<T>              $identifier
+     * @param int|string|array<int|string> $id
+     * @param array<string>                $with
      * @return T|null
      */
     public static function find(string $identifier, $id, array $with = [])
@@ -182,6 +183,33 @@ class Helper
         $entity = \XF::app()->find($identifier, $id, $with);
 
         return $entity;
+    }
+
+    /**
+     * @template T of Entity
+     * @param class-string<T> $identifier
+     * @param array           $ids
+     * @param array<string>   $with
+     * @return AbstractCollection<T>|T[]
+     * @noinspection PhpReturnDocTypeMismatchInspection
+     */
+    public static function findByIds(string $identifier, array $ids, array $with = [])
+    {
+        if (count($ids) === 0)
+        {
+            return \XF::em()->getEmptyCollection();
+        }
+
+        // XF2.2 entity cache key is on the short name, not the class name. So map to the expected thing
+        if (\XF::$versionId < 2030000 && strpos($identifier, ':') === false)
+        {
+            $identifier = str_replace('\\Entity\\', ':', $identifier);
+        }
+
+        /** @var AbstractCollection<T> $collection */
+        $collection = \XF::em()->findByIds($identifier, $ids, $with);
+
+        return $collection;
     }
 
     /**
