@@ -252,7 +252,7 @@ trait InstallerHelper
 
                         /** @var PhraseEntity $newPhrase */
                         $newPhrase = $replace
-                            ? $em->getFinder('XF:Phrase', false)
+                            ? \SV\StandardLib\Helper::finder(\XF\Finder\Phrase::class, false)
                                  ->where('title', '=', $newTitle)
                                  ->fetchOne()
                             : null;

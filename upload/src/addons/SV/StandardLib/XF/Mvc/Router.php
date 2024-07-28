@@ -16,7 +16,7 @@ class Router extends XFCP_Router
         parent::__construct($linkFormatter, $routes);
 
         /** @var LinkBuilder $repo */
-        $repo = \XF::app()->repository('SV\StandardLib:LinkBuilder');
+        $repo = \SV\StandardLib\Helper::repository(\SV\StandardLib\Repository\LinkBuilder::class);
         $repo->hookRouteBuilder($this);
     }
 

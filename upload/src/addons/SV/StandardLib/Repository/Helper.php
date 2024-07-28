@@ -51,7 +51,7 @@ class Helper extends Repository
 
         if (is_string($targetVersion))
         {
-            $addOnEntity = \XF::em()->findCached('XF:AddOn', $addonId);
+            $addOnEntity = \SV\StandardLib\Helper::findCached(\XF\Entity\AddOn::class, $addonId);
             if ($addOnEntity instanceof AddOn)
             {
                 // unlike \XF::isAddOnActive, the add-on must not be in a processing state

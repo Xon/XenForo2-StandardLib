@@ -578,6 +578,6 @@ class TemplaterHelper
 
     protected function repository(string $identifier): Repository
     {
-        return $this->app->repository($identifier);
+        return \SV\StandardLib\Helper::repository($identifier);
     }
 }

@@ -68,11 +68,11 @@ class Delete extends AbstractPlugin
 				throw new \InvalidArgumentException('Entity does not have an ID or does not have a simple key');
 			}
 			$entityId = intval(reset($id));
-			
+
 			if ($entity->{$stateKey} == 'deleted')
 			{
 				$linkHash = $this->buildLinkHash($entityId);
-				
+
 				$type = $this->filter('hard_delete', 'uint');
 				switch ($type)
 				{
@@ -86,8 +86,8 @@ class Delete extends AbstractPlugin
                         }
 
 						$reason = $this->filter('reason', 'str');
-						
-						$deleter = $this->service($deleterService, $entity);
+
+						$deleter = \SV\StandardLib\Helper::service($deleterService, $entity);
 						if ($includeAuthorAlert && $this->filter('author_alert', 'bool'))
 						{
                             assert(method_exists($deleter, 'setSendAlert'));
@@ -98,7 +98,7 @@ class Delete extends AbstractPlugin
 
 						$inlineModPlugin = Helper::plugin($this, InlineModPlugin::class);
 						$inlineModPlugin->clearIdFromCookie($contentType, $entityId);
-						
+
 						return $this->redirect($redirectLink);
 
 					case 2:
@@ -107,7 +107,7 @@ class Delete extends AbstractPlugin
                             return $this->noPermission();
                         }
 
-						$deleter = $this->service($deleterService, $entity);
+						$deleter = \SV\StandardLib\Helper::service($deleterService, $entity);
 						if ($includeAuthorAlert && $this->filter('author_alert', 'bool'))
 						{
                             assert(method_exists($deleter, 'setSendAlert'));
@@ -116,7 +116,7 @@ class Delete extends AbstractPlugin
 
                         assert(method_exists($deleter, 'unDelete'));
                         $deleter->unDelete();
-						
+
 						return $this->redirect($redirectLink . $linkHash);
 				}
 			}
@@ -129,8 +129,8 @@ class Delete extends AbstractPlugin
                 {
                     return $this->noPermission($error);
                 }
-				
-				$deleter = $this->service($deleterService, $entity);
+
+				$deleter = \SV\StandardLib\Helper::service($deleterService, $entity);
 				if ($includeAuthorAlert && $this->filter('author_alert', 'bool'))
 				{
                     assert(method_exists($deleter, 'setSendAlert'));
@@ -141,13 +141,13 @@ class Delete extends AbstractPlugin
 
 				$inlineModPlugin = Helper::plugin($this, InlineModPlugin::class);
 				$inlineModPlugin->clearIdFromCookie($contentType, $entityId);
-				
+
 				return $this->redirect($redirectLink);
 			}
 		}
-		
+
 		$templateName = $templateName ?: 'public:svStandardLib_delete_state';
-		
+
 		$viewParams = [
 				'entity'             => $entity,
 				'stateKey'           => $stateKey,

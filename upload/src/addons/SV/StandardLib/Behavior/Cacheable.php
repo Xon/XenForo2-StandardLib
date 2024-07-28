@@ -44,13 +44,13 @@ class Cacheable extends Behavior
 
         return true;
     }
-	
+
 	public function rebuildCache(): void
 	{
         $class = $this->config['repository'];
         $func = $this->config['rebuildCacheFuncName'];
 
-        $repo = $this->repository($class);
+        $repo = \SV\StandardLib\Helper::repository($class);
         $callable = [$repo, $func];
         if (is_callable($callable))
         {
