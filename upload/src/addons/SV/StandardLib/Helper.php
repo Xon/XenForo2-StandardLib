@@ -185,6 +185,29 @@ class Helper
         return $entity;
     }
 
+
+
+    /**
+     * @template T of Entity
+     * @param class-string<T> $identifier
+     * @param array           $where
+     * @param array<string>   $with
+     * @return T|null
+     */
+    public static function findOne(string $identifier, array $where, array $with = [])
+    {
+        // XF2.2 entity cache key is on the short name, not the class name. So map to the expected thing
+        if (\XF::$versionId < 2030000 && strpos($identifier, ':') === false)
+        {
+            $identifier = str_replace('\\Entity\\', ':', $identifier);
+        }
+
+        /** @var T|null $entity */
+        $entity = \XF::em()->findOne($identifier, $where, $with);
+
+        return $entity;
+    }
+
     /**
      * @template T of Entity
      * @param class-string<T> $identifier
