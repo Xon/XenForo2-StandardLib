@@ -129,11 +129,11 @@ class Helper extends Repository
     protected function getAddonVersions(): array
     {
         /** @var callable(Container, string): array $func */
-        $func = $this->app()->fromRegistry('addon.versionCache', function (Container $c, string $key) {
+        $func = \XF::app()->fromRegistry('addon.versionCache', function (Container $c, string $key) {
             return $this->rebuildAddOnVersionCache();
         });
 
-        return $func($this->app()->container(), 'addon.versionCache');
+        return $func(\XF::app()->container(), 'addon.versionCache');
     }
 
     public function rebuildAddOnVersionCache(): array
@@ -144,7 +144,7 @@ class Helper extends Repository
             FROM xf_addon
             WHERE `active` = 1 AND is_processing = 0
         ');
-        $this->app()->registry()->set('addon.versionCache', $data);
+        \XF::app()->registry()->set('addon.versionCache', $data);
         $this->markAsCriticalAddon();
         return $data;
     }
@@ -159,7 +159,7 @@ class Helper extends Repository
 
     public function resetAddOnVersionCache(): void
     {
-        $this->app()->registry()->delete('addon.versionCache');
+        \XF::app()->registry()->delete('addon.versionCache');
     }
 
     /** @noinspection PhpUnnecessaryLocalVariableInspection */

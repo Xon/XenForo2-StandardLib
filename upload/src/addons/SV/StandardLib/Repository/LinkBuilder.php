@@ -13,7 +13,7 @@ class LinkBuilder extends Repository
      */
     public function hookRouteBuilder(Router $router)
     {
-        $app = $this->app();
+        $app = \XF::app();
         $classType = $app->container('app.classType');
         $app->fire('patch_route_build_callback', [$this, $router], $classType);
     }

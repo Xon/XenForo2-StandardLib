@@ -93,7 +93,7 @@ class Template extends XFCP_Template
             if (is_numeric($status))
             {
                 return \XF::phrase('svStandardLib_match_count_x', [
-                    'count' => $this->app()->language()->numberFormat($status)
+                    'count' => \XF::app()->language()->numberFormat($status)
                 ]);
             }
             return $status;
@@ -128,7 +128,7 @@ class Template extends XFCP_Template
 
                 try
                 {
-                    $viewParams['compiledTemplate'] = $this->app()->templateCompiler()->compile($templateStr);
+                    $viewParams['compiledTemplate'] = \XF::app()->templateCompiler()->compile($templateStr);
                 }
                 /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (TemplateCompilerException $exception)

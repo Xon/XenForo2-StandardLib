@@ -183,7 +183,7 @@ class TemplaterHelper
 
     protected function getStyle(): Style
     {
-        return $this->templater->getStyle() ?? $this->app()->style();
+        return $this->templater->getStyle() ?? \XF::app()->style();
     }
 
     public function uncacheTemplateData(string $type, string $template)
@@ -250,7 +250,7 @@ class TemplaterHelper
      */
     public function fnIsToggleSet(BaseTemplater $templater, bool &$escape, string $storageKey, bool $default = false, string $storageContainer = 'toggle'): bool
     {
-        $cookie = $this->app->request()->getCookie($storageContainer);
+        $cookie = \XF::app()->request()->getCookie($storageContainer);
         if (!$cookie)
         {
             return $default;
@@ -319,7 +319,7 @@ class TemplaterHelper
 
         $value[] = $toAdd;
 
-        return $wasCollection ? $this->em()->getBasicCollection([$value]) : $value;
+        return $wasCollection ? \XF::app()->em()->getBasicCollection([$value]) : $value;
     }
 
     /**
@@ -370,7 +370,7 @@ class TemplaterHelper
             }
         }
 
-        return $wasCollection ? $this->em()->getBasicCollection([$value]) : $value;
+        return $wasCollection ? \XF::app()->em()->getBasicCollection([$value]) : $value;
     }
 
     public function fnDynamicPhrase(BaseTemplater $templater, bool &$escape, string $value): Phrase
@@ -573,7 +573,7 @@ class TemplaterHelper
 
     protected function em(): Manager
     {
-        return $this->app->em();
+        return \XF::app()->em();
     }
 
     protected function repository(string $identifier): Repository
