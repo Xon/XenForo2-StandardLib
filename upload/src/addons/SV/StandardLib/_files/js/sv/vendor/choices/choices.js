@@ -1080,30 +1080,39 @@ var Choices = /** @class */function () {
     this.passedElement.triggerEvent(constants_1.EVENTS.choice, {
       choice: choice
     });
-    if (!choice.selected && !choice.disabled) {
-      var canAddItem = this._canAddItem(activeItems, choice.value);
-      if (canAddItem.response) {
-        if (this.config.pseudoMultiSelectForSingle) {
-          var lastItem = activeItems[activeItems.length - 1];
-          if (lastItem) {
-            this._removeItem(lastItem);
+    var triggerChange = false;
+    this._startLoading();
+    try {
+      if (!choice.selected && !choice.disabled) {
+        var canAddItem = this._canAddItem(activeItems, choice.value);
+        if (canAddItem.response) {
+          if (this.config.pseudoMultiSelectForSingle) {
+            var lastItem = activeItems[activeItems.length - 1];
+            if (lastItem) {
+              this._removeItem(lastItem);
+            }
           }
+          this._addItem({
+            value: choice.value,
+            label: choice.label,
+            choiceId: choice.id,
+            groupId: choice.groupId,
+            labelClass: choice.labelClass,
+            labelDescription: choice.labelDescription,
+            customProperties: choice.customProperties,
+            placeholder: choice.placeholder,
+            keyCode: choice.keyCode
+          });
+          triggerChange = true;
         }
-        this._addItem({
-          value: choice.value,
-          label: choice.label,
-          choiceId: choice.id,
-          groupId: choice.groupId,
-          labelClass: choice.labelClass,
-          labelDescription: choice.labelDescription,
-          customProperties: choice.customProperties,
-          placeholder: choice.placeholder,
-          keyCode: choice.keyCode
-        });
-        this._triggerChange(choice.value);
       }
+      this.clearInput();
+    } finally {
+      this._stopLoading();
     }
-    this.clearInput();
+    if (triggerChange) {
+      this._triggerChange(choice.value);
+    }
     // We want to close the dropdown if we are dealing with a single select box
     if (hasActiveDropdown && (this.config.pseudoMultiSelectForSingle || this._isSelectOneElement)) {
       this.hideDropdown(true);
@@ -4394,7 +4403,6 @@ var templates = {
       inputCloned = _b.inputCloned;
     var inp = Object.assign(document.createElement('input'), {
       type: 'search',
-      name: 'search_terms',
       className: "".concat((0, utils_1.getClassNames)(input).join(' '), " ").concat((0, utils_1.getClassNames)(inputCloned).join(' ')),
       autocomplete: 'off',
       autocapitalize: 'off',
