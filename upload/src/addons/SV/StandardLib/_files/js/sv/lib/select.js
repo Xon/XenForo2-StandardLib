@@ -87,16 +87,17 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 placeholderValue = this.options.placeholder || field.getAttribute('placeholder'),
                 placeholder = !!placeholderValue,
                 config = SV.extendObject({}, this.options, {
-                pseudoMultiSelectForSingle: this.options.maxItemCount === 1,
-                placeholder: placeholder,
-                placeholderValue: placeholder ? placeholderValue : null,
-            }, this.getPhrases(), this.getClassNames());
+                    pseudoMultiSelectForSingle: this.options.maxItemCount === 1,
+                    placeholder: placeholder,
+                    placeholderValue: placeholder ? placeholderValue : null,
+                }, this.getPhrases(), this.getClassNames());
             delete config.resetOnSubmit;
 
             if (!config.pseudoMultiSelectForSingle && !field.getAttribute('multiple') && config.maxItemCount === -1)
             {
                 config.pseudoMultiSelectForSingle = true;
-                config.maxItemCount = this.options.maxItemCount = 1;
+                config.maxItemCount = 1;
+                this.options.maxItemCount = 1;
             }
 
             return config;

@@ -254,7 +254,7 @@ var Choices = /** @class */function () {
     if (userConfig.allowHTML === undefined) {
       console.warn('Deprecation warning: allowHTML will default to false in a future release. To render HTML in Choices, you will need to set it to true. Setting allowHTML will suppress this message.');
     }
-    this.config = (0, utils_1.extend)(true, defaults_1.DEFAULT_CONFIG, Choices.defaults.options, userConfig);
+    this.config = (0, utils_1.extend)(true, {}, defaults_1.DEFAULT_CONFIG, Choices.defaults.options, userConfig);
     var invalidConfigOptions = (0, utils_1.diff)(this.config, defaults_1.DEFAULT_CONFIG);
     if (invalidConfigOptions.length) {
       console.warn('Unknown config option(s) passed', invalidConfigOptions.join(', '));
@@ -263,15 +263,16 @@ var Choices = /** @class */function () {
     if (!(passedElement instanceof HTMLInputElement || passedElement instanceof HTMLSelectElement)) {
       throw TypeError('Expected one of the following types text|select-one|select-multiple');
     }
-    this._isTextElement = passedElement.type === constants_1.TEXT_TYPE;
+    this._elementType = passedElement.type;
+    this._isTextElement = this._elementType === constants_1.TEXT_TYPE;
     if (this._isTextElement || this.config.maxItemCount !== 1) {
       this.config.pseudoMultiSelectForSingle = false;
     }
     if (this.config.pseudoMultiSelectForSingle) {
-      passedElement.setAttribute('multiple', 'multiple');
+      this._elementType = constants_1.SELECT_MULTIPLE_TYPE;
     }
-    this._isSelectOneElement = passedElement.type === constants_1.SELECT_ONE_TYPE;
-    this._isSelectMultipleElement = passedElement.type === constants_1.SELECT_MULTIPLE_TYPE;
+    this._isSelectOneElement = this._elementType === constants_1.SELECT_ONE_TYPE;
+    this._isSelectMultipleElement = this._elementType === constants_1.SELECT_MULTIPLE_TYPE;
     this._isSelectElement = this._isSelectOneElement || this._isSelectMultipleElement;
     this.config.searchEnabled = this._isSelectMultipleElement || this.config.searchEnabled;
     if (!['auto', 'always'].includes("".concat(this.config.renderSelectedChoices))) {
@@ -1647,7 +1648,7 @@ var Choices = /** @class */function () {
         _this.containerOuter.addFocusState();
       }
     }, _b);
-    focusActions[this.passedElement.element.type]();
+    focusActions[this._elementType]();
   };
   Choices.prototype._onBlur = function (_a) {
     var _b;
@@ -1681,7 +1682,7 @@ var Choices = /** @class */function () {
           }
         }
       }, _b);
-      blurActions[this.passedElement.element.type]();
+      blurActions[this._elementType]();
     } else {
       // On IE11, clicking the scollbar blurs our input and thus
       // closes the dropdown. To stop this, we refocus our input
@@ -1934,25 +1935,25 @@ var Choices = /** @class */function () {
     if (callbackOnCreateTemplates && typeof callbackOnCreateTemplates === 'function') {
       userTemplates = callbackOnCreateTemplates.call(this, utils_1.strToEl, defaultTemplates);
     }
-    this._templates = (0, utils_1.extend)(true, defaultTemplates, userTemplates);
+    this._templates = (0, utils_1.extend)(true, {}, defaultTemplates, userTemplates);
   };
   Choices.prototype._createElements = function () {
     this.containerOuter = new components_1.Container({
-      element: this._getTemplate('containerOuter', this._direction, this._isSelectElement, this._isSelectOneElement, this.config.searchEnabled, this.passedElement.element.type, this.config.labelId),
+      element: this._getTemplate('containerOuter', this._direction, this._isSelectElement, this._isSelectOneElement, this.config.searchEnabled, this._elementType, this.config.labelId),
       classNames: this.config.classNames,
-      type: this.passedElement.element.type,
+      type: this._elementType,
       position: this.config.position
     });
     this.containerInner = new components_1.Container({
       element: this._getTemplate('containerInner'),
       classNames: this.config.classNames,
-      type: this.passedElement.element.type,
+      type: this._elementType,
       position: this.config.position
     });
     this.input = new components_1.Input({
       element: this._getTemplate('input', this._placeholderValue),
       classNames: this.config.classNames,
-      type: this.passedElement.element.type,
+      type: this._elementType,
       preventPaste: !this.config.paste
     });
     this.choiceList = new components_1.List({
@@ -1964,7 +1965,7 @@ var Choices = /** @class */function () {
     this.dropdown = new components_1.Dropdown({
       element: this._getTemplate('dropdown'),
       classNames: this.config.classNames,
-      type: this.passedElement.element.type
+      type: this._elementType
     });
   };
   Choices.prototype._createStructure = function () {
