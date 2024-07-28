@@ -240,7 +240,7 @@ trait InstallerHelper
             {
                 $em = \XF::em();
                 /** @var PhraseEntity[] $phrases */
-                $phrases = \XF::em()->findByIds('XF:Phrase', \array_keys($results));
+                $phrases = Helper::findByIds(PhraseEntity::class, \array_keys($results));
                 foreach ($results AS $phraseId => $oldTitle)
                 {
                     if (isset($phrases[$phraseId]))
