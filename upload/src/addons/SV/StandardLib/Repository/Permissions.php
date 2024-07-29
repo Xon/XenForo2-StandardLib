@@ -19,7 +19,7 @@ class Permissions extends Repository
      */
     public function cacheGlobalPermissions(array $permissionCombinationIds)
     {
-        $db = $this->db();
+        $db = \XF::db();
 
         $cachedPerms = PermissionCache::getCachedGlobalPermissions();
         $uncachedCombinations = [];
@@ -58,7 +58,7 @@ class Permissions extends Repository
      */
     public function cachePermissions(string $contentType, string $permissionGroup, array $permissionMap)
     {
-        $db = $this->db();
+        $db = \XF::db();
 
         $allCachedPermissions = PermissionCache::getCachedContentPermissions();
         $conditions = [];

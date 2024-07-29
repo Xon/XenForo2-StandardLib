@@ -500,7 +500,7 @@ trait InstallerHelper
 
     protected function isCliRecommendedCheck(int $minAddonVersion, int $maxThreads, int $maxPosts, int $maxUsers) : bool
     {
-        $totals = \XF::app()->db()->fetchOne("
+        $totals = \XF::db()->fetchOne("
 			SELECT data_value
 			FROM xf_data_registry
 			WHERE data_key IN ('boardTotals', 'forumStatistics')

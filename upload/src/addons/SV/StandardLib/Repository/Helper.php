@@ -139,7 +139,7 @@ class Helper extends Repository
     public function rebuildAddOnVersionCache(): array
     {
         // unlike \XF::isAddOnActive, the add-on must not be in a processing state
-        $data = $this->db()->fetchPairs('
+        $data = \XF::db()->fetchPairs('
             SELECT addon_id, version_string
             FROM xf_addon
             WHERE `active` = 1 AND is_processing = 0

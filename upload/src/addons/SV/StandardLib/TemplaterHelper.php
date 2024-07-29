@@ -319,7 +319,7 @@ class TemplaterHelper
 
         $value[] = $toAdd;
 
-        return $wasCollection ? \XF::app()->em()->getBasicCollection([$value]) : $value;
+        return $wasCollection ? \XF::em()->getBasicCollection([$value]) : $value;
     }
 
     /**
@@ -370,7 +370,7 @@ class TemplaterHelper
             }
         }
 
-        return $wasCollection ? \XF::app()->em()->getBasicCollection([$value]) : $value;
+        return $wasCollection ? \XF::em()->getBasicCollection([$value]) : $value;
     }
 
     public function fnDynamicPhrase(BaseTemplater $templater, bool &$escape, string $value): Phrase
@@ -573,7 +573,7 @@ class TemplaterHelper
 
     protected function em(): Manager
     {
-        return \XF::app()->em();
+        return \XF::em();
     }
 
     protected function repository(string $identifier): Repository
