@@ -23,31 +23,10 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports.clearChoices = exports.activateChoices = exports.filterChoices = exports.removeChoice = exports.addChoice = void 0;
 var constants_1 = __webpack_require__(493);
-var addChoice = function (_a) {
-  var value = _a.value,
-    label = _a.label,
-    id = _a.id,
-    groupId = _a.groupId,
-    disabled = _a.disabled,
-    elementId = _a.elementId,
-    labelClass = _a.labelClass,
-    labelDescription = _a.labelDescription,
-    customProperties = _a.customProperties,
-    placeholder = _a.placeholder,
-    keyCode = _a.keyCode;
+var addChoice = function (choice) {
   return {
     type: constants_1.ACTION_TYPES.ADD_CHOICE,
-    value: value,
-    label: label,
-    id: id,
-    groupId: groupId,
-    disabled: disabled,
-    elementId: elementId,
-    labelClass: labelClass,
-    labelDescription: labelDescription,
-    customProperties: customProperties,
-    placeholder: placeholder,
-    keyCode: keyCode
+    choice: choice
   };
 };
 exports.addChoice = addChoice;
@@ -94,17 +73,10 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports.addGroup = void 0;
 var constants_1 = __webpack_require__(493);
-var addGroup = function (_a) {
-  var value = _a.value,
-    id = _a.id,
-    active = _a.active,
-    disabled = _a.disabled;
+var addGroup = function (group) {
   return {
     type: constants_1.ACTION_TYPES.ADD_GROUP,
-    value: value,
-    id: id,
-    active: active,
-    disabled: disabled
+    group: group
   };
 };
 exports.addGroup = addGroup;
@@ -121,37 +93,17 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports.highlightItem = exports.removeItem = exports.addItem = void 0;
 var constants_1 = __webpack_require__(493);
-var addItem = function (_a) {
-  var value = _a.value,
-    label = _a.label,
-    id = _a.id,
-    choiceId = _a.choiceId,
-    groupId = _a.groupId,
-    labelClass = _a.labelClass,
-    labelDescription = _a.labelDescription,
-    customProperties = _a.customProperties,
-    placeholder = _a.placeholder,
-    keyCode = _a.keyCode;
+var addItem = function (item) {
   return {
     type: constants_1.ACTION_TYPES.ADD_ITEM,
-    value: value,
-    label: label,
-    id: id,
-    choiceId: choiceId,
-    groupId: groupId,
-    labelClass: labelClass,
-    labelDescription: labelDescription,
-    customProperties: customProperties,
-    placeholder: placeholder,
-    keyCode: keyCode
+    item: item
   };
 };
 exports.addItem = addItem;
-var removeItem = function (id, choiceId) {
+var removeItem = function (item) {
   return {
     type: constants_1.ACTION_TYPES.REMOVE_ITEM,
-    id: id,
-    choiceId: choiceId
+    item: item
   };
 };
 exports.removeItem = removeItem;
@@ -234,6 +186,7 @@ var utils_1 = __webpack_require__(705);
 var reducers_1 = __webpack_require__(572);
 var store_1 = __importDefault(__webpack_require__(771));
 var templates_1 = __importDefault(__webpack_require__(543));
+var choice_input_1 = __webpack_require__(200);
 /** @see {@link http://browserhacks.com/#hack-acea075d0ac6954f275a70023906050c} */
 var IS_IE11 = '-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style;
 var USER_DEFAULTS = {};
@@ -332,25 +285,29 @@ var Choices = /** @class */function () {
     this._idNames = {
       itemChoice: 'item-choice'
     };
-    if (this._isSelectElement) {
-      // Assign preset groups from passed element
-      this._presetGroups = this.passedElement.optionGroups;
-      // Assign preset options from passed element
-      this._presetOptions = this.passedElement.options;
-    }
     // Assign preset choices from passed object
-    this._presetChoices = this.config.choices;
+    this._presetChoices = this.config.choices.map(function (e) {
+      return (0, choice_input_1.mapInputToChoice)(e, true);
+    });
     // Assign preset items from passed object first
-    this._presetItems = this.config.items;
+    this._presetItems = this.config.items.map(function (e) {
+      return (0, choice_input_1.mapInputToChoice)(e, false);
+    });
     // Add any values passed from attribute
-    if (this.passedElement.value && this._isTextElement) {
-      var splitValues = this.passedElement.value.split(this.config.delimiter);
-      this._presetItems = this._presetItems.concat(splitValues);
-    }
-    // Create array of choices from option elements
-    if (this.passedElement.options) {
+    if (this._isTextElement) {
+      var value = this.passedElement.value;
+      if (value) {
+        var elementItems = value.split(this.config.delimiter).map(function (e) {
+          return (0, choice_input_1.mapInputToChoice)(e, false);
+        });
+        this._presetItems = this._presetItems.concat(elementItems);
+      }
+    } else if (this._isSelectElement) {
+      // Create array of choices from option elements
       var choicesFromOptions = this.passedElement.optionsAsChoices();
-      (_a = this._presetChoices).push.apply(_a, choicesFromOptions);
+      if (choicesFromOptions) {
+        (_a = this._presetChoices).push.apply(_a, choicesFromOptions);
+      }
     }
     this._render = this._render.bind(this);
     this._onFocus = this._onFocus.bind(this);
@@ -426,9 +383,6 @@ var Choices = /** @class */function () {
     this.passedElement.reveal();
     this.containerOuter.unwrap(this.passedElement.element);
     this.clearStore();
-    if (this._isSelectElement) {
-      this.passedElement.options = this._presetOptions;
-    }
     this._templates = templates_1.default;
     this.initialised = false;
   };
@@ -461,22 +415,9 @@ var Choices = /** @class */function () {
     if (!item || !item.id) {
       return this;
     }
-    var id = item.id,
-      _a = item.groupId,
-      groupId = _a === void 0 ? -1 : _a,
-      _b = item.value,
-      value = _b === void 0 ? '' : _b,
-      _c = item.label,
-      label = _c === void 0 ? '' : _c;
-    var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
-    this._store.dispatch((0, items_1.highlightItem)(id, true));
+    this._store.dispatch((0, items_1.highlightItem)(item.id, true));
     if (runEvent) {
-      this.passedElement.triggerEvent(constants_1.EVENTS.highlightItem, {
-        id: id,
-        value: value,
-        label: label,
-        groupValue: group && group.value ? group.value : null
-      });
+      this.passedElement.triggerEvent(constants_1.EVENTS.highlightItem, this._getChoiceForEvent(item));
     }
     return this;
   };
@@ -484,53 +425,48 @@ var Choices = /** @class */function () {
     if (!item || !item.id) {
       return this;
     }
-    var id = item.id,
-      _a = item.groupId,
-      groupId = _a === void 0 ? -1 : _a,
-      _b = item.value,
-      value = _b === void 0 ? '' : _b,
-      _c = item.label,
-      label = _c === void 0 ? '' : _c;
-    var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
-    this._store.dispatch((0, items_1.highlightItem)(id, false));
-    this.passedElement.triggerEvent(constants_1.EVENTS.highlightItem, {
-      id: id,
-      value: value,
-      label: label,
-      groupValue: group && group.value ? group.value : null
-    });
+    this._store.dispatch((0, items_1.highlightItem)(item.id, false));
+    this.passedElement.triggerEvent(constants_1.EVENTS.highlightItem, this._getChoiceForEvent(item));
     return this;
   };
   Choices.prototype.highlightAll = function () {
     var _this = this;
-    this._store.items.forEach(function (item) {
-      return _this.highlightItem(item);
+    this._store.withDeferRendering(function () {
+      _this._store.items.forEach(function (item) {
+        return _this.highlightItem(item);
+      });
     });
     return this;
   };
   Choices.prototype.unhighlightAll = function () {
     var _this = this;
-    this._store.items.forEach(function (item) {
-      return _this.unhighlightItem(item);
+    this._store.withDeferRendering(function () {
+      _this._store.items.forEach(function (item) {
+        return _this.unhighlightItem(item);
+      });
     });
     return this;
   };
   Choices.prototype.removeActiveItemsByValue = function (value) {
     var _this = this;
-    this._store.activeItems.filter(function (item) {
-      return item.value === value;
-    }).forEach(function (item) {
-      return _this._removeItem(item);
+    this._store.withDeferRendering(function () {
+      _this._store.activeItems.filter(function (item) {
+        return item.value === value;
+      }).forEach(function (item) {
+        return _this._removeItem(item);
+      });
     });
     return this;
   };
   Choices.prototype.removeActiveItems = function (excludedId) {
     var _this = this;
-    this._store.activeItems.filter(function (_a) {
-      var id = _a.id;
-      return id !== excludedId;
-    }).forEach(function (item) {
-      return _this._removeItem(item);
+    this._store.withDeferRendering(function () {
+      _this._store.activeItems.filter(function (_a) {
+        var id = _a.id;
+        return id !== excludedId;
+      }).forEach(function (item) {
+        return _this._removeItem(item);
+      });
     });
     return this;
   };
@@ -539,13 +475,15 @@ var Choices = /** @class */function () {
     if (runEvent === void 0) {
       runEvent = false;
     }
-    this._store.highlightedActiveItems.forEach(function (item) {
-      _this._removeItem(item);
-      // If this action was performed by the user
-      // trigger the event
-      if (runEvent) {
-        _this._triggerChange(item.value);
-      }
+    this._store.withDeferRendering(function () {
+      _this._store.highlightedActiveItems.forEach(function (item) {
+        _this._removeItem(item);
+        // If this action was performed by the user
+        // trigger the event
+        if (runEvent) {
+          _this._triggerChange(item.value);
+        }
+      });
     });
     return this;
   };
@@ -596,8 +534,10 @@ var Choices = /** @class */function () {
     if (!this.initialised) {
       return this;
     }
-    items.forEach(function (value) {
-      return _this._setChoiceOrItem(value);
+    this._store.withDeferRendering(function () {
+      items.forEach(function (value) {
+        _this._addChoice((0, choice_input_1.mapInputToChoice)(value, false));
+      });
     });
     return this;
   };
@@ -606,11 +546,13 @@ var Choices = /** @class */function () {
     if (!this.initialised || this._isTextElement) {
       return this;
     }
-    // If only one value has been passed, convert to array
-    var choiceValue = Array.isArray(value) ? value : [value];
-    // Loop through each value and
-    choiceValue.forEach(function (val) {
-      return _this._findAndSelectChoiceByValue(val);
+    this._store.withDeferRendering(function () {
+      // If only one value has been passed, convert to array
+      var choiceValue = Array.isArray(value) ? value : [value];
+      // Loop through each value and
+      choiceValue.forEach(function (val) {
+        return _this._findAndSelectChoiceByValue(val);
+      });
     });
     return this;
   };
@@ -739,30 +681,30 @@ var Choices = /** @class */function () {
       throw new TypeError(".setChoices must be called either with array of choices with a function resulting into Promise of array of choices");
     }
     this.containerOuter.removeLoadingState();
-    this._startLoading();
-    choicesArrayOrFetcher.forEach(function (groupOrChoice) {
-      if (groupOrChoice.choices) {
-        _this._addGroup({
-          id: groupOrChoice.id ? parseInt("".concat(groupOrChoice.id), 10) : null,
-          group: groupOrChoice,
-          valueKey: value,
-          labelKey: label
-        });
-      } else {
-        var choice = groupOrChoice;
-        _this._addChoice({
-          value: choice[value],
-          label: choice[label],
-          isSelected: !!choice.selected,
-          isDisabled: !!choice.disabled,
-          placeholder: !!choice.placeholder,
-          labelClass: choice.labelClass,
-          labelDescription: choice.labelDescription,
-          customProperties: choice.customProperties
-        });
-      }
+    this._store.withDeferRendering(function () {
+      var isDefaultValue = value === 'value';
+      var isDefaultLabel = label === 'label';
+      choicesArrayOrFetcher.forEach(function (groupOrChoice) {
+        if (groupOrChoice.choices) {
+          var group = groupOrChoice;
+          if (!isDefaultLabel) {
+            group = (0, utils_1.extend)(true, {}, group, {
+              label: group[label]
+            });
+          }
+          _this._addGroup((0, choice_input_1.mapInputToChoice)(group, true));
+        } else {
+          var choice = groupOrChoice;
+          if (!isDefaultLabel || !isDefaultValue) {
+            choice = (0, utils_1.extend)(true, {}, choice, {
+              value: choice[value],
+              label: choice[label]
+            });
+          }
+          _this._addChoice((0, choice_input_1.mapInputToChoice)(choice, false));
+        }
+      });
     });
-    this._stopLoading();
     return this;
   };
   Choices.prototype.removeChoice = function (value) {
@@ -1000,9 +942,6 @@ var Choices = /** @class */function () {
         var value = _a.value;
         return value;
       }).join(this.config.delimiter);
-    } else {
-      // Update the options of the hidden input
-      this.passedElement.options = items;
     }
     var addItemToFragment = function (item) {
       // Create new list element
@@ -1014,6 +953,32 @@ var Choices = /** @class */function () {
     items.forEach(addItemToFragment);
     return fragment;
   };
+  Choices.prototype._getChoiceForEvent = function (choice) {
+    var id = choice.id,
+      _a = choice.value,
+      value = _a === void 0 ? '' : _a,
+      _b = choice.groupId,
+      groupId = _b === void 0 ? -1 : _b,
+      _c = choice.label,
+      label = _c === void 0 ? '' : _c,
+      labelClass = choice.labelClass,
+      labelDescription = choice.labelDescription,
+      customProperties = choice.customProperties,
+      keyCode = choice.keyCode,
+      element = choice.element;
+    var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
+    return {
+      id: id,
+      value: value,
+      label: label,
+      labelClass: labelClass,
+      labelDescription: labelDescription,
+      customProperties: customProperties,
+      groupValue: group && group.value ? group.value : null,
+      element: element,
+      keyCode: keyCode
+    };
+  };
   Choices.prototype._triggerChange = function (value) {
     if (value === undefined || value === null) {
       return;
@@ -1023,13 +988,7 @@ var Choices = /** @class */function () {
     });
   };
   Choices.prototype._selectPlaceholderChoice = function (placeholderChoice) {
-    this._addItem({
-      value: placeholderChoice.value,
-      label: placeholderChoice.label,
-      choiceId: placeholderChoice.id,
-      groupId: placeholderChoice.groupId,
-      placeholder: placeholderChoice.placeholder
-    });
+    this._addItem(placeholderChoice);
     if (placeholderChoice.value) {
       this._triggerChange(placeholderChoice.value);
     }
@@ -1079,6 +1038,7 @@ var Choices = /** @class */function () {
     this.input.focus();
   };
   Choices.prototype._handleChoiceAction = function (activeItems, element) {
+    var _this = this;
     if (!activeItems) {
       return;
     }
@@ -1096,35 +1056,22 @@ var Choices = /** @class */function () {
       choice: choice
     });
     var triggerChange = false;
-    this._startLoading();
-    try {
+    this._store.withDeferRendering(function () {
       if (!choice.selected && !choice.disabled) {
-        var canAddItem = this._canAddItem(activeItems, choice.value);
+        var canAddItem = _this._canAddItem(activeItems, choice.value);
         if (canAddItem.response) {
-          if (this.config.pseudoMultiSelectForSingle) {
+          if (_this.config.pseudoMultiSelectForSingle) {
             var lastItem = activeItems[activeItems.length - 1];
             if (lastItem) {
-              this._removeItem(lastItem);
+              _this._removeItem(lastItem);
             }
           }
-          this._addItem({
-            value: choice.value,
-            label: choice.label,
-            choiceId: choice.id,
-            groupId: choice.groupId,
-            labelClass: choice.labelClass,
-            labelDescription: choice.labelDescription,
-            customProperties: choice.customProperties,
-            placeholder: choice.placeholder,
-            keyCode: choice.keyCode
-          });
+          _this._addItem(choice);
           triggerChange = true;
         }
       }
-      this.clearInput();
-    } finally {
-      this._stopLoading();
-    }
+      _this.clearInput();
+    });
     if (triggerChange) {
       this._triggerChange(choice.value);
     }
@@ -1158,10 +1105,10 @@ var Choices = /** @class */function () {
     }
   };
   Choices.prototype._startLoading = function () {
-    this._store.dispatch((0, misc_1.setIsLoading)(true));
+    this._store.startDeferRendering();
   };
   Choices.prototype._stopLoading = function () {
-    this._store.dispatch((0, misc_1.setIsLoading)(false));
+    this._store.stopDeferRendering();
   };
   Choices.prototype._handleLoadingState = function (setLoading) {
     if (setLoading === void 0) {
@@ -1464,13 +1411,13 @@ var Choices = /** @class */function () {
       }
       if (canAdd.response) {
         this.hideDropdown(true);
-        this._addItem({
+        this._addChoice((0, choice_input_1.mapInputToChoice)({
           value: this.config.allowHtmlUserInput ? value : (0, utils_1.sanitise)(value),
           label: {
             escaped: (0, utils_1.sanitise)(value),
             raw: value
           }
-        });
+        }, false));
         this._triggerChange(value);
         this.clearInput();
         addedItem = true;
@@ -1763,184 +1710,54 @@ var Choices = /** @class */function () {
       this.containerOuter.setActiveDescendant(passedEl.id);
     }
   };
-  Choices.prototype._addItem = function (_a) {
-    var value = _a.value,
-      _b = _a.label,
-      label = _b === void 0 ? null : _b,
-      _c = _a.choiceId,
-      choiceId = _c === void 0 ? -1 : _c,
-      _d = _a.groupId,
-      groupId = _d === void 0 ? -1 : _d,
-      _e = _a.labelClass,
-      labelClass = _e === void 0 ? null : _e,
-      _f = _a.labelDescription,
-      labelDescription = _f === void 0 ? null : _f,
-      _g = _a.customProperties,
-      customProperties = _g === void 0 ? {} : _g,
-      _h = _a.placeholder,
-      placeholder = _h === void 0 ? false : _h,
-      _j = _a.keyCode,
-      keyCode = _j === void 0 ? -1 : _j;
-    var passedValue = typeof value === 'string' ? value.trim() : value;
-    var items = this._store.items;
-    var passedLabel = label || passedValue;
-    var passedOptionId = choiceId || -1;
-    var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
-    var id = items ? items.length + 1 : 1;
-    // If a prepended value has been passed, prepend it
-    if (this.config.prependValue) {
-      passedValue = this.config.prependValue + passedValue.toString();
+  Choices.prototype._addItem = function (item) {
+    var id = item.id;
+    if (typeof id !== 'number') {
+      throw new TypeError('item.id must be set before _addItem is called for a choice/item');
     }
-    // If an appended value has been passed, append it
-    if (this.config.appendValue) {
-      passedValue += this.config.appendValue.toString();
-    }
-    this._store.dispatch((0, items_1.addItem)({
-      value: passedValue,
-      label: passedLabel,
-      id: id,
-      choiceId: passedOptionId,
-      groupId: groupId,
-      labelClass: labelClass,
-      labelDescription: labelDescription,
-      customProperties: customProperties,
-      placeholder: placeholder,
-      keyCode: keyCode
-    }));
+    this._store.dispatch((0, items_1.addItem)(item));
     if (this._isSelectOneElement) {
       this.removeActiveItems(id);
     }
-    // Trigger change event
-    this.passedElement.triggerEvent(constants_1.EVENTS.addItem, {
-      id: id,
-      value: passedValue,
-      label: passedLabel,
-      labelClass: labelClass,
-      labelDescription: labelDescription,
-      customProperties: customProperties,
-      groupValue: group && group.value ? group.value : null,
-      keyCode: keyCode
-    });
+    this.passedElement.triggerEvent(constants_1.EVENTS.addItem, this._getChoiceForEvent(item));
   };
   Choices.prototype._removeItem = function (item) {
-    var id = item.id,
-      value = item.value,
-      label = item.label,
-      labelClass = item.labelClass,
-      labelDescription = item.labelDescription,
-      customProperties = item.customProperties,
-      choiceId = item.choiceId,
-      groupId = item.groupId;
-    var group = groupId && groupId >= 0 ? this._store.getGroupById(groupId) : null;
-    if (!id || !choiceId) {
+    var id = item.id;
+    if (!id) {
       return;
     }
-    this._store.dispatch((0, items_1.removeItem)(id, choiceId));
-    this.passedElement.triggerEvent(constants_1.EVENTS.removeItem, {
-      id: id,
-      value: value,
-      label: label,
-      labelClass: labelClass,
-      labelDescription: labelDescription,
-      customProperties: customProperties,
-      groupValue: group && group.value ? group.value : null
-    });
+    this._store.dispatch((0, items_1.removeItem)(item));
+    this.passedElement.triggerEvent(constants_1.EVENTS.removeItem, this._getChoiceForEvent(item));
   };
-  Choices.prototype._addChoice = function (_a) {
-    var value = _a.value,
-      _b = _a.label,
-      label = _b === void 0 ? null : _b,
-      _c = _a.isSelected,
-      isSelected = _c === void 0 ? false : _c,
-      _d = _a.isDisabled,
-      isDisabled = _d === void 0 ? false : _d,
-      _e = _a.groupId,
-      groupId = _e === void 0 ? -1 : _e,
-      _f = _a.labelClass,
-      labelClass = _f === void 0 ? null : _f,
-      _g = _a.labelDescription,
-      labelDescription = _g === void 0 ? null : _g,
-      _h = _a.customProperties,
-      customProperties = _h === void 0 ? {} : _h,
-      _j = _a.placeholder,
-      placeholder = _j === void 0 ? false : _j,
-      _k = _a.keyCode,
-      keyCode = _k === void 0 ? -1 : _k;
-    if (typeof value === 'undefined' || value === null) {
-      return;
+  Choices.prototype._addChoice = function (choice) {
+    if (typeof choice.id === 'number') {
+      throw new TypeError('Can not re-add a choice which has already been added');
     }
-    // Generate unique id
+    // Generate unique id, in-place update is required so chaining _addItem works as expected
     var choices = this._store.choices;
-    var choiceLabel = label || value;
-    var choiceId = choices ? choices.length + 1 : 1;
-    var choiceElementId = "".concat(this._baseId, "-").concat(this._idNames.itemChoice, "-").concat(choiceId);
-    this._store.dispatch((0, choices_1.addChoice)({
-      id: choiceId,
-      groupId: groupId,
-      elementId: choiceElementId,
-      value: value,
-      label: choiceLabel,
-      disabled: isDisabled,
-      labelClass: labelClass,
-      labelDescription: labelDescription,
-      customProperties: customProperties,
-      placeholder: placeholder,
-      keyCode: keyCode
-    }));
-    if (isSelected) {
-      this._addItem({
-        value: value,
-        label: choiceLabel,
-        choiceId: choiceId,
-        labelClass: labelClass,
-        labelDescription: labelDescription,
-        customProperties: customProperties,
-        placeholder: placeholder,
-        keyCode: keyCode
-      });
+    var item = choice;
+    item.id = choices ? choices.length + 1 : 1;
+    item.elementId = "".concat(this._baseId, "-").concat(this._idNames.itemChoice, "-").concat(item.id);
+    this._store.dispatch((0, choices_1.addChoice)(choice));
+    if (choice.selected) {
+      this._addItem(choice);
     }
   };
-  Choices.prototype._addGroup = function (_a) {
+  Choices.prototype._addGroup = function (group) {
     var _this = this;
-    var group = _a.group,
-      id = _a.id,
-      _b = _a.valueKey,
-      valueKey = _b === void 0 ? 'value' : _b,
-      _c = _a.labelKey,
-      labelKey = _c === void 0 ? 'label' : _c;
-    var groupChoices = (0, utils_1.isType)('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
-    var groupId = id || Math.floor(new Date().valueOf() * Math.random());
-    var isDisabled = group.disabled ? group.disabled : false;
-    if (groupChoices) {
-      this._store.dispatch((0, groups_1.addGroup)({
-        value: group.label,
-        id: groupId,
-        active: true,
-        disabled: isDisabled
-      }));
-      var addGroupChoices = function (choice) {
-        var isOptDisabled = choice.disabled || choice.parentNode && choice.parentNode.disabled;
-        _this._addChoice({
-          value: choice[valueKey],
-          label: (0, utils_1.isType)('Object', choice) ? choice[labelKey] : choice.innerHTML,
-          isSelected: choice.selected,
-          isDisabled: isOptDisabled,
-          groupId: groupId,
-          labelClass: choice.labelClass,
-          labelDescription: choice.labelDescription,
-          customProperties: choice.customProperties,
-          placeholder: choice.placeholder
-        });
-      };
-      groupChoices.forEach(addGroupChoices);
-    } else {
-      this._store.dispatch((0, groups_1.addGroup)({
-        value: group.label,
-        id: group.id,
-        active: false,
-        disabled: group.disabled
-      }));
+    this._store.dispatch((0, groups_1.addGroup)(group));
+    if (!group.choices) {
+      return;
     }
+    var id = group.id;
+    group.choices.forEach(function (choice) {
+      var item = choice;
+      item.groupId = id;
+      if (group.disabled) {
+        item.disabled = true;
+      }
+      _this._addChoice(item);
+    });
   };
   Choices.prototype._getTemplate = function (template) {
     var _a;
@@ -1991,6 +1808,7 @@ var Choices = /** @class */function () {
     });
   };
   Choices.prototype._createStructure = function () {
+    var _this = this;
     // Hide original element
     this.passedElement.conceal();
     // Wrap input in container preserving DOM ordering
@@ -2016,35 +1834,14 @@ var Choices = /** @class */function () {
     } else if (this.config.searchEnabled) {
       this.dropdown.element.insertBefore(this.input.element, this.dropdown.element.firstChild);
     }
-    if (this._isSelectElement) {
-      this._highlightPosition = 0;
-      this._isSearching = false;
-      this._startLoading();
-      this._addPredefinedChoices(this._presetChoices);
-      this._stopLoading();
-    }
-    if (this._isTextElement) {
-      this._addPredefinedItems(this._presetItems);
-    }
-  };
-  Choices.prototype._addPredefinedGroups = function (groups) {
-    var _this = this;
-    // If we have a placeholder option
-    var placeholderChoice = this.passedElement.placeholderOption;
-    if (placeholderChoice && placeholderChoice.parentNode && placeholderChoice.parentNode.tagName === 'SELECT') {
-      this._addChoice({
-        value: placeholderChoice.value,
-        label: placeholderChoice.innerHTML,
-        isSelected: placeholderChoice.selected,
-        isDisabled: placeholderChoice.disabled,
-        placeholder: true
-      });
-    }
-    groups.forEach(function (group) {
-      return _this._addGroup({
-        group: group,
-        id: group.id || null
-      });
+    this._highlightPosition = 0;
+    this._isSearching = false;
+    this._store.withDeferRendering(function () {
+      if (_this._isSelectElement) {
+        _this._addPredefinedChoices(_this._presetChoices);
+      } else if (_this._isTextElement) {
+        _this._addPredefinedItems(_this._presetItems);
+      }
     });
   };
   Choices.prototype._addPredefinedChoices = function (choices) {
@@ -2059,21 +1856,11 @@ var Choices = /** @class */function () {
     var firstEnabledChoiceIndex = choices.findIndex(function (choice) {
       return choice.disabled === undefined || !choice.disabled;
     });
-    choices.forEach(function (choice, index) {
-      var _a = choice.value,
-        value = _a === void 0 ? '' : _a,
-        label = choice.label,
-        labelClass = choice.labelClass,
-        labelDescription = choice.labelDescription,
-        customProperties = choice.customProperties,
-        placeholder = choice.placeholder;
+    choices.forEach(function (item, index) {
       if (_this._isSelectElement) {
         // If the choice is actually a group
-        if (choice.choices) {
-          _this._addGroup({
-            group: choice,
-            id: choice.id || null
-          });
+        if (item.choices) {
+          _this._addGroup(item);
         } else {
           /**
            * If there is a selected choice already or the choice is not the first in
@@ -2081,104 +1868,22 @@ var Choices = /** @class */function () {
            *
            * Otherwise we pre-select the first enabled choice in the array ("select-one" only)
            */
-          var shouldPreselect = _this._isSelectOneElement && !hasSelectedChoice && index === firstEnabledChoiceIndex;
-          var isSelected = shouldPreselect ? true : choice.selected;
-          var isDisabled = choice.disabled;
-          _this._addChoice({
-            value: value,
-            label: label,
-            isSelected: !!isSelected,
-            isDisabled: !!isDisabled,
-            placeholder: !!placeholder,
-            labelClass: labelClass,
-            labelDescription: labelDescription,
-            customProperties: customProperties
-          });
+          var choice = item;
+          if (_this._isSelectOneElement && !hasSelectedChoice && index === firstEnabledChoiceIndex) {
+            choice.selected = true;
+          }
+          _this._addChoice(choice);
         }
       } else {
-        _this._addChoice({
-          value: value,
-          label: label,
-          isSelected: !!choice.selected,
-          isDisabled: !!choice.disabled,
-          placeholder: !!choice.placeholder,
-          labelClass: labelClass,
-          labelDescription: labelDescription,
-          customProperties: customProperties
-        });
+        _this._addChoice(item);
       }
     });
   };
   Choices.prototype._addPredefinedItems = function (items) {
     var _this = this;
     items.forEach(function (item) {
-      if (typeof item === 'object' && item.value) {
-        _this._addItem({
-          value: item.value,
-          label: item.label,
-          choiceId: item.id,
-          customProperties: item.customProperties,
-          labelClass: item.labelClass,
-          labelDescription: item.labelDescription,
-          placeholder: item.placeholder
-        });
-      }
-      if (typeof item === 'string') {
-        _this._addItem({
-          value: item
-        });
-      }
+      _this._addChoice(item);
     });
-  };
-  Choices.prototype._setChoiceOrItem = function (item) {
-    var _this = this;
-    var itemType = (0, utils_1.getType)(item).toLowerCase();
-    var handleType = {
-      object: function () {
-        if (!item.value) {
-          return;
-        }
-        // If we are dealing with a select input, we need to create an option first
-        // that is then selected. For text inputs we can just add items normally.
-        if (!_this._isTextElement) {
-          _this._addChoice({
-            value: item.value,
-            label: item.label,
-            isSelected: true,
-            isDisabled: false,
-            labelClass: item.labelClass,
-            labelDescription: item.labelDescription,
-            customProperties: item.customProperties,
-            placeholder: item.placeholder
-          });
-        } else {
-          _this._addItem({
-            value: item.value,
-            label: item.label,
-            choiceId: item.id,
-            labelClass: item.labelClass,
-            labelDescription: item.labelDescription,
-            customProperties: item.customProperties,
-            placeholder: item.placeholder
-          });
-        }
-      },
-      string: function () {
-        if (!_this._isTextElement) {
-          _this._addChoice({
-            value: item,
-            label: item,
-            isSelected: true,
-            isDisabled: false
-          });
-        } else {
-          _this._addItem({
-            value: item
-          });
-        }
-      }
-    };
-    handleType[itemType]();
   };
   Choices.prototype._findAndSelectChoiceByValue = function (value) {
     var _this = this;
@@ -2188,17 +1893,7 @@ var Choices = /** @class */function () {
       return _this.config.valueComparer(choice.value, value);
     });
     if (foundChoice && !foundChoice.selected) {
-      this._addItem({
-        value: foundChoice.value,
-        label: foundChoice.label,
-        choiceId: foundChoice.id,
-        groupId: foundChoice.groupId,
-        labelClass: foundChoice.labelClass,
-        labelDescription: foundChoice.labelDescription,
-        customProperties: foundChoice.customProperties,
-        placeholder: foundChoice.placeholder,
-        keyCode: foundChoice.keyCode
-      });
+      this._addItem(foundChoice);
     }
   };
   Choices.prototype._generatePlaceholderValue = function () {
@@ -2922,7 +2617,7 @@ var WrappedSelect = /** @class */function (_super) {
       var fragment = document.createDocumentFragment();
       var addOptionToFragment = function (data) {
         // Create a standard select option
-        var option = _this.template(data);
+        var option = data.element ? data.element : _this.template(data);
         // Append it to fragment
         fragment.appendChild(option);
       };
@@ -2957,7 +2652,9 @@ var WrappedSelect = /** @class */function (_super) {
     return {
       value: option.value,
       label: option.innerHTML,
-      selected: !!option.selected,
+      element: option,
+      active: true,
+      selected: option.selected,
       disabled: option.disabled,
       placeholder: option.value === '' || option.hasAttribute('placeholder'),
       labelClass: typeof option.dataset.labelClass !== 'undefined' ? option.dataset.labelClass.split(' ') : undefined,
@@ -2967,12 +2664,17 @@ var WrappedSelect = /** @class */function (_super) {
   };
   WrappedSelect.prototype._optgroupToChoice = function (optgroup) {
     var _this = this;
+    var options = optgroup.querySelectorAll('option');
+    var choices = Array.from(options).map(function (option) {
+      return _this._optionToChoice(option);
+    });
     return {
-      label: optgroup.label || '',
-      disabled: !!optgroup.disabled,
-      choices: Array.from(optgroup.querySelectorAll('option')).map(function (option) {
-        return _this._optionToChoice(option);
-      })
+      id: Math.floor(new Date().valueOf() * Math.random()),
+      value: optgroup.label || '',
+      element: optgroup,
+      active: choices.length !== 0,
+      disabled: optgroup.disabled,
+      choices: choices
     };
   };
   return WrappedSelect;
@@ -3244,7 +2946,6 @@ __exportStar(__webpack_require__(405), exports);
 __exportStar(__webpack_require__(424), exports);
 __exportStar(__webpack_require__(394), exports);
 __exportStar(__webpack_require__(30), exports);
-__exportStar(__webpack_require__(13), exports);
 __exportStar(__webpack_require__(536), exports);
 __exportStar(__webpack_require__(641), exports);
 __exportStar(__webpack_require__(411), exports);
@@ -3253,17 +2954,6 @@ __exportStar(__webpack_require__(89), exports);
 __exportStar(__webpack_require__(638), exports);
 __exportStar(__webpack_require__(512), exports);
 __exportStar(__webpack_require__(132), exports);
-
-/***/ }),
-
-/***/ 13:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
 
 /***/ }),
 
@@ -3352,6 +3042,63 @@ Object.defineProperty(exports, "__esModule", ({
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
+
+/***/ }),
+
+/***/ 200:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.mapInputToChoice = void 0;
+var mapInputToChoice = function (value, allowGroup) {
+  if (typeof value === 'string') {
+    return (0, exports.mapInputToChoice)({
+      value: value,
+      label: value,
+      selected: true
+    }, false);
+  }
+  if (value.choices) {
+    if (!allowGroup) {
+      // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/optgroup
+      throw new TypeError("optGroup is not allowed");
+    }
+    var group = value;
+    var choices = group.choices.map(function (e) {
+      return (0, exports.mapInputToChoice)(e, false);
+    });
+    return {
+      id: group.id || Math.floor(new Date().valueOf() * Math.random()),
+      value: group.label,
+      active: choices.length !== 0,
+      disabled: !!group.disabled,
+      choices: choices
+    };
+  }
+  var choice = value;
+  var coerceBool = function (arg, defaultValue) {
+    if (defaultValue === void 0) {
+      defaultValue = true;
+    }
+    return typeof arg === 'undefined' ? defaultValue : !!arg;
+  };
+  return {
+    value: choice.value,
+    label: choice.label || choice.value,
+    active: coerceBool(choice.active),
+    selected: coerceBool(choice.selected, false),
+    disabled: coerceBool(choice.disabled, false),
+    placeholder: coerceBool(choice.placeholder, false),
+    labelClass: choice.labelClass,
+    labelDescription: choice.labelDescription,
+    customProperties: choice.customProperties
+  };
+};
+exports.mapInputToChoice = mapInputToChoice;
 
 /***/ }),
 
@@ -3501,6 +3248,9 @@ var unwrapStringForRaw = function (s) {
       return s.raw;
     }
   }
+  if (s === null || s === undefined) {
+    return '';
+  }
   return "".concat(s);
 };
 exports.unwrapStringForRaw = unwrapStringForRaw;
@@ -3515,6 +3265,9 @@ var unwrapStringForEscaped = function (s) {
     if ('trusted' in s) {
       return s.trusted;
     }
+  }
+  if (s === null || s === undefined) {
+    return '';
   }
   return "".concat(s);
 };
@@ -3698,22 +3451,7 @@ function choices(state, action) {
   switch (action.type) {
     case 'ADD_CHOICE':
       {
-        var addChoiceAction = action;
-        var choice = {
-          id: addChoiceAction.id,
-          elementId: addChoiceAction.elementId,
-          groupId: addChoiceAction.groupId,
-          value: addChoiceAction.value,
-          label: addChoiceAction.label || addChoiceAction.value,
-          disabled: addChoiceAction.disabled || false,
-          selected: false,
-          active: true,
-          score: 9999,
-          labelClass: addChoiceAction.labelClass,
-          labelDescription: addChoiceAction.labelDescription,
-          customProperties: addChoiceAction.customProperties,
-          placeholder: addChoiceAction.placeholder || false
-        };
+        var choice = action.choice;
         /*
           A disabled choice appears in the choice dropdown but cannot be selected
           A selected choice has been added to the passed input's value (added as an item)
@@ -3723,52 +3461,37 @@ function choices(state, action) {
       }
     case 'REMOVE_CHOICE':
       {
-        var removeChoiceAction = action;
-        var choiceValue_1 = removeChoiceAction.value;
+        var value_1 = action.value;
         return state.filter(function (choice) {
-          return choice.value !== choiceValue_1;
+          return choice.value !== value_1;
         });
       }
     case 'ADD_ITEM':
       {
-        var addItemAction_1 = action;
-        // When an item is added and it has an associated choice,
-        // we want to disable it so it can't be chosen again
-        if (addItemAction_1.choiceId > -1) {
-          return state.map(function (obj) {
-            var choice = obj;
-            if (choice.id === parseInt("".concat(addItemAction_1.choiceId), 10)) {
-              choice.selected = true;
-            }
-            return choice;
-          });
+        var item = action.item;
+        // trigger a rebuild of the choices list as the item can not be added multiple times
+        if (item.id && item.selected) {
+          return __spreadArray([], state, true);
         }
         return state;
       }
     case 'REMOVE_ITEM':
       {
-        var removeItemAction_1 = action;
-        // When an item is removed and it has an associated choice,
-        // we want to re-enable it so it can be chosen again
-        if (removeItemAction_1.choiceId && removeItemAction_1.choiceId > -1) {
-          return state.map(function (obj) {
-            var choice = obj;
-            if (choice.id === parseInt("".concat(removeItemAction_1.choiceId), 10)) {
-              choice.selected = false;
-            }
-            return choice;
-          });
+        var item = action.item;
+        // trigger a rebuild of the choices list as the item can be added
+        if (item.id && !item.selected) {
+          return __spreadArray([], state, true);
         }
         return state;
       }
     case 'FILTER_CHOICES':
       {
-        var filterChoicesAction_1 = action;
+        var results_1 = action.results;
         return state.map(function (obj) {
           var choice = obj;
           // Set active state based on whether choice is
           // within filtered results
-          choice.active = filterChoicesAction_1.results.some(function (_a) {
+          choice.active = results_1.some(function (_a) {
             var item = _a.item,
               score = _a.score;
             if (item.id === choice.id) {
@@ -3782,10 +3505,10 @@ function choices(state, action) {
       }
     case 'ACTIVATE_CHOICES':
       {
-        var activateChoicesAction_1 = action;
+        var active_1 = action.active;
         return state.map(function (obj) {
           var choice = obj;
-          choice.active = activateChoicesAction_1.active;
+          choice.active = active_1;
           return choice;
         });
       }
@@ -3833,12 +3556,7 @@ function groups(state, action) {
     case 'ADD_GROUP':
       {
         var addGroupAction = action;
-        return __spreadArray(__spreadArray([], state, true), [{
-          id: addGroupAction.id,
-          value: addGroupAction.value,
-          active: addGroupAction.active,
-          disabled: addGroupAction.disabled
-        }], false);
+        return __spreadArray(__spreadArray([], state, true), [addGroupAction.group], false);
       }
     case 'CLEAR_CHOICES':
       {
@@ -3877,7 +3595,7 @@ exports.defaultState = {
   groups: [],
   items: [],
   choices: [],
-  loading: false
+  loading: 0
 };
 var appReducer = (0, redux_1.combineReducers)({
   items: items_1.default,
@@ -3932,46 +3650,43 @@ function items(state, action) {
   switch (action.type) {
     case 'ADD_ITEM':
       {
-        var addItemAction = action;
-        // Add object to items array
-        var newState = __spreadArray(__spreadArray([], state, true), [{
-          id: addItemAction.id,
-          choiceId: addItemAction.choiceId,
-          groupId: addItemAction.groupId,
-          value: addItemAction.value,
-          label: addItemAction.label,
-          active: true,
-          highlighted: false,
-          labelClass: addItemAction.labelClass,
-          labelDescription: addItemAction.labelDescription,
-          customProperties: addItemAction.customProperties,
-          placeholder: addItemAction.placeholder || false,
-          keyCode: null
-        }], false);
-        return newState.map(function (obj) {
-          var item = obj;
-          item.highlighted = false;
-          return item;
+        var item = action.item;
+        if (!item.id) {
+          return state;
+        }
+        item.selected = true;
+        var el = item.element;
+        if (el) {
+          el.selected = true;
+          el.setAttribute('selected', '');
+        }
+        return __spreadArray(__spreadArray([], state, true), [item], false).map(function (obj) {
+          var choice = obj;
+          choice.highlighted = false;
+          return choice;
         });
       }
     case 'REMOVE_ITEM':
       {
-        var removeItemAction_1 = action;
-        // Set item to inactive
-        return state.map(function (obj) {
-          var item = obj;
-          if (item.id === removeItemAction_1.id) {
-            item.active = false;
-          }
-          return item;
+        var item_1 = action.item;
+        if (!item_1.id) {
+          return state;
+        }
+        item_1.selected = false;
+        var el = item_1.element;
+        if (el) {
+          el.selected = false;
+          el.removeAttribute('selected');
+        }
+        return state.filter(function (choice) {
+          return choice.id !== item_1.id;
         });
       }
     case 'REMOVE_CHOICE':
       {
-        var removeChoiceAction = action;
-        var choiceValue_1 = removeChoiceAction.value;
+        var value_1 = action.value;
         return state.filter(function (choice) {
-          return choice.value !== choiceValue_1;
+          return choice.value !== value_1;
         });
       }
     case 'HIGHLIGHT_ITEM':
@@ -4003,7 +3718,7 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports.defaultState = void 0;
-exports.defaultState = false;
+exports.defaultState = 0;
 var general = function (state, action) {
   if (state === void 0) {
     state = exports.defaultState;
@@ -4014,7 +3729,10 @@ var general = function (state, action) {
   switch (action.type) {
     case 'SET_IS_LOADING':
       {
-        return action.isLoading;
+        if (action.isLoading) {
+          return state + 1;
+        }
+        return Math.max(0, state - 1);
       }
     default:
       {
@@ -4051,6 +3769,7 @@ Object.defineProperty(exports, "__esModule", ({
 /* eslint-disable @typescript-eslint/no-explicit-any */
 var redux_1 = __webpack_require__(829);
 var index_1 = __importDefault(__webpack_require__(572));
+var misc_1 = __webpack_require__(278);
 var Store = /** @class */function () {
   function Store() {
     this._store = (0, redux_1.createStore)(index_1.default, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
@@ -4066,6 +3785,20 @@ var Store = /** @class */function () {
    */
   Store.prototype.dispatch = function (action) {
     this._store.dispatch(action);
+  };
+  Store.prototype.startDeferRendering = function () {
+    this._store.dispatch((0, misc_1.setIsLoading)(true));
+  };
+  Store.prototype.stopDeferRendering = function () {
+    this._store.dispatch((0, misc_1.setIsLoading)(false));
+  };
+  Store.prototype.withDeferRendering = function (func) {
+    this.startDeferRendering();
+    try {
+      func();
+    } finally {
+      this.stopDeferRendering();
+    }
   };
   Object.defineProperty(Store.prototype, "state", {
     /**
@@ -4202,7 +3935,7 @@ var Store = /** @class */function () {
    * Get loading state from store
    */
   Store.prototype.isLoading = function () {
-    return this.state.loading;
+    return this.state.loading > 0;
   };
   /**
    * Get single choice by it's ID
