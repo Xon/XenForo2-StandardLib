@@ -322,7 +322,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             if (tempSelect !== null)
             {
-                tempSelect.querySelectorAll('*').forEach((optionOrOptgroup) =>
+                tempSelect.querySelectorAll('[label]').forEach((optionOrOptgroup) =>
                 {
                     if (optionOrOptgroup instanceof HTMLOptionElement)
                     {
