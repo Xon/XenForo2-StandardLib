@@ -58,7 +58,6 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             placeholder: null,
             maxItemCount: -1,
             removeItemButton: true,
-            allowHTML: true,
             shouldSort: false,
             shouldSortItems: false,
             editItems: false,
@@ -87,6 +86,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 placeholderValue = this.options.placeholder || field.getAttribute('placeholder'),
                 placeholder = !!placeholderValue,
                 config = SV.extendObject({}, this.options, {
+                    allowHTML: false,
                     pseudoMultiSelectForSingle: this.options.maxItemCount === 1,
                     placeholder: placeholder,
                     placeholderValue: placeholder ? placeholderValue : null,
