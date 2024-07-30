@@ -234,6 +234,8 @@ var utils_1 = __webpack_require__(705);
 var reducers_1 = __webpack_require__(572);
 var store_1 = __importDefault(__webpack_require__(771));
 var templates_1 = __importDefault(__webpack_require__(543));
+var PreEscapedString_1 = __webpack_require__(969);
+var UntrustedString_1 = __webpack_require__(671);
 /** @see {@link http://browserhacks.com/#hack-acea075d0ac6954f275a70023906050c} */
 var IS_IE11 = '-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style;
 var USER_DEFAULTS = {};
@@ -258,6 +260,14 @@ var Choices = /** @class */function () {
     var invalidConfigOptions = (0, utils_1.diff)(this.config, defaults_1.DEFAULT_CONFIG);
     if (invalidConfigOptions.length) {
       console.warn('Unknown config option(s) passed', invalidConfigOptions.join(', '));
+    }
+    if (!this.config.silent && this.config.allowHTML && this.config.allowHtmlUserInput) {
+      if (this.config.addItems) {
+        console.warn('Deprecation warning: allowHTML/allowHtmlUserInput/addItems all being true is strongly not recommended and may lead to XSS attacks');
+      }
+      if (this.config.addChoices) {
+        console.warn('Deprecation warning: allowHTML/allowHtmlUserInput/addChoices all being true is strongly not recommended and may lead to XSS attacks');
+      }
     }
     var passedElement = typeof element === 'string' ? document.querySelector(element) : element;
     if (!(passedElement instanceof HTMLInputElement || passedElement instanceof HTMLSelectElement)) {
@@ -774,6 +784,7 @@ var Choices = /** @class */function () {
     this.input.clear(shouldSetInputWidth);
     if (!this._isTextElement && this._canSearch) {
       this._isSearching = false;
+      this._currentValue = '';
       this._store.dispatch((0, choices_1.activateChoices)(true));
     }
     return this;
@@ -1026,12 +1037,12 @@ var Choices = /** @class */function () {
     }
   };
   Choices.prototype._handleButtonAction = function (activeItems, element) {
-    if (!activeItems || !element || !this.config.removeItems || !this.config.removeItemButton) {
+    if (!activeItems || !this.config.removeItems || !this.config.removeItemButton) {
       return;
     }
-    var itemId = element.parentNode && element.parentNode.dataset.id;
-    var itemToRemove = itemId && activeItems.find(function (item) {
-      return item.id === parseInt(itemId, 10);
+    var id = element && (0, utils_1.parseDataSetId)(element.parentNode);
+    var itemToRemove = id && activeItems.find(function (item) {
+      return item.id === id;
     });
     if (!itemToRemove) {
       return;
@@ -1048,15 +1059,18 @@ var Choices = /** @class */function () {
     if (hasShiftKey === void 0) {
       hasShiftKey = false;
     }
-    if (!activeItems || !element || !this.config.removeItems || this._isSelectOneElement) {
+    if (!activeItems || !this.config.removeItems || this._isSelectOneElement) {
       return;
     }
-    var passedId = element.dataset.id;
+    var id = (0, utils_1.parseDataSetId)(element);
+    if (!id) {
+      return;
+    }
     // We only want to select one item with a click
     // so we deselect any items that aren't the target
     // unless shift is being pressed
     activeItems.forEach(function (item) {
-      if (item.id === parseInt("".concat(passedId), 10) && !item.highlighted) {
+      if (item.id === id && !item.highlighted) {
         _this.highlightItem(item);
       } else if (!hasShiftKey && item.highlighted) {
         _this.unhighlightItem(item);
@@ -1067,11 +1081,11 @@ var Choices = /** @class */function () {
     this.input.focus();
   };
   Choices.prototype._handleChoiceAction = function (activeItems, element) {
-    if (!activeItems || !element) {
+    if (!activeItems) {
       return;
     }
     // If we are clicking on an option
-    var id = element.dataset.id;
+    var id = (0, utils_1.parseDataSetId)(element);
     var choice = id && this._store.getChoiceById(id);
     if (!choice) {
       return;
@@ -1215,7 +1229,7 @@ var Choices = /** @class */function () {
   };
   Choices.prototype._canAddItem = function (activeItems, value) {
     var canAddItem = true;
-    var notice = typeof this.config.addItemText === 'function' ? this.config.addItemText(value) : this.config.addItemText;
+    var notice = typeof this.config.addItemText === 'function' ? this.config.addItemText((0, utils_1.sanitise)(value), value) : this.config.addItemText;
     if (!this._isSelectOneElement) {
       var isDuplicateValue = (0, utils_1.existsInArray)(activeItems, value);
       if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
@@ -1228,21 +1242,21 @@ var Choices = /** @class */function () {
       }
       if (!this.config.duplicateItemsAllowed && isDuplicateValue && canAddItem) {
         canAddItem = false;
-        notice = typeof this.config.uniqueItemText === 'function' ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
+        notice = typeof this.config.uniqueItemText === 'function' ? this.config.uniqueItemText((0, utils_1.sanitise)(value), value) : this.config.uniqueItemText;
       }
       if (this._isTextElement && this.config.addItems && canAddItem && typeof this.config.addItemFilter === 'function' && !this.config.addItemFilter(value)) {
         canAddItem = false;
-        notice = typeof this.config.customAddItemText === 'function' ? this.config.customAddItemText(value) : this.config.customAddItemText;
+        notice = typeof this.config.customAddItemText === 'function' ? this.config.customAddItemText((0, utils_1.sanitise)(value), value) : this.config.customAddItemText;
       }
     }
     return {
       response: canAddItem,
-      notice: notice
+      notice: new PreEscapedString_1.PreEscapedString(notice)
     };
   };
   Choices.prototype._searchChoices = function (value) {
-    var newValue = typeof value === 'string' ? value.trim() : value;
-    var currentValue = typeof this._currentValue === 'string' ? this._currentValue.trim() : this._currentValue;
+    var newValue = value.trim();
+    var currentValue = this._currentValue.trim();
     if (newValue.length < 1 && newValue === "".concat(currentValue, " ")) {
       return 0;
     }
@@ -1442,12 +1456,17 @@ var Choices = /** @class */function () {
     var addedItem = false;
     if (target && target.value) {
       var value = this.input.value;
-      var canAddItem = this._canAddItem(activeItems, value);
-      var canAddChoice = this._canAddChoice(activeItems, value);
-      if (this._isTextElement && canAddItem.response || !this._isTextElement && canAddChoice.response) {
+      var canAdd = void 0;
+      if (this._isTextElement) {
+        canAdd = this._canAddItem(activeItems, value);
+      } else {
+        canAdd = this._canAddChoice(activeItems, value);
+      }
+      if (canAdd.response) {
         this.hideDropdown(true);
         this._addItem({
-          value: value
+          value: this.config.allowHtmlUserInput ? value : (0, utils_1.sanitise)(value),
+          label: new UntrustedString_1.UntrustedString(value)
         });
         this._triggerChange(value);
         this.clearInput();
@@ -2448,7 +2467,6 @@ exports.WrappedSelect = wrapped_select_1.default;
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-var utils_1 = __webpack_require__(705);
 var constants_1 = __webpack_require__(493);
 var Input = /** @class */function () {
   function Input(_a) {
@@ -2476,7 +2494,7 @@ var Input = /** @class */function () {
   });
   Object.defineProperty(Input.prototype, "value", {
     get: function () {
-      return (0, utils_1.sanitise)(this.element.value);
+      return this.element.value;
     },
     set: function (value) {
       this.element.value = value;
@@ -3061,12 +3079,15 @@ exports.DEFAULT_CONFIG = {
   pseudoMultiSelectForSingle: false,
   addChoices: false,
   addItems: true,
-  addItemFilter: null,
+  addItemFilter: function (value) {
+    return !!value && value !== '';
+  },
   removeItems: true,
   removeItemButton: false,
   removeItemButtonAlignLeft: false,
   editItems: false,
   allowHTML: true,
+  allowHtmlUserInput: false,
   duplicateItemsAllowed: true,
   delimiter: ',',
   paste: true,
@@ -3093,13 +3114,13 @@ exports.DEFAULT_CONFIG = {
   uniqueItemText: 'Only unique values can be added',
   customAddItemText: 'Only values matching specific conditions can be added',
   addItemText: function (value) {
-    return "Press Enter to add <b>\"".concat((0, utils_1.sanitise)(value), "\"</b>");
+    return "Press Enter to add <b>\"".concat(value, "\"</b>");
   },
   removeItemIconText: function () {
     return "Remove item";
   },
   removeItemLabelText: function (value) {
-    return "Remove item: ".concat((0, utils_1.sanitise)(value));
+    return "Remove item: ".concat(value);
   },
   maxItemText: function (maxItemCount) {
     return "Only ".concat(maxItemCount, " values can be added");
@@ -3331,6 +3352,52 @@ Object.defineProperty(exports, "__esModule", ({
 
 /***/ }),
 
+/***/ 969:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.PreEscapedString = void 0;
+var PreEscapedString = /** @class */function () {
+  function PreEscapedString(unescapedString) {
+    this.s = unescapedString;
+  }
+  PreEscapedString.prototype.toString = function () {
+    return this.s;
+  };
+  return PreEscapedString;
+}();
+exports.PreEscapedString = PreEscapedString;
+
+/***/ }),
+
+/***/ 671:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.UntrustedString = void 0;
+var utils_1 = __webpack_require__(705);
+var UntrustedString = /** @class */function () {
+  function UntrustedString(unescapedString) {
+    this.raw = unescapedString;
+    this.s = (0, utils_1.sanitise)(unescapedString);
+  }
+  UntrustedString.prototype.toString = function () {
+    return this.s;
+  };
+  return UntrustedString;
+}();
+exports.UntrustedString = UntrustedString;
+
+/***/ }),
+
 /***/ 353:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -3360,7 +3427,7 @@ exports.isHTMLOptgroup = isHTMLOptgroup;
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.parseCustomProperties = exports.getClassNamesSelector = exports.getClassNames = exports.extend = exports.diff = exports.isEmptyObject = exports.cloneObject = exports.existsInArray = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.wrap = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
+exports.parseDataSetId = exports.parseCustomProperties = exports.getClassNamesSelector = exports.getClassNames = exports.extend = exports.diff = exports.isEmptyObject = exports.cloneObject = exports.existsInArray = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.wrap = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
 var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
@@ -3439,7 +3506,7 @@ var sanitise = function (value) {
   if (typeof value !== 'string') {
     return value;
   }
-  return value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  return value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/'/g, '&#039;').replace(/"/g, '&quot;');
 };
 exports.sanitise = sanitise;
 exports.strToEl = function () {
@@ -3505,7 +3572,7 @@ var cloneObject = function (obj) {
 };
 exports.cloneObject = cloneObject;
 var isEmptyObject = function (obj) {
-  if (typeof obj !== 'object') {
+  if (!obj || typeof obj !== 'object') {
     return true;
   }
   // eslint-disable-next-line no-restricted-syntax
@@ -3589,6 +3656,17 @@ var parseCustomProperties = function (customProperties) {
   return {};
 };
 exports.parseCustomProperties = parseCustomProperties;
+var parseDataSetId = function (element) {
+  if (!element) {
+    return undefined;
+  }
+  var id = element.dataset.id;
+  if (!id) {
+    return undefined;
+  }
+  return parseInt(id, 10);
+};
+exports.parseDataSetId = parseDataSetId;
 
 /***/ }),
 
@@ -3649,13 +3727,9 @@ function choices(state, action) {
       {
         var removeChoiceAction = action;
         var choiceValue_1 = removeChoiceAction.value;
-        var choiceIndex = state.findIndex(function (choice) {
-          return choice.value === choiceValue_1;
+        return state.filter(function (choice) {
+          return choice.value !== choiceValue_1;
         });
-        if (choiceIndex !== -1) {
-          return state.splice(choiceIndex, 1);
-        }
-        return state;
       }
     case 'ADD_ITEM':
       {
@@ -3884,13 +3958,22 @@ function items(state, action) {
       }
     case 'REMOVE_ITEM':
       {
+        var removeItemAction_1 = action;
         // Set item to inactive
         return state.map(function (obj) {
           var item = obj;
-          if (item.id === action.id) {
+          if (item.id === removeItemAction_1.id) {
             item.active = false;
           }
           return item;
+        });
+      }
+    case 'REMOVE_CHOICE':
+      {
+        var removeChoiceAction = action;
+        var choiceValue_1 = removeChoiceAction.value;
+        return state.filter(function (choice) {
+          return choice.value !== choiceValue_1;
         });
       }
     case 'HIGHLIGHT_ITEM':
@@ -4128,7 +4211,7 @@ var Store = /** @class */function () {
    */
   Store.prototype.getChoiceById = function (id) {
     return this.activeChoices.find(function (choice) {
-      return choice.id === parseInt(id, 10);
+      return choice.id === id;
     });
   };
   /**
@@ -4209,23 +4292,23 @@ var templates = {
     });
   },
   placeholder: function (_a, value) {
-    var _b;
     var allowHTML = _a.allowHTML,
       placeholder = _a.classNames.placeholder;
-    return Object.assign(document.createElement('div'), (_b = {
-      className: (0, utils_1.getClassNames)(placeholder).join(' ')
-    }, _b[allowHTML ? 'innerHTML' : 'innerText'] = value, _b));
+    return Object.assign(document.createElement('div'), {
+      className: (0, utils_1.getClassNames)(placeholder).join(' '),
+      innerHTML: allowHTML ? value : (0, utils_1.sanitise)(value)
+    });
   },
   item: function (_a, _b, removeItemButton) {
-    var _c, _d, _e, _f, _g;
+    var _c, _d, _e;
     var allowHTML = _a.allowHTML,
       removeItemButtonAlignLeft = _a.removeItemButtonAlignLeft,
-      _h = _a.classNames,
-      item = _h.item,
-      button = _h.button,
-      highlightedState = _h.highlightedState,
-      itemSelectable = _h.itemSelectable,
-      placeholder = _h.placeholder;
+      _f = _a.classNames,
+      item = _f.item,
+      button = _f.button,
+      highlightedState = _f.highlightedState,
+      itemSelectable = _f.itemSelectable,
+      placeholder = _f.placeholder;
     var id = _b.id,
       value = _b.value,
       label = _b.label,
@@ -4240,12 +4323,13 @@ var templates = {
       className: (0, utils_1.getClassNames)(item).join(' ')
     });
     if (typeof labelClass === 'string' || Array.isArray(labelClass)) {
-      var spanLabel = Object.assign(document.createElement('span'), (_c = {}, _c[allowHTML ? 'innerHTML' : 'innerText'] = label, _c.className = (0, utils_1.getClassNames)(labelClass).join(' '), _c));
+      var spanLabel = Object.assign(document.createElement('span'), {
+        innerHTML: allowHTML ? label : (0, utils_1.sanitise)(label),
+        className: (0, utils_1.getClassNames)(labelClass).join(' ')
+      });
       div.appendChild(spanLabel);
-    } else if (allowHTML) {
-      div.innerHTML = label;
     } else {
-      div.innerText = label;
+      div.innerHTML = allowHTML ? label : (0, utils_1.sanitise)(label);
     }
     Object.assign(div.dataset, {
       item: '',
@@ -4268,20 +4352,21 @@ var templates = {
       div.setAttribute('aria-disabled', 'true');
     }
     if (isPlaceholder) {
-      (_d = div.classList).add.apply(_d, (0, utils_1.getClassNames)(placeholder));
+      (_c = div.classList).add.apply(_c, (0, utils_1.getClassNames)(placeholder));
     }
-    (_e = div.classList).add.apply(_e, highlighted ? (0, utils_1.getClassNames)(highlightedState) : (0, utils_1.getClassNames)(itemSelectable));
+    (_d = div.classList).add.apply(_d, highlighted ? (0, utils_1.getClassNames)(highlightedState) : (0, utils_1.getClassNames)(itemSelectable));
     if (removeItemButton) {
       if (disabled) {
-        (_f = div.classList).remove.apply(_f, (0, utils_1.getClassNames)(itemSelectable));
+        (_e = div.classList).remove.apply(_e, (0, utils_1.getClassNames)(itemSelectable));
       }
       div.dataset.deletable = '';
-      var REMOVE_ITEM_ICON = typeof this.config.removeItemIconText === 'function' ? this.config.removeItemIconText(value) : this.config.removeItemIconText;
-      var REMOVE_ITEM_LABEL = typeof this.config.removeItemLabelText === 'function' ? this.config.removeItemLabelText(value) : this.config.removeItemLabelText;
-      var removeButton = Object.assign(document.createElement('button'), (_g = {
+      var REMOVE_ITEM_ICON = typeof this.config.removeItemIconText === 'function' ? this.config.removeItemIconText((0, utils_1.sanitise)(value), value) : this.config.removeItemIconText;
+      var REMOVE_ITEM_LABEL = typeof this.config.removeItemLabelText === 'function' ? this.config.removeItemLabelText((0, utils_1.sanitise)(value), value) : this.config.removeItemLabelText;
+      var removeButton = Object.assign(document.createElement('button'), {
         type: 'button',
-        className: (0, utils_1.getClassNames)(button).join(' ')
-      }, _g[allowHTML ? 'innerHTML' : 'innerText'] = REMOVE_ITEM_ICON, _g));
+        className: (0, utils_1.getClassNames)(button).join(' '),
+        innerHTML: REMOVE_ITEM_ICON
+      });
       removeButton.setAttribute('aria-label', REMOVE_ITEM_LABEL);
       removeButton.dataset.button = '';
       if (removeItemButtonAlignLeft) {
@@ -4304,12 +4389,11 @@ var templates = {
     return div;
   },
   choiceGroup: function (_a, _b) {
-    var _c;
     var allowHTML = _a.allowHTML,
-      _d = _a.classNames,
-      group = _d.group,
-      groupHeading = _d.groupHeading,
-      itemDisabled = _d.itemDisabled;
+      _c = _a.classNames,
+      group = _c.group,
+      groupHeading = _c.groupHeading,
+      itemDisabled = _c.itemDisabled;
     var id = _b.id,
       value = _b.value,
       disabled = _b.disabled;
@@ -4325,22 +4409,23 @@ var templates = {
     if (disabled) {
       div.setAttribute('aria-disabled', 'true');
     }
-    div.appendChild(Object.assign(document.createElement('div'), (_c = {
-      className: (0, utils_1.getClassNames)(groupHeading).join(' ')
-    }, _c[allowHTML ? 'innerHTML' : 'innerText'] = value, _c)));
+    div.appendChild(Object.assign(document.createElement('div'), {
+      className: (0, utils_1.getClassNames)(groupHeading).join(' '),
+      innerHTML: allowHTML ? value : (0, utils_1.sanitise)(value)
+    }));
     return div;
   },
   choice: function (_a, _b, selectText) {
-    var _c, _d, _e, _f, _g, _h, _j;
+    var _c, _d, _e, _f, _g;
     var allowHTML = _a.allowHTML,
-      _k = _a.classNames,
-      item = _k.item,
-      itemChoice = _k.itemChoice,
-      itemSelectable = _k.itemSelectable,
-      selectedState = _k.selectedState,
-      itemDisabled = _k.itemDisabled,
-      description = _k.description,
-      placeholder = _k.placeholder;
+      _h = _a.classNames,
+      item = _h.item,
+      itemChoice = _h.itemChoice,
+      itemSelectable = _h.itemSelectable,
+      selectedState = _h.selectedState,
+      itemDisabled = _h.itemDisabled,
+      description = _h.description,
+      placeholder = _h.placeholder;
     var id = _b.id,
       value = _b.value,
       label = _b.label,
@@ -4357,26 +4442,29 @@ var templates = {
     });
     var descId = "".concat(elementId, "-description");
     if (typeof labelClass === 'string' || Array.isArray(labelClass)) {
-      var spanLabel = Object.assign(document.createElement('span'), (_c = {}, _c[allowHTML ? 'innerHTML' : 'innerText'] = label, _c.className = (0, utils_1.getClassNames)(labelClass).join(' '), _c));
+      var spanLabel = Object.assign(document.createElement('span'), {
+        innerHTML: allowHTML ? label : (0, utils_1.sanitise)(label),
+        className: (0, utils_1.getClassNames)(labelClass).join(' ')
+      });
       spanLabel.setAttribute('aria-describedby', descId);
       div.appendChild(spanLabel);
-    } else if (allowHTML) {
-      div.innerHTML = label;
-      div.setAttribute('aria-describedby', descId);
     } else {
-      div.innerText = label;
+      div.innerHTML = allowHTML ? label : (0, utils_1.sanitise)(label);
       div.setAttribute('aria-describedby', descId);
     }
     if (typeof labelDescription === 'string') {
-      var spanDesc = Object.assign(document.createElement('span'), (_d = {}, _d[allowHTML ? 'innerHTML' : 'innerText'] = labelDescription, _d.id = descId, _d));
-      (_e = spanDesc.classList).add.apply(_e, (0, utils_1.getClassNames)(description));
+      var spanDesc = Object.assign(document.createElement('span'), {
+        innerHTML: allowHTML ? labelDescription : (0, utils_1.sanitise)(labelDescription),
+        id: descId
+      });
+      (_c = spanDesc.classList).add.apply(_c, (0, utils_1.getClassNames)(description));
       div.appendChild(spanDesc);
     }
     if (isSelected) {
-      (_f = div.classList).add.apply(_f, (0, utils_1.getClassNames)(selectedState));
+      (_d = div.classList).add.apply(_d, (0, utils_1.getClassNames)(selectedState));
     }
     if (isPlaceholder) {
-      (_g = div.classList).add.apply(_g, (0, utils_1.getClassNames)(placeholder));
+      (_e = div.classList).add.apply(_e, (0, utils_1.getClassNames)(placeholder));
     }
     div.setAttribute('role', groupId && groupId > 0 ? 'treeitem' : 'option');
     Object.assign(div.dataset, {
@@ -4392,11 +4480,11 @@ var templates = {
       div.dataset.labelDescription = labelDescription;
     }
     if (isDisabled) {
-      (_h = div.classList).add.apply(_h, (0, utils_1.getClassNames)(itemDisabled));
+      (_f = div.classList).add.apply(_f, (0, utils_1.getClassNames)(itemDisabled));
       div.dataset.choiceDisabled = '';
       div.setAttribute('aria-disabled', 'true');
     } else {
-      (_j = div.classList).add.apply(_j, (0, utils_1.getClassNames)(itemSelectable));
+      (_g = div.classList).add.apply(_g, (0, utils_1.getClassNames)(itemSelectable));
       div.dataset.choiceSelectable = '';
     }
     return div;
@@ -4429,13 +4517,12 @@ var templates = {
     return div;
   },
   notice: function (_a, innerText, type) {
-    var _b;
     var allowHTML = _a.allowHTML,
-      _c = _a.classNames,
-      item = _c.item,
-      itemChoice = _c.itemChoice,
-      noResults = _c.noResults,
-      noChoices = _c.noChoices;
+      _b = _a.classNames,
+      item = _b.item,
+      itemChoice = _b.itemChoice,
+      noResults = _b.noResults,
+      noChoices = _b.noChoices;
     if (type === void 0) {
       type = '';
     }
@@ -4445,7 +4532,10 @@ var templates = {
     } else if (type === 'no-results') {
       classes.push(noResults);
     }
-    return Object.assign(document.createElement('div'), (_b = {}, _b[allowHTML ? 'innerHTML' : 'innerText'] = innerText, _b.className = classes.join(' '), _b));
+    return Object.assign(document.createElement('div'), {
+      innerHTML: allowHTML ? innerText : (0, utils_1.sanitise)(innerText),
+      className: classes.join(' ')
+    });
   },
   option: function (_a) {
     var label = _a.label,
@@ -4455,7 +4545,12 @@ var templates = {
       customProperties = _a.customProperties,
       active = _a.active,
       disabled = _a.disabled;
-    var opt = new Option(label, value, false, active);
+    var labelValue = label;
+    if (typeof label === 'object' && (0, utils_1.isType)('UntrustedString', label)) {
+      // HtmlOptionElement's label value does not support HTML, so the avoid double escaping unwrap the untrusted string.
+      labelValue = label.raw;
+    }
+    var opt = new Option(labelValue, value, false, active);
     if (typeof labelClass !== 'undefined' && labelClass) {
       opt.dataset.labelClass = (0, utils_1.getClassNames)(labelClass).join(' ');
     }
