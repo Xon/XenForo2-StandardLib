@@ -368,6 +368,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                                 values.push(option.value)
                             }
                         })
+
+                        choices.push(groupedChoices)
                     }
                 })
             }
