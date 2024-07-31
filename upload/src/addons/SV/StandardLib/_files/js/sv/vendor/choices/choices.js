@@ -258,7 +258,6 @@ var Choices = /** @class */function () {
     this._isSelectOneElement = this._elementType === constants_1.SELECT_ONE_TYPE;
     this._isSelectMultipleElement = this._elementType === constants_1.SELECT_MULTIPLE_TYPE;
     this._isSelectElement = this._isSelectOneElement || this._isSelectMultipleElement;
-    this.config.searchEnabled = this._isSelectMultipleElement || this.config.searchEnabled;
     if (!['auto', 'always'].includes("".concat(this.config.renderSelectedChoices))) {
       this.config.renderSelectedChoices = 'auto';
     }
@@ -923,7 +922,7 @@ var Choices = /** @class */function () {
     // Add Choices without group first, regardless of sort, otherwise they won't be distinguishable
     // from the last group
     var choicesWithoutGroup = choices.filter(function (c) {
-      return c.groupId === -1;
+      return c.groupId === 0;
     });
     if (choicesWithoutGroup.length > 0) {
       this._createChoicesFragment(choicesWithoutGroup, fragment, false);
