@@ -230,9 +230,6 @@ var Choices = /** @class */function () {
     var _this = this;
     this._lastAddedChoiceId = 0;
     this._lastAddedGroupId = 0;
-    if (userConfig.allowHTML === undefined) {
-      console.warn('Deprecation warning: allowHTML will default to false in a future release. To render HTML in Choices, you will need to set it to true. Setting allowHTML will suppress this message.');
-    }
     this.config = (0, utils_1.extend)(true, {}, defaults_1.DEFAULT_CONFIG, Choices.defaults.options, userConfig);
     var invalidConfigOptions = (0, utils_1.diff)(this.config, defaults_1.DEFAULT_CONFIG);
     if (invalidConfigOptions.length) {
@@ -240,10 +237,10 @@ var Choices = /** @class */function () {
     }
     if (!this.config.silent && this.config.allowHTML && this.config.allowHtmlUserInput) {
       if (this.config.addItems) {
-        console.warn('Deprecation warning: allowHTML/allowHtmlUserInput/addItems all being true is strongly not recommended and may lead to XSS attacks');
+        console.warn('Warning: allowHTML/allowHtmlUserInput/addItems all being true is strongly not recommended and may lead to XSS attacks');
       }
       if (this.config.addChoices) {
-        console.warn('Deprecation warning: allowHTML/allowHtmlUserInput/addChoices all being true is strongly not recommended and may lead to XSS attacks');
+        console.warn('Warning: allowHTML/allowHtmlUserInput/addChoices all being true is strongly not recommended and may lead to XSS attacks');
       }
     }
     var passedElement = typeof element === 'string' ? document.querySelector(element) : element;
@@ -1851,6 +1848,15 @@ var Choices = /** @class */function () {
     this._lastAddedChoiceId++;
     item.id = this._lastAddedChoiceId;
     item.elementId = "".concat(this._baseId, "-").concat(this._idNames.itemChoice, "-").concat(item.id);
+    if (this.config.prependValue) {
+      item.value = this.config.prependValue + item.value;
+    }
+    if (this.config.appendValue) {
+      item.value += this.config.appendValue.toString();
+    }
+    if ((this.config.prependValue || this.config.appendValue) && item.element) {
+      item.element.value = item.value;
+    }
     this._store.dispatch((0, choices_1.addChoice)(choice));
     if (choice.selected) {
       this._addItem(choice, withEvents);
@@ -2949,7 +2955,7 @@ exports.DEFAULT_CONFIG = {
   removeItemButton: false,
   removeItemButtonAlignLeft: false,
   editItems: false,
-  allowHTML: true,
+  allowHTML: false,
   allowHtmlUserInput: false,
   duplicateItemsAllowed: true,
   delimiter: ',',
@@ -3224,7 +3230,8 @@ var mapInputToChoice = function (value, allowGroup) {
       return (0, exports.mapInputToChoice)(e, false);
     });
     var result_2 = {
-      id: group.id || 0,
+      id: 0,
+      // actual ID will be assigned during _addGroup
       label: (0, utils_1.unwrapStringForRaw)(group.label) || group.value,
       active: choices.length !== 0,
       disabled: !!group.disabled,
@@ -3234,8 +3241,10 @@ var mapInputToChoice = function (value, allowGroup) {
   }
   var choice = groupOrChoice;
   var result = {
-    id: choice.id || 0,
+    id: 0,
+    // actual ID will be assigned during _addChoice
     groupId: 0,
+    // actual ID will be assigned during _addGroup but before _addChoice
     value: choice.value,
     label: choice.label || choice.value,
     active: coerceBool(choice.active),
