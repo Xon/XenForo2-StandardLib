@@ -250,9 +250,9 @@ var Choices = /** @class */function () {
     this._elementType = passedElement.type;
     this._isTextElement = this._elementType === constants_1.TEXT_TYPE;
     if (this._isTextElement || this.config.maxItemCount !== 1) {
-      this.config.pseudoMultiSelectForSingle = false;
+      this.config.singleModeForMultiSelect = false;
     }
-    if (this.config.pseudoMultiSelectForSingle) {
+    if (this.config.singleModeForMultiSelect) {
       this._elementType = constants_1.SELECT_MULTIPLE_TYPE;
     }
     this._isSelectOneElement = this._elementType === constants_1.SELECT_ONE_TYPE;
@@ -553,7 +553,7 @@ var Choices = /** @class */function () {
       selectedItems.push(itemValue);
       return selectedItems;
     }, []);
-    return this._isSelectOneElement ? values[0] : values;
+    return this._isSelectOneElement || this.config.singleModeForMultiSelect ? values[0] : values;
   };
   Choices.prototype.setValue = function (items) {
     var _this = this;
@@ -1152,7 +1152,7 @@ var Choices = /** @class */function () {
       if (!choice.selected && !choice.disabled) {
         var canAddItem = _this._canAddItem(activeItems, choice.value);
         if (canAddItem.response) {
-          if (_this.config.pseudoMultiSelectForSingle) {
+          if (_this.config.singleModeForMultiSelect) {
             var lastItem = activeItems[activeItems.length - 1];
             if (lastItem) {
               _this._removeItem(lastItem);
@@ -1168,7 +1168,7 @@ var Choices = /** @class */function () {
       this._triggerChange(choice.value);
     }
     // We want to close the dropdown if we are dealing with a single select box
-    if (hasActiveDropdown && (this.config.pseudoMultiSelectForSingle || this._isSelectOneElement)) {
+    if (hasActiveDropdown && (this.config.singleModeForMultiSelect || this._isSelectOneElement)) {
       this.hideDropdown(true);
       this.containerOuter.focus();
     }
@@ -1274,7 +1274,7 @@ var Choices = /** @class */function () {
       if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
         // If there is a max entry limit and we have reached that limit
         // don't update
-        if (!this.config.pseudoMultiSelectForSingle) {
+        if (!this.config.singleModeForMultiSelect) {
           canAddItem = false;
           notice = typeof this.config.maxItemText === 'function' ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
         }
@@ -2944,7 +2944,7 @@ exports.DEFAULT_CONFIG = {
   silent: false,
   renderChoiceLimit: -1,
   maxItemCount: -1,
-  pseudoMultiSelectForSingle: false,
+  singleModeForMultiSelect: false,
   addChoices: false,
   addItems: true,
   addItemFilter: function (value) {
