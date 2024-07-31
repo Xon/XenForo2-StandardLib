@@ -303,10 +303,6 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             /** @type HTMLSelectElement **/
             let tempSelect = null
-
-            let choices = [],
-                values = []
-
             if (workingHtml instanceof HTMLDivElement)
             {
                 tempSelect = workingHtml.querySelector('select')
@@ -317,67 +313,14 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
             else if (workingListRaw instanceof Object)
             {
-                choices = workingListRaw
+                this.choices.clearStore().setChoices(workingListRaw);
+                //this.choices.setChoiceByValue(values);
             }
 
             if (tempSelect !== null)
             {
-                tempSelect.querySelectorAll('[label]').forEach((optionOrOptgroup) =>
-                {
-                    if (optionOrOptgroup instanceof HTMLOptionElement)
-                    {
-                        let isSelected = !!optionOrOptgroup.getAttribute('selected');
-                        choices.push({
-                            value: optionOrOptgroup.value,
-                            label: optionOrOptgroup.text,
-                            labelClass: typeof optionOrOptgroup.dataset.labelClass !== 'undefined' ? optionOrOptgroup.dataset.labelClass : null,
-                            labelDescription: typeof optionOrOptgroup.dataset.labelDescription !== 'undefined' ? optionOrOptgroup.dataset.labelDescription : null,
-                            customProperties: typeof optionOrOptgroup.dataset.customProperties !== 'undefined' ? JSON.parse(optionOrOptgroup.dataset.customProperties) : [],
-                            disabled: !!optionOrOptgroup.disabled,
-                            selected: isSelected
-                        })
-
-                        if (!optionOrOptgroup.disabled && isSelected)
-                        {
-                            values.push(optionOrOptgroup.value)
-                        }
-                    }
-                    else if (optionOrOptgroup instanceof HTMLOptGroupElement)
-                    {
-                        let groupedChoices = {
-                            label: optionOrOptgroup.label,
-                            disabled: optionOrOptgroup.disabled,
-                            choices: []
-                        }
-
-                        optionOrOptgroup.querySelectorAll('option').forEach((option) =>
-                        {
-                            let isSelected = !!option.getAttribute('selected');
-                            groupedChoices.choices.push({
-                                value: option.value,
-                                label: option.text,
-                                labelClass: typeof option.dataset.labelClass !== 'undefined' ? option.dataset.labelClass : null,
-                                labelDescription: typeof option.dataset.labelDescription !== 'undefined' ? option.dataset.labelDescription : null,
-                                customProperties: typeof option.dataset.customProperties !== 'undefined' ? JSON.parse(option.dataset.customProperties) : [],
-                                disabled: !!option.disabled,
-                                selected: isSelected
-                            })
-
-                            if (!option.disabled && isSelected)
-                            {
-                                values.push(option.value)
-                            }
-                        })
-
-                        choices.push(groupedChoices)
-                    }
-                })
-            }
-
-            this.choices.clearStore().setChoices(choices);
-            if (values)
-            {
-                this.choices.setChoiceByValue(values);
+                this.choices.passedElement.element.innerHTML = tempSelect.innerHTML;
+                this.choices.refresh();
             }
         },
 
