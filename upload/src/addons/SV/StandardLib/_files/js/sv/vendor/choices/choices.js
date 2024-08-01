@@ -230,7 +230,7 @@ var Choices = /** @class */function () {
     var _this = this;
     this._lastAddedChoiceId = 0;
     this._lastAddedGroupId = 0;
-    this.config = (0, utils_1.extend)(true, {}, defaults_1.DEFAULT_CONFIG, Choices.defaults.options, userConfig);
+    this.config = (0, utils_1.extend)(true, {}, Choices.defaults.allOptions, Choices.defaults.options, userConfig);
     var invalidConfigOptions = (0, utils_1.diff)(this.config, defaults_1.DEFAULT_CONFIG);
     if (invalidConfigOptions.length) {
       console.warn('Unknown config option(s) passed', invalidConfigOptions.join(', '));
@@ -369,6 +369,9 @@ var Choices = /** @class */function () {
       return Object.preventExtensions({
         get options() {
           return USER_DEFAULTS;
+        },
+        get allOptions() {
+          return defaults_1.DEFAULT_CONFIG;
         },
         get templates() {
           return templates_1.default;

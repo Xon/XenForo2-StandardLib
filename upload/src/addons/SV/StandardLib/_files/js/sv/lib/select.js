@@ -8,6 +8,14 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
     "use strict";
     let $ = SV.$;
 
+    /**
+     * @param s string
+     * @return {string}
+     */
+    function ucfirst(s) {
+        return s && s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
     let dynamicElements = Choices.prototype._createElements,
         dynamicStructure = Choices.prototype._createStructure;
     Choices.prototype._createElements = function ()
@@ -78,6 +86,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             renderChoiceLimit: false,
             appendGroupInSearch: false,
             removeItemButtonAlignLeft: true,
+            // to append a class to various styling elements, use `containerOuter` => `data-class-container-outer`
+            // see https://github.com/Xon/Choices.js?tab=readme-ov-file#classnames for class keys
         },
         initialValue: null,
         form: null,
@@ -175,6 +185,19 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             {
                 classnames.classNames.containerOuter.push('svChoices--select-prompt');
             }
+
+            const field = this.target || this.$target.get(0),
+                options = Choices.defaults.allOptions();
+
+            options.classNames.keys().forEach(key => {
+                const parts = ('' + field.dataset['class' + ucfirst(key)]).split(' ');
+                if (parts.length !== 0) {
+                    if (!(key in classnames.classNames)) {
+                        classnames.classNames[key] = [];
+                    }
+                    parts.forEach(s => classnames.classNames[key].push(s));
+                }
+            });
 
             return classnames;
         },
