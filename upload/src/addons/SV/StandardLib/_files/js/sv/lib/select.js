@@ -187,14 +187,18 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             const field = this.target || this.$target.get(0),
-                options = Choices.defaults.allOptions();
+                options = Choices.defaults.allOptions;
 
-            options.classNames.keys().forEach(key => {
-                const parts = ('' + field.dataset['class' + ucfirst(key)]).split(' ');
-                if (parts.length !== 0) {
-                    if (!(key in classnames.classNames)) {
-                        classnames.classNames[key] = [];
+            Object.keys(options.classNames).forEach((key) =>
+            {
+                const parts = ('' + field.dataset['class' + ucfirst(key)]).split(' ')
+                if (parts.length !== 0)
+                {
+                    if (!(key in classnames.classNames))
+                    {
+                        classnames.classNames[key] = []
                     }
+
                     parts.forEach(s => classnames.classNames[key].push(s));
                 }
             });
