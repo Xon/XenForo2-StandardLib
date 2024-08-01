@@ -295,10 +295,13 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                     })
                 }
             }
+
+            this.triggerFormFillIfNeeded()
         },
 
         onRemoveItem: function (event)
         {
+            this.triggerFormFillIfNeeded()
         },
 
         onChoice: function (event)
@@ -395,6 +398,15 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             this.choices._onFormReset()
+        },
+
+        triggerFormFillIfNeeded ()
+        {
+            const formFillHandler = XF.Element.getHandler(this.target ? this.form : $(this.form), 'form-fill')
+            if (formFillHandler !== null)
+            {
+                formFillHandler.change()
+            }
         }
     });
 
