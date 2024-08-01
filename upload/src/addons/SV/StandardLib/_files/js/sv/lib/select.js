@@ -1,7 +1,7 @@
-window.SV = window.SV || {};
-window.SV.StandardLib = window.SV.StandardLib || {};
-window.SV.$ = window.SV.$ || window.jQuery || null;
-window.SV.extendObject = window.SV.extendObject || XF.extendObject || jQuery.extend;
+var SV = window.SV || {};
+SV.StandardLib = SV.StandardLib || {};
+SV.$ = SV.$ || window.jQuery || null;
+SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
 (function()
 {
