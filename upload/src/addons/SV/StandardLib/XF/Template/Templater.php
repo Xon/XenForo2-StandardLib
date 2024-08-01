@@ -75,11 +75,6 @@ class Templater extends XFCP_Templater
             $controlOptions['class'] = $class . ' u-noJsOnly';
         }
 
-        if (in_array('sv-choices-loader', $init, true))
-        {
-            return parent::formSelect($controlOptions, $choices);
-        }
-
         if ($controlOptions['skip-rendering'] ?? false)
         {
             unset($controlOptions['skip-rendering']);
