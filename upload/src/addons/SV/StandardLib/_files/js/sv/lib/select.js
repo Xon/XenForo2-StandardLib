@@ -22,19 +22,30 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
     {
         dynamicElements.call(this)
 
-        let el = this.passedElement.element
+        const el = this.passedElement.element
         this.isDynamicRendered = !el.dataset.rendered
         if (this.isDynamicRendered)
         {
             return
         }
 
+        const wrapOrWarn = function (container, element, selector)
+        {
+            if (element === null) {
+                console.warn('Expected pre-rendered element for '+selector+' does not exist', el);
+                return;
+            }
+            container.element = element
+        }
+
         // patch the created items to link to the pre-rendered elements
-        let container = el.closest('.choices.svChoices--inputGroup')
-        this.containerOuter.element = container
-        this.containerInner.element = container.querySelector('.choices__inner')
-        this.input.element = container.querySelector('input[name=search_terms]')
-        this.itemList.element = container.querySelector('.choices__list')
+        const container = el.closest('.choices.svChoices--inputGroup')
+        wrapOrWarn(this.containerOuter, container, '.choices.svChoices--inputGroup')
+        if (container) {
+            wrapOrWarn(this.containerInner, container.querySelector('.choices__inner'), '.choices__inner')
+            wrapOrWarn(this.input, container.querySelector('input[type="search"]'), 'input[type="search"]')
+            wrapOrWarn(this.itemList, container.querySelector('.choices__list'), '.choices__list')
+        }
     };
 
     Choices.prototype._createStructure = function ()
@@ -112,7 +123,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                     singleModeForMultiSelect: this.options.maxItemCount === 1,
                     placeholder: placeholder,
                     placeholderValue: placeholder ? placeholderValue : null,
-                }, this.getPhrases(), this.getClassNames());
+                    classNames: this.getClassNames(),
+                }, this.getPhrases());
             delete config.resetOnSubmit;
 
             if (!config.singleModeForMultiSelect && !field.getAttribute('multiple') && config.maxItemCount === -1)
@@ -167,29 +179,28 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         getClassNames: function ()
         {
             // This classes should match public:svStandardLib_macros::choices_static_render
-            let classnames = {
-                classNames: {
-                    containerOuter: [
-                        'choices',
-                        'inputGroup',
-                        'svChoices--inputGroup',
-                    ],
-                    containerInner: [
-                        'choices__inner',
-                        'input',
-                    ],
-                }
+            const classNames = {
+                containerOuter: [
+                    'choices',
+                    'inputGroup',
+                    'svChoices--inputGroup',
+                ],
+                containerInner: [
+                    'choices__inner',
+                    'input',
+                ],
             };
 
             if (XF.phrases['svChoices_itemSelectText'])
             {
-                classnames.classNames.containerOuter.push('svChoices--select-prompt');
+                classNames.containerOuter.push('svChoices--select-prompt');
             }
 
             const theTarget = this.target || this.$target.get(0),
-                options = Choices.defaults.allOptions;
+                options = Choices.defaults.allOptions,
+                defaultClassNames = options.classNames;
 
-            Object.keys(options.classNames).forEach((key) =>
+            Object.keys(defaultClassNames).forEach((key) =>
             {
                 const datasetKey = 'class' + ucfirst(key)
                 const fromDataset = theTarget.dataset[datasetKey]
@@ -199,17 +210,18 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                     const parts = ('' + fromDataset).split(' ')
                     if (parts.length !== 0)
                     {
-                        if (!(key in classnames.classNames))
+                        if (!(key in classNames))
                         {
-                            classnames.classNames[key] = []
+                            classNames[key] = []
                         }
 
-                        parts.forEach(part => classnames.classNames[key].push(part));
+                        defaultClassNames[key].forEach(part => classNames[key].push(part));
+                        parts.forEach(part => classNames[key].push(part));
                     }
                 }
             });
 
-            return classnames;
+            return classNames;
         },
 
         initEvents: function ()

@@ -3,10 +3,13 @@
 namespace SV\StandardLib\XF\Template;
 
 use XF\Mvc\Entity\Entity;
+use XF\Phrase;
+use function array_replace;
 use function explode;
 use function in_array;
 use function is_array;
 use function stripos;
+use function strval;
 use function substr;
 
 /**
@@ -16,13 +19,30 @@ class Templater extends XFCP_Templater
 {
     protected $svIncludeJsMap = [
         'SV/StandardLib' => [
-            'sv/lib/storage.js' => [
+            'sv/lib/storage.js'           => [
                 ['dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
             ],
             'sv/lib/xf/core/structure.js' => [
                 ['dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
             ]
         ]
+    ];
+
+    /**
+     * HTML data attribute to class name mapping for supported prerender choices class overrides
+     * Must match https://github.com/Xon/Choices.js?tab=readme-ov-file#classnames entries
+     *
+     * @var array<string,string>
+     */
+    protected static $choicesClassOverrides = [
+        'data-class-container-outer' => 'containerOuter',
+        'data-class-container-inner' => 'containerInner',
+        'data-class-list' => 'list',
+        'data-class-list-items' => 'listItems',
+        'data-class-item' => 'item',
+        'data-class-item-selectable' => 'itemSelectable',
+        'data-class-input' => 'input',
+        'data-class-input-cloned' => 'inputCloned',
     ];
 
     public function includeJs(array $options)
@@ -78,6 +98,7 @@ class Templater extends XFCP_Templater
         if ($controlOptions['skip-rendering'] ?? false)
         {
             unset($controlOptions['skip-rendering']);
+
             return parent::formSelect($controlOptions, $choices);
         }
 
@@ -115,17 +136,50 @@ class Templater extends XFCP_Templater
         // signal to javascript about pre-rendering
         $controlOptions['data-rendered'] = 1;
 
+        $class = $this->copyChoicesClassOverridesFromDataAttributes($controlOptions);
+
         $selectHtml = parent::formSelect($controlOptions, $choices);
 
         return $this->callMacro('', 'public:svStandardLib_macros::choices_static_render', [
-            'name' => $name,
-            'value' => $value,
-            'multiple' => $multiple,
-            'placeholder' => $placeholder,
-            'controlOptions' => $controlOptions,
-            'selectHtml' => $selectHtml,
-            'choices' => $choices,
+            'name'            => $name,
+            'value'           => $value,
+            'multiple'        => $multiple,
+            'placeholder'     => $placeholder,
+            'controlOptions'  => $controlOptions,
+            'selectHtml'      => $selectHtml,
+            'choices'         => $choices,
             'selectedChoices' => $selectedChoices,
+            'class'           => $class,
         ], $this->defaultParams);
+    }
+
+    protected function copyChoicesClassOverridesFromDataAttributes(array $controlOptions): array
+    {
+        $attrs = [];
+        foreach (static::$choicesClassOverrides as $attrKey => $classKey)
+        {
+            $value = $controlOptions[$attrKey] ?? null;
+            if ($value === null)
+            {
+                continue;
+            }
+
+            if ($value instanceof Phrase)
+            {
+                // strval will do escaping of the values or the whole phrase, so get the raw value and escape that here
+                $value = $value->render('raw');
+            }
+            else
+            {
+                $value = strval($value);
+            }
+
+            if ($value !== '')
+            {
+                $attrs[$classKey] = \XF::escapeString($value);
+            }
+        }
+
+        return $attrs;
     }
 }
