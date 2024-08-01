@@ -1,53 +1,65 @@
-var SV = window.SV || {};
-SV.StandardLib = SV.StandardLib || {};
-SV.$ = SV.$ || window.jQuery || null;
-SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
+window.SV = window.SV || {};
+window.SV.StandardLib = window.SV.StandardLib || {};
+window.SV.$ = window.SV.$ || window.jQuery || null;
+window.SV.extendObject = window.SV.extendObject || XF.extendObject || jQuery.extend;
 
 (function()
 {
     "use strict";
-    var $ = SV.$;
+    let $ = SV.$;
 
-    var dynamicElements = Choices.prototype._createElements,
+    let dynamicElements = Choices.prototype._createElements,
         dynamicStructure = Choices.prototype._createStructure;
-    Choices.prototype._createElements = function () {
-        dynamicElements.call(this);
+    Choices.prototype._createElements = function ()
+    {
+        dynamicElements.call(this)
 
-        var el = this.passedElement.element;
-        this.isDynamicRendered = !el.dataset.rendered;
-        if (this.isDynamicRendered) {
-            return;
+        let el = this.passedElement.element
+        this.isDynamicRendered = !el.dataset.rendered
+        if (this.isDynamicRendered)
+        {
+            return
         }
+
         // patch the created items to link to the pre-rendered elements
-        var container = el.closest('.choices.svChoices--inputGroup')
-        this.containerOuter.element = container;
-        this.containerInner.element = container.querySelector('.choices__inner');
-        this.input.element = container.querySelector('input[name=search_terms]');
-        this.itemList.element = container.querySelector('.choices__list');
+        let container = el.closest('.choices.svChoices--inputGroup')
+        this.containerOuter.element = container
+        this.containerInner.element = container.querySelector('.choices__inner')
+        this.input.element = container.querySelector('input[name=search_terms]')
+        this.itemList.element = container.querySelector('.choices__list')
     };
 
-    Choices.prototype._createStructure = function () {
-        if (this.isDynamicRendered) {
-            dynamicStructure.call(this);
+    Choices.prototype._createStructure = function ()
+    {
+        if (this.isDynamicRendered)
+        {
+            dynamicStructure.call(this)
             return;
         }
 
-        this.containerOuter.element.appendChild(this.dropdown.element);
-        if (!this._isTextElement) {
-            this.dropdown.element.appendChild(this.choiceList.element);
+        this.containerOuter.element.appendChild(this.dropdown.element)
+        if (!this._isTextElement)
+        {
+            this.dropdown.element.appendChild(this.choiceList.element)
         }
-        if (this._isSelectOneElement && this.config.searchEnabled) {
-            this.dropdown.element.insertBefore(this.input.element, this.dropdown.element.firstChild);
+
+        if (this._isSelectOneElement && this.config.searchEnabled)
+        {
+            this.dropdown.element.insertBefore(this.input.element, this.dropdown.element.firstChild)
         }
-        if (!this._isSelectOneElement) {
-            this.input.setWidth();
+
+        if (!this._isSelectOneElement)
+        {
+            this.input.setWidth()
         }
-        if (this._isSelectElement) {
-            this._highlightPosition = 0;
-            this._isSearching = false;
-            this._startLoading();
-            this._addPredefinedChoices(this._presetChoices);
-            this._stopLoading();
+
+        if (this._isSelectElement)
+        {
+            this._highlightPosition = 0
+            this._isSearching = false
+            this._startLoading()
+            this._addPredefinedChoices(this._presetChoices)
+            this._stopLoading()
         }
     };
 
@@ -82,7 +94,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getConfig: function ()
         {
-            var field = this.target || this.$target.get(0),
+            let field = this.target || this.$target.get(0),
                 placeholderValue = this.options.placeholder || field.getAttribute('placeholder'),
                 placeholder = !!placeholderValue,
                 config = SV.extendObject({}, this.options, {
@@ -105,7 +117,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getPhrase: function(name, vars)
         {
-            var phrase = XF.phrases[name];
+            let phrase = XF.phrases[name];
             if (phrase && vars)
             {
                 phrase = XF.stringTranslate(phrase, vars);
@@ -145,7 +157,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         getClassNames: function ()
         {
             // This classes should match public:svStandardLib_macros::choices_static_render
-            var classnames = {
+            let classnames = {
                 classNames: {
                     containerOuter: [
                         'choices',
@@ -190,7 +202,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                     }
                 }
 
-                var $target = $(passedElement);
+                let $target = $(passedElement);
                 $target.on('addItem', this.onAddItem.bind(this));
                 $target.on('removeItem', this.onRemoveItem.bind(this));
                 $target.on('choice', this.onChoice.bind(this));
@@ -242,7 +254,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 {
                     this.choices._currentState.items.forEach((option) =>
                     {
-                        var customProperties = option.customProperties;
+                        let customProperties = option.customProperties;
                         if (typeof customProperties === 'object' && customProperties.clears)
                         {
                             this.choices.removeActiveItemsByValue(option.value);
