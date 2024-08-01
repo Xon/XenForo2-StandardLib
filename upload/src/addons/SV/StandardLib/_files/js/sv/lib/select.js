@@ -186,20 +186,26 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 classnames.classNames.containerOuter.push('svChoices--select-prompt');
             }
 
-            const field = this.target || this.$target.get(0),
+            const theTarget = this.target || this.$target.get(0),
                 options = Choices.defaults.allOptions;
 
             Object.keys(options.classNames).forEach((key) =>
             {
-                const parts = ('' + field.dataset['class' + ucfirst(key)]).split(' ')
-                if (parts.length !== 0)
-                {
-                    if (!(key in classnames.classNames))
-                    {
-                        classnames.classNames[key] = []
-                    }
+                const datasetKey = 'class' + ucfirst(key)
+                const fromDataset = theTarget.dataset[datasetKey]
 
-                    parts.forEach(s => classnames.classNames[key].push(s));
+                if (typeof fromDataset !== 'undefined')
+                {
+                    const parts = ('' + fromDataset).split(' ')
+                    if (parts.length !== 0)
+                    {
+                        if (!(key in classnames.classNames))
+                        {
+                            classnames.classNames[key] = []
+                        }
+
+                        parts.forEach(part => classnames.classNames[key].push(part));
+                    }
                 }
             });
 
