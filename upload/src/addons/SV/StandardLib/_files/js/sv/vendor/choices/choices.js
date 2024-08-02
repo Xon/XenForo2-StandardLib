@@ -1,4 +1,4 @@
-/*! choices.js v11.0.0 RC1 | © 2024 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! choices.js v11.0.0 RC2 | © 2024 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -227,7 +227,6 @@ var USER_DEFAULTS = {};
  */
 var Choices = /** @class */function () {
   function Choices(element, userConfig) {
-    var _a;
     if (element === void 0) {
       element = '[data-choice]';
     }
@@ -272,6 +271,7 @@ var Choices = /** @class */function () {
     this._isSelectOneElement = this._elementType === constants_1.SELECT_ONE_TYPE;
     this._isSelectMultipleElement = this._elementType === constants_1.SELECT_MULTIPLE_TYPE;
     this._isSelectElement = this._isSelectOneElement || this._isSelectMultipleElement;
+    this._canAddUserChoices = this._isTextElement && this.config.addItems || this._isSelectElement && this.config.addChoices;
     if (!['auto', 'always'].includes("".concat(this.config.renderSelectedChoices))) {
       this.config.renderSelectedChoices = 'auto';
     }
@@ -321,30 +321,6 @@ var Choices = /** @class */function () {
     this._idNames = {
       itemChoice: 'item-choice'
     };
-    if (this._isTextElement) {
-      // Assign preset items from passed object first
-      this._presetItems = this.config.items.map(function (e) {
-        return (0, choice_input_1.mapInputToChoice)(e, false);
-      });
-      // Add any values passed from attribute
-      var value = this.passedElement.value;
-      if (value) {
-        var elementItems = value.split(this.config.delimiter).map(function (e) {
-          return (0, choice_input_1.mapInputToChoice)(e, false);
-        });
-        this._presetItems = this._presetItems.concat(elementItems);
-      }
-    } else if (this._isSelectElement) {
-      // Assign preset choices from passed object
-      this._presetChoices = this.config.choices.map(function (e) {
-        return (0, choice_input_1.mapInputToChoice)(e, true);
-      });
-      // Create array of choices from option elements
-      var choicesFromOptions = this.passedElement.optionsAsChoices();
-      if (choicesFromOptions) {
-        (_a = this._presetChoices).push.apply(_a, choicesFromOptions);
-      }
-    }
     this._render = this._render.bind(this);
     this._onFocus = this._onFocus.bind(this);
     this._onBlur = this._onBlur.bind(this);
@@ -399,6 +375,7 @@ var Choices = /** @class */function () {
     if (this.initialised) {
       return;
     }
+    this._loadChoices();
     this._createTemplates();
     this._createElements();
     this._createStructure();
@@ -424,6 +401,8 @@ var Choices = /** @class */function () {
     this.passedElement.reveal();
     this.containerOuter.unwrap(this.passedElement.element);
     this.clearStore();
+    this._isSearching = false;
+    this._currentValue = '';
     this._templates = templates_1.default;
     this.initialised = false;
   };
@@ -1101,12 +1080,12 @@ var Choices = /** @class */function () {
       this._triggerChange(placeholderChoice.value);
     }
   };
-  Choices.prototype._handleButtonAction = function (activeItems, element) {
-    if (!activeItems || !this.config.removeItems || !this.config.removeItemButton) {
+  Choices.prototype._handleButtonAction = function (items, element) {
+    if (items.length === 0 || !this.config.removeItems || !this.config.removeItemButton) {
       return;
     }
     var id = element && (0, utils_1.parseDataSetId)(element.parentNode);
-    var itemToRemove = id && activeItems.find(function (item) {
+    var itemToRemove = id && items.find(function (item) {
       return item.id === id;
     });
     if (!itemToRemove) {
@@ -1119,12 +1098,12 @@ var Choices = /** @class */function () {
       this._selectPlaceholderChoice(this._store.placeholderChoice);
     }
   };
-  Choices.prototype._handleItemAction = function (activeItems, element, hasShiftKey) {
+  Choices.prototype._handleItemAction = function (items, element, hasShiftKey) {
     var _this = this;
     if (hasShiftKey === void 0) {
       hasShiftKey = false;
     }
-    if (!activeItems || !this.config.removeItems || this._isSelectOneElement) {
+    if (items.length === 0 || !this.config.removeItems || this._isSelectOneElement) {
       return;
     }
     var id = (0, utils_1.parseDataSetId)(element);
@@ -1134,7 +1113,7 @@ var Choices = /** @class */function () {
     // We only want to select one item with a click
     // so we deselect any items that aren't the target
     // unless shift is being pressed
-    activeItems.forEach(function (item) {
+    items.forEach(function (item) {
       if (item.id === id && !item.highlighted) {
         _this.highlightItem(item);
       } else if (!hasShiftKey && item.highlighted) {
@@ -1145,18 +1124,15 @@ var Choices = /** @class */function () {
     // highlighted item
     this.input.focus();
   };
-  Choices.prototype._handleChoiceAction = function (activeItems, element) {
+  Choices.prototype._handleChoiceAction = function (items, element) {
     var _this = this;
-    if (!activeItems) {
-      return;
-    }
     // If we are clicking on an option
     var id = (0, utils_1.parseDataSetId)(element);
     var choice = id && this._store.getChoiceById(id);
     if (!choice) {
       return;
     }
-    var passedKeyCode = activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : undefined;
+    var passedKeyCode = items.length !== 0 && items[0] && items[0].keyCode ? items[0].keyCode : undefined;
     var hasActiveDropdown = this.dropdown.isActive;
     // Update choice keyCode
     choice.keyCode = passedKeyCode;
@@ -1166,11 +1142,11 @@ var Choices = /** @class */function () {
     var triggerChange = false;
     this._store.withDeferRendering(function () {
       if (!choice.selected && !choice.disabled) {
-        var canAddItem = _this._canAddItem(activeItems, choice.value);
+        var canAddItem = _this._canAddItem(items, choice.value);
         if (canAddItem.response) {
           if (_this.config.singleModeForMultiSelect) {
-            var lastItem = activeItems[activeItems.length - 1];
-            if (lastItem) {
+            if (items.length !== 0) {
+              var lastItem = items[items.length - 1];
               _this._removeItem(lastItem);
             }
           }
@@ -1189,12 +1165,12 @@ var Choices = /** @class */function () {
       this.containerOuter.focus();
     }
   };
-  Choices.prototype._handleBackspace = function (activeItems) {
-    if (!this.config.removeItems || !activeItems) {
+  Choices.prototype._handleBackspace = function (items) {
+    if (!this.config.removeItems || items.length === 0) {
       return;
     }
-    var lastItem = activeItems[activeItems.length - 1];
-    var hasHighlightedItems = activeItems.some(function (item) {
+    var lastItem = items[items.length - 1];
+    var hasHighlightedItems = items.some(function (item) {
       return item.highlighted;
     });
     // If editing the last item is allowed and there are not other selected items,
@@ -1210,6 +1186,33 @@ var Choices = /** @class */function () {
         this.highlightItem(lastItem, false);
       }
       this.removeHighlightedItems(true);
+    }
+  };
+  Choices.prototype._loadChoices = function () {
+    var _a;
+    if (this._isTextElement) {
+      // Assign preset items from passed object first
+      this._presetItems = this.config.items.map(function (e) {
+        return (0, choice_input_1.mapInputToChoice)(e, false);
+      });
+      // Add any values passed from attribute
+      var value = this.passedElement.value;
+      if (value) {
+        var elementItems = value.split(this.config.delimiter).map(function (e) {
+          return (0, choice_input_1.mapInputToChoice)(e, false);
+        });
+        this._presetItems = this._presetItems.concat(elementItems);
+      }
+    } else if (this._isSelectElement) {
+      // Assign preset choices from passed object
+      this._presetChoices = this.config.choices.map(function (e) {
+        return (0, choice_input_1.mapInputToChoice)(e, true);
+      });
+      // Create array of choices from option elements
+      var choicesFromOptions = this.passedElement.optionsAsChoices();
+      if (choicesFromOptions) {
+        (_a = this._presetChoices).push.apply(_a, choicesFromOptions);
+      }
     }
   };
   // noinspection JSUnusedGlobalSymbols
@@ -1279,32 +1282,42 @@ var Choices = /** @class */function () {
       this._store.dispatch((0, choices_1.activateChoices)(true));
     }
   };
-  Choices.prototype._canAddChoice = function (activeItems, value) {
-    var canAddItem = this._canAddItem(activeItems, value);
-    canAddItem.response = this.config.addChoices && canAddItem.response;
-    return canAddItem;
+  Choices.prototype._canAddChoice = function (items, value) {
+    if (!this._canAddUserChoices) {
+      return {
+        response: false,
+        notice: ''
+      };
+    }
+    return this._canAddItem(items, value);
   };
-  Choices.prototype._canAddItem = function (activeItems, value) {
+  Choices.prototype._canAddItem = function (items, value) {
+    var _this = this;
     var canAddItem = true;
-    var notice = typeof this.config.addItemText === 'function' ? this.config.addItemText((0, utils_1.sanitise)(value), value) : this.config.addItemText;
-    if (!this._isSelectOneElement) {
-      var isDuplicateValue = (0, utils_1.existsInArray)(activeItems, value);
-      if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
-        // If there is a max entry limit and we have reached that limit
-        // don't update
-        if (!this.config.singleModeForMultiSelect) {
-          canAddItem = false;
-          notice = typeof this.config.maxItemText === 'function' ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
-        }
+    var notice = '';
+    if (this.config.maxItemCount > 0 && this.config.maxItemCount <= items.length) {
+      // If there is a max entry limit and we have reached that limit
+      // don't update
+      if (!this.config.singleModeForMultiSelect) {
+        canAddItem = false;
+        notice = typeof this.config.maxItemText === 'function' ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
       }
-      if (!this.config.duplicateItemsAllowed && isDuplicateValue && canAddItem) {
+    }
+    if (canAddItem && this._canAddUserChoices && value !== '' && typeof this.config.addItemFilter === 'function' && !this.config.addItemFilter(value)) {
+      canAddItem = false;
+      notice = typeof this.config.customAddItemText === 'function' ? this.config.customAddItemText((0, utils_1.sanitise)(value), value) : this.config.customAddItemText;
+    }
+    if (canAddItem && (this._isSelectElement || !this.config.duplicateItemsAllowed)) {
+      var foundChoice = this._store.items.find(function (choice) {
+        return _this.config.valueComparer(choice.value, value);
+      });
+      if (foundChoice) {
         canAddItem = false;
         notice = typeof this.config.uniqueItemText === 'function' ? this.config.uniqueItemText((0, utils_1.sanitise)(value), value) : this.config.uniqueItemText;
       }
-      if (this._isTextElement && this.config.addItems && canAddItem && typeof this.config.addItemFilter === 'function' && !this.config.addItemFilter(value)) {
-        canAddItem = false;
-        notice = typeof this.config.customAddItemText === 'function' ? this.config.customAddItemText((0, utils_1.sanitise)(value), value) : this.config.customAddItemText;
-      }
+    }
+    if (canAddItem) {
+      notice = typeof this.config.addItemText === 'function' ? this.config.addItemText((0, utils_1.sanitise)(value), value) : this.config.addItemText;
     }
     return {
       response: canAddItem,
@@ -1396,7 +1409,7 @@ var Choices = /** @class */function () {
   };
   Choices.prototype._onKeyDown = function (event) {
     var keyCode = event.keyCode;
-    var activeItems = this._store.activeItems;
+    var items = this._store.items;
     var hasFocusedInput = this.input.isFocussed;
     var hasActiveDropdown = this.dropdown.isActive;
     var hasItems = this.itemList.hasChildren();
@@ -1439,7 +1452,7 @@ var Choices = /** @class */function () {
       case 65 /* KeyCodeMap.A_KEY */:
         return this._onSelectKey(event, hasItems);
       case 13 /* KeyCodeMap.ENTER_KEY */:
-        return this._onEnterKey(event, activeItems, hasActiveDropdown);
+        return this._onEnterKey(event, items, hasActiveDropdown);
       case 27 /* KeyCodeMap.ESC_KEY */:
         return this._onEscapeKey(event, hasActiveDropdown);
       case 38 /* KeyCodeMap.UP_KEY */:
@@ -1449,7 +1462,7 @@ var Choices = /** @class */function () {
         return this._onDirectionKey(event, hasActiveDropdown);
       case 8 /* KeyCodeMap.DELETE_KEY */:
       case 46 /* KeyCodeMap.BACK_KEY */:
-        return this._onDeleteKey(event, activeItems, hasFocusedInput);
+        return this._onDeleteKey(event, items, hasFocusedInput);
       default:
     }
   };
@@ -1457,8 +1470,8 @@ var Choices = /** @class */function () {
     var target = _a.target,
       keyCode = _a.keyCode;
     var value = this.input.value;
-    var activeItems = this._store.activeItems;
-    var canAddItem = this._canAddItem(activeItems, value);
+    var items = this._store.items;
+    var canAddItem = this._canAddItem(items, value);
     // We are typing into a text input and have a value, we want to show a dropdown
     // notice. Otherwise hide the dropdown
     if (this._isTextElement) {
@@ -1497,35 +1510,50 @@ var Choices = /** @class */function () {
       }
     }
   };
-  Choices.prototype._onEnterKey = function (event, activeItems, hasActiveDropdown) {
+  Choices.prototype._onEnterKey = function (event, items, hasActiveDropdown) {
+    var _this = this;
     var target = event.target;
     var targetWasButton = target && target.hasAttribute('data-button');
     var addedItem = false;
     if (target && target.value) {
-      var value = this.input.value;
+      var value_1 = this.input.value;
       var canAdd = void 0;
       if (this._isTextElement) {
-        canAdd = this._canAddItem(activeItems, value);
+        canAdd = this._canAddItem(items, value_1);
       } else {
-        canAdd = this._canAddChoice(activeItems, value);
+        canAdd = this._canAddChoice(items, value_1);
       }
       if (canAdd.response) {
         this.hideDropdown(true);
-        this._addChoice((0, choice_input_1.mapInputToChoice)({
-          value: this.config.allowHtmlUserInput ? value : (0, utils_1.sanitise)(value),
-          label: {
-            escaped: (0, utils_1.sanitise)(value),
-            raw: value
-          },
-          selected: true
-        }, false));
-        this._triggerChange(value);
-        this.clearInput();
+        this._store.withDeferRendering(function () {
+          if (_this._isSelectOneElement || _this.config.singleModeForMultiSelect) {
+            if (items.length !== 0) {
+              var lastItem = items[items.length - 1];
+              _this._removeItem(lastItem);
+            }
+          }
+          var choiceNotFound = true;
+          if (_this._isSelectElement || !_this.config.duplicateItemsAllowed) {
+            choiceNotFound = !_this._findAndSelectChoiceByValue(value_1);
+          }
+          if (choiceNotFound) {
+            _this._addChoice((0, choice_input_1.mapInputToChoice)({
+              value: _this.config.allowHtmlUserInput ? value_1 : (0, utils_1.sanitise)(value_1),
+              label: {
+                escaped: (0, utils_1.sanitise)(value_1),
+                raw: value_1
+              },
+              selected: true
+            }, false));
+          }
+          _this.clearInput();
+        });
+        this._triggerChange(value_1);
         addedItem = true;
       }
     }
     if (targetWasButton) {
-      this._handleButtonAction(activeItems, target);
+      this._handleButtonAction(items, target);
       event.preventDefault();
     }
     if (hasActiveDropdown) {
@@ -1534,11 +1562,11 @@ var Choices = /** @class */function () {
         if (addedItem) {
           this.unhighlightAll();
         } else {
-          if (activeItems[0]) {
+          if (items[0]) {
             // add enter keyCode value
-            activeItems[0].keyCode = 13 /* KeyCodeMap.ENTER_KEY */; // eslint-disable-line no-param-reassign
+            items[0].keyCode = 13 /* KeyCodeMap.ENTER_KEY */; // eslint-disable-line no-param-reassign
           }
-          this._handleChoiceAction(activeItems, highlightedChoice);
+          this._handleChoiceAction(items, highlightedChoice);
         }
       }
       event.preventDefault();
@@ -1592,11 +1620,11 @@ var Choices = /** @class */function () {
       event.preventDefault();
     }
   };
-  Choices.prototype._onDeleteKey = function (event, activeItems, hasFocusedInput) {
+  Choices.prototype._onDeleteKey = function (event, items, hasFocusedInput) {
     var target = event.target;
     // If backspace or delete key is pressed and the input has no value
     if (!this._isSelectOneElement && !target.value && hasFocusedInput) {
-      this._handleBackspace(activeItems);
+      this._handleBackspace(items);
       event.preventDefault();
     }
   };
@@ -1643,12 +1671,14 @@ var Choices = /** @class */function () {
     var item = target.closest('[data-button],[data-item],[data-choice]');
     if (item instanceof HTMLElement) {
       var hasShiftKey = event.shiftKey;
-      var activeItems = this._store.activeItems;
+      var _a = this._store,
+        activeItems = _a.activeItems,
+        items = _a.items;
       var dataset = item.dataset;
       if ('button' in dataset) {
-        this._handleButtonAction(activeItems, item);
+        this._handleButtonAction(items, item);
       } else if ('item' in dataset) {
-        this._handleItemAction(activeItems, item, hasShiftKey);
+        this._handleItemAction(items, item, hasShiftKey);
       } else if ('choice' in dataset) {
         this._handleChoiceAction(activeItems, item);
       }
@@ -2047,7 +2077,9 @@ var Choices = /** @class */function () {
     });
     if (foundChoice && !foundChoice.selected) {
       this._addItem(foundChoice);
+      return true;
     }
+    return false;
   };
   Choices.prototype._generatePlaceholderValue = function () {
     var _a = this.config,
@@ -3253,7 +3285,7 @@ exports.isHTMLOptgroup = isHTMLOptgroup;
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.parseDataSetId = exports.parseCustomProperties = exports.getClassNamesSelector = exports.getClassNames = exports.diff = exports.isEmptyObject = exports.cloneObject = exports.existsInArray = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.unwrapStringForEscaped = exports.unwrapStringForRaw = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.wrap = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
+exports.parseDataSetId = exports.parseCustomProperties = exports.getClassNamesSelector = exports.getClassNames = exports.diff = exports.isEmptyObject = exports.cloneObject = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.unwrapStringForEscaped = exports.unwrapStringForRaw = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.wrap = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
 var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
@@ -3428,18 +3460,6 @@ var dispatchEvent = function (element, type, customArgs) {
   return element.dispatchEvent(event);
 };
 exports.dispatchEvent = dispatchEvent;
-var existsInArray = function (array, value, key) {
-  if (key === void 0) {
-    key = 'value';
-  }
-  return array.some(function (item) {
-    if (typeof value === 'string') {
-      return item[key] === value.trim();
-    }
-    return item[key] === value;
-  });
-};
-exports.existsInArray = existsInArray;
 var cloneObject = function (obj) {
   return JSON.parse(JSON.stringify(obj));
 };
