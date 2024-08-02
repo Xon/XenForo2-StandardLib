@@ -149,6 +149,16 @@ exports.setIsLoading = setIsLoading;
 
 
 
+var __assign = this && this.__assign || function () {
+  __assign = Object.assign || function (t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+      s = arguments[i];
+      for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+    }
+    return t;
+  };
+  return __assign.apply(this, arguments);
+};
 var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
   if (k2 === undefined) k2 = k;
   var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -206,6 +216,7 @@ var misc_1 = __webpack_require__(278);
 var components_1 = __webpack_require__(253);
 var constants_1 = __webpack_require__(493);
 var defaults_1 = __webpack_require__(468);
+var options_1 = __webpack_require__(411);
 var utils_1 = __webpack_require__(705);
 var reducers_1 = __webpack_require__(572);
 var store_1 = __importDefault(__webpack_require__(771));
@@ -230,7 +241,10 @@ var Choices = /** @class */function () {
     var _this = this;
     this._lastAddedChoiceId = 0;
     this._lastAddedGroupId = 0;
-    this.config = (0, utils_1.extend)(true, {}, Choices.defaults.allOptions, Choices.defaults.options, userConfig);
+    this.config = __assign(__assign(__assign({}, Choices.defaults.allOptions), Choices.defaults.options), userConfig);
+    options_1.ObjectsInConfig.forEach(function (key) {
+      Object.assign(_this.config[key], Choices.defaults.allOptions[key], Choices.defaults.options[key], userConfig[key]);
+    });
     var invalidConfigOptions = (0, utils_1.diff)(this.config, defaults_1.DEFAULT_CONFIG);
     if (invalidConfigOptions.length) {
       console.warn('Unknown config option(s) passed', invalidConfigOptions.join(', '));
@@ -243,9 +257,13 @@ var Choices = /** @class */function () {
         console.warn('Warning: allowHTML/allowHtmlUserInput/addChoices all being true is strongly not recommended and may lead to XSS attacks');
       }
     }
-    var passedElement = typeof element === 'string' ? document.querySelector(element) : element;
+    var documentElement = this.config.shadowRoot || document.documentElement;
+    var passedElement = typeof element === 'string' ? documentElement.querySelector(element) : element;
     if (!(passedElement instanceof HTMLInputElement || passedElement instanceof HTMLSelectElement)) {
-      throw TypeError('Expected one of the following types text|select-one|select-multiple');
+      if (!passedElement && typeof element === 'string') {
+        throw TypeError("Selector ".concat(element, " failed to find an element"));
+      }
+      throw TypeError("Expected one of the following types text|select-one|select-multiple");
     }
     this._elementType = passedElement.type;
     this._isTextElement = this._elementType === constants_1.TEXT_TYPE;
@@ -717,7 +735,7 @@ var Choices = /** @class */function () {
         if ('choices' in groupOrChoice) {
           var group = groupOrChoice;
           if (!isDefaultLabel) {
-            group = (0, utils_1.extend)(true, {}, group, {
+            group = __assign(__assign({}, group), {
               label: group[label]
             });
           }
@@ -725,7 +743,7 @@ var Choices = /** @class */function () {
         } else {
           var choice = groupOrChoice;
           if (!isDefaultLabel || !isDefaultValue) {
-            choice = (0, utils_1.extend)(true, {}, choice, {
+            choice = __assign(__assign({}, choice), {
               value: choice[value],
               label: choice[label]
             });
@@ -1320,7 +1338,7 @@ var Choices = /** @class */function () {
     return results.length;
   };
   Choices.prototype._addEventListeners = function () {
-    var documentElement = document.documentElement;
+    var documentElement = this.config.shadowRoot || document.documentElement;
     // capture events - can cancel event processing or propagation
     documentElement.addEventListener('touchend', this._onTouchEnd, true);
     this.containerOuter.element.addEventListener('keydown', this._onKeyDown, true);
@@ -1360,7 +1378,7 @@ var Choices = /** @class */function () {
     this.input.addEventListeners();
   };
   Choices.prototype._removeEventListeners = function () {
-    var documentElement = document.documentElement;
+    var documentElement = this.config.shadowRoot || document.documentElement;
     documentElement.removeEventListener('touchend', this._onTouchEnd, true);
     this.containerOuter.element.removeEventListener('keydown', this._onKeyDown, true);
     this.containerOuter.element.removeEventListener('mousedown', this._onMouseDown, true);
@@ -1908,15 +1926,19 @@ var Choices = /** @class */function () {
   Choices.prototype._createTemplates = function () {
     var _this = this;
     var callbackOnCreateTemplates = this.config.callbackOnCreateTemplates;
-    var defaultTemplates = templates_1.default;
     var userTemplates = {};
     if (callbackOnCreateTemplates && typeof callbackOnCreateTemplates === 'function') {
       userTemplates = callbackOnCreateTemplates.call(this, utils_1.strToEl, templates_1.escapeForTemplate);
     }
-    this._templates = (0, utils_1.extend)(true, {}, defaultTemplates, userTemplates);
-    Object.keys(this._templates).forEach(function (name) {
-      _this._templates[name] = _this._templates[name].bind(_this);
+    var templating = {};
+    Object.keys(templates_1.default).forEach(function (name) {
+      if (name in userTemplates) {
+        templating[name] = userTemplates[name].bind(_this);
+      } else {
+        templating[name] = templates_1.default[name].bind(_this);
+      }
     });
+    this._templates = templating;
   };
   Choices.prototype._createElements = function () {
     this.containerOuter = new components_1.Container({
@@ -2972,6 +2994,7 @@ exports.DEFAULT_CONFIG = {
   shouldSort: true,
   shouldSortItems: false,
   sorter: utils_1.sortByAlpha,
+  shadowRoot: null,
   placeholder: true,
   placeholderValue: null,
   searchPlaceholderValue: null,
@@ -3139,6 +3162,8 @@ Object.defineProperty(exports, "__esModule", ({
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
+exports.ObjectsInConfig = void 0;
+exports.ObjectsInConfig = ['fuseOptions', 'classNames'];
 
 /***/ }),
 
@@ -3293,7 +3318,7 @@ exports.isHTMLOptgroup = isHTMLOptgroup;
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.parseDataSetId = exports.parseCustomProperties = exports.getClassNamesSelector = exports.getClassNames = exports.extend = exports.diff = exports.isEmptyObject = exports.cloneObject = exports.existsInArray = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.unwrapStringForEscaped = exports.unwrapStringForRaw = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.wrap = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
+exports.parseDataSetId = exports.parseCustomProperties = exports.getClassNamesSelector = exports.getClassNames = exports.diff = exports.isEmptyObject = exports.cloneObject = exports.existsInArray = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.unwrapStringForEscaped = exports.unwrapStringForRaw = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.wrap = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
 var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
@@ -3508,43 +3533,6 @@ var diff = function (a, b) {
   });
 };
 exports.diff = diff;
-var extend = function () {
-  var args = [];
-  for (var _i = 0; _i < arguments.length; _i++) {
-    args[_i] = arguments[_i];
-  }
-  // Variables
-  var deep = false;
-  var target = args[0] || {};
-  var i = 1;
-  if (typeof target === 'boolean') {
-    deep = target;
-    target = args[i] || {};
-    i++;
-  }
-  var _loop_1 = function () {
-    var source = args[i];
-    Object.keys(source).forEach(function (key) {
-      var srcValue = target[key];
-      var copyValue = source[key];
-      if (deep && copyValue && typeof copyValue === 'object') {
-        if (Array.isArray(copyValue)) {
-          target[key] = srcValue && Array.isArray(srcValue) ? srcValue : [];
-        } else {
-          target[key] = srcValue && typeof srcValue === 'object' ? srcValue : {};
-        }
-        target[key] = (0, exports.extend)(deep, target[key], copyValue);
-      } else if (copyValue !== undefined) {
-        target[key] = copyValue;
-      }
-    });
-  };
-  for (; i < args.length; i++) {
-    _loop_1();
-  }
-  return target;
-};
-exports.extend = extend;
 var getClassNames = function (ClassNames) {
   return Array.isArray(ClassNames) ? ClassNames : [ClassNames];
 };
