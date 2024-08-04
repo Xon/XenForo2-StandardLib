@@ -115,10 +115,12 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             // if the user typed text into the search input before choices initialized, ensure search works
             if (typeof this.choices.isDynamicRendered === 'boolean' && !this.choices.isDynamicRendered && this.choices._canSearch) {
                 const searchValue = this.choices.input.value;
-                if (searchValue) {
+                if (searchValue || this.choices.input.element === document.activeElement) {
                     this.choices.showDropdown(false);
                     this.choices.input.isFocussed = true;
-                    this.choices._handleSearch(searchValue);
+                    if (searchValue) {
+                        this.choices._handleSearch(searchValue);
+                    }
                 }
             }
         },
@@ -134,6 +136,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                     placeholder: placeholder,
                     placeholderValue: placeholder ? placeholderValue : null,
                     classNames: this.getClassNames(),
+                    fuseOptions: this.getFuseOptions(),
                 }, this.getPhrases());
             delete config.resetOnSubmit;
 
@@ -145,6 +148,25 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             return config;
+        },
+
+        getFuseOptions: function () {
+            return {
+                // When `true`, the algorithm continues searching to the end of the input even if a perfect
+                // match is found before the end of the same input.
+                //isCaseSensitive: false,
+                // Approximately where in the text is the pattern expected to be found?
+                //location: 0,
+                // At what point does the match algorithm give up. A threshold of '0.0' requires a perfect match
+                // (of both letters and location), a threshold of '1.0' would match anything.
+                //threshold: 0.6,
+                // Determines how close the match must be to the fuzzy location (specified above).
+                // An exact letter match which is 'distance' characters away from the fuzzy location
+                // would score as a complete mismatch. A distance of '0' requires the match be at
+                // the exact location specified, a threshold of '1000' would require a perfect match
+                // to be within 800 characters of the fuzzy location to be found using a 0.8 threshold.
+                //distance: 100
+            };
         },
 
         getPhrase: function(name, vars)
