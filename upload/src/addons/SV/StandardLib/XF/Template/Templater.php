@@ -73,6 +73,11 @@ class Templater extends XFCP_Templater
         parent::includeJs($options);
     }
 
+    protected function isPreRenderableChoicesInit(array $init): bool
+    {
+        return in_array('sv-choices', $init, true);
+    }
+
     public function formSelect(array $controlOptions, array $choices)
     {
         $value = $controlOptions['value'] ?? null;
@@ -84,7 +89,7 @@ class Templater extends XFCP_Templater
         }
 
         $init = explode(' ', $controlOptions['data-xf-init'] ?? '');
-        if (!in_array('sv-choices', $init, true))
+        if (!$this->isPreRenderableChoicesInit($init))
         {
             return parent::formSelect($controlOptions, $choices);
         }
