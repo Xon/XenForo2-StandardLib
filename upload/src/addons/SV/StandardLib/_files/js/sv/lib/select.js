@@ -111,6 +111,16 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             this.initialValue = theTarget.value
             this.choices = new Choices(theTarget, this.getConfig());
             this.initEvents();
+
+            // if the user typed text into the search input before choices initialized, ensure search works
+            if (typeof this.choices.isDynamicRendered === 'boolean' && !this.choices.isDynamicRendered && this.choices._canSearch) {
+                const searchValue = this.choices.input.value;
+                if (searchValue) {
+                    this.choices.showDropdown(false);
+                    this.choices.input.isFocussed = true;
+                    this.choices._handleSearch(searchValue);
+                }
+            }
         },
 
         getConfig: function ()
