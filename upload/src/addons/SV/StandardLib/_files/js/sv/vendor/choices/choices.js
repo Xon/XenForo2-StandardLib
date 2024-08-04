@@ -239,7 +239,7 @@ var Choices = /** @class */function () {
     this._lastAddedGroupId = 0;
     this.config = __assign(__assign(__assign({}, Choices.defaults.allOptions), Choices.defaults.options), userConfig);
     options_1.ObjectsInConfig.forEach(function (key) {
-      Object.assign(_this.config[key], Choices.defaults.allOptions[key], Choices.defaults.options[key], userConfig[key]);
+      _this.config[key] = __assign(__assign(__assign({}, Choices.defaults.allOptions[key]), Choices.defaults.options[key]), userConfig[key]);
     });
     var invalidConfigOptions = (0, utils_1.diff)(this.config, defaults_1.DEFAULT_CONFIG);
     if (invalidConfigOptions.length) {
