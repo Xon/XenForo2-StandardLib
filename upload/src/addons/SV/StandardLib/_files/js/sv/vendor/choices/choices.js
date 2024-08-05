@@ -221,6 +221,13 @@ var choice_input_1 = __webpack_require__(200);
 /** @see {@link http://browserhacks.com/#hack-acea075d0ac6954f275a70023906050c} */
 var IS_IE11 = '-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style;
 var USER_DEFAULTS = {};
+var parseDataSetId = function (element) {
+  if (!element) {
+    return undefined;
+  }
+  var id = element.dataset.id;
+  return id ? parseInt(id, 10) : undefined;
+};
 /**
  * Choices
  * @author Josh Johnson<josh@joshuajohnson.co.uk>
@@ -291,8 +298,7 @@ var Choices = /** @class */function () {
     if (this._isTextElement) {
       this.passedElement = new components_1.WrappedInput({
         element: passedElement,
-        classNames: this.config.classNames,
-        delimiter: this.config.delimiter
+        classNames: this.config.classNames
       });
     } else {
       var selectEl = passedElement;
@@ -1064,18 +1070,13 @@ var Choices = /** @class */function () {
     // Add each list item to list
     items.forEach(addItemToFragment);
     if (this._isSelectOneElement && this._hasNonChoicePlaceholder && items.length === 0) {
-      var placeholder = {
-        id: 0,
-        groupId: 0,
+      addItemToFragment((0, choice_input_1.mapInputToChoice)({
         selected: true,
         value: '',
         label: this.config.placeholderValue || '',
         active: true,
-        disabled: false,
-        highlighted: false,
         placeholder: true
-      };
-      addItemToFragment(placeholder);
+      }, false));
     }
     return fragment;
   };
@@ -1121,7 +1122,7 @@ var Choices = /** @class */function () {
     if (items.length === 0 || !this.config.removeItems || !this.config.removeItemButton) {
       return;
     }
-    var id = element && (0, utils_1.parseDataSetId)(element.parentNode);
+    var id = element && parseDataSetId(element.parentNode);
     var itemToRemove = id && items.find(function (item) {
       return item.id === id;
     });
@@ -1131,8 +1132,11 @@ var Choices = /** @class */function () {
     // Remove item associated with button
     this._removeItem(itemToRemove);
     this._triggerChange(itemToRemove.value);
-    if (this._isSelectOneElement && this._store.placeholderChoice) {
-      this._selectPlaceholderChoice(this._store.placeholderChoice);
+    if (this._isSelectOneElement && !this._hasNonChoicePlaceholder) {
+      var placeholderChoice = this._store.placeholderChoice;
+      if (placeholderChoice) {
+        this._selectPlaceholderChoice(placeholderChoice);
+      }
     }
   };
   Choices.prototype._handleItemAction = function (items, element, hasShiftKey) {
@@ -1143,7 +1147,7 @@ var Choices = /** @class */function () {
     if (items.length === 0 || !this.config.removeItems || this._isSelectOneElement) {
       return;
     }
-    var id = (0, utils_1.parseDataSetId)(element);
+    var id = parseDataSetId(element);
     if (!id) {
       return;
     }
@@ -1164,7 +1168,7 @@ var Choices = /** @class */function () {
   Choices.prototype._handleChoiceAction = function (items, element, keyCode) {
     var _this = this;
     // If we are clicking on an option
-    var id = (0, utils_1.parseDataSetId)(element);
+    var id = parseDataSetId(element);
     var choice = id && this._store.getChoiceById(id);
     if (!choice) {
       return false;
@@ -1265,7 +1269,7 @@ var Choices = /** @class */function () {
     if (setLoading === void 0) {
       setLoading = true;
     }
-    var placeholderItem = this.itemList.getChild((0, utils_1.getClassNamesSelector)(this.config.classNames.placeholder));
+    var placeholderItem = this.itemList.element.querySelector((0, utils_1.getClassNamesSelector)(this.config.classNames.placeholder));
     if (setLoading) {
       this.disable();
       this.containerOuter.addLoadingState();
@@ -1593,7 +1597,7 @@ var Choices = /** @class */function () {
      */
     // add the highlighted item
     if (hasActiveDropdown) {
-      var highlightedChoice = this.dropdown.getChild((0, utils_1.getClassNamesSelector)(this.config.classNames.highlightedState));
+      var highlightedChoice = this.dropdown.element.querySelector((0, utils_1.getClassNamesSelector)(this.config.classNames.highlightedState));
       if (highlightedChoice) {
         addedItem = this._handleChoiceAction(items, highlightedChoice, 13 /* KeyCodeMap.ENTER_KEY */);
         if (addedItem) {
@@ -2153,7 +2157,7 @@ var Choices = /** @class */function () {
     if (this._hasNonChoicePlaceholder) {
       return this.config.placeholderValue;
     }
-    if (this._isSelectElement && this.passedElement.placeholderOption) {
+    if (this._isSelectElement) {
       var placeholderOption = this.passedElement.placeholderOption;
       return placeholderOption ? placeholderOption.text : null;
     }
@@ -2187,20 +2191,9 @@ var Container = /** @class */function () {
     this.position = position;
     this.isOpen = false;
     this.isFlipped = false;
-    this.isFocussed = false;
     this.isDisabled = false;
     this.isLoading = false;
-    this._onFocus = this._onFocus.bind(this);
-    this._onBlur = this._onBlur.bind(this);
   }
-  Container.prototype.addEventListeners = function () {
-    this.element.addEventListener('focus', this._onFocus);
-    this.element.addEventListener('blur', this._onBlur);
-  };
-  Container.prototype.removeEventListeners = function () {
-    this.element.removeEventListener('focus', this._onFocus);
-    this.element.removeEventListener('blur', this._onBlur);
-  };
   /**
    * Determine whether container should be flipped based on passed
    * dropdown position
@@ -2245,9 +2238,7 @@ var Container = /** @class */function () {
     }
   };
   Container.prototype.focus = function () {
-    if (!this.isFocussed) {
-      this.element.focus();
-    }
+    this.element.focus();
   };
   Container.prototype.addFocusState = function () {
     var _a;
@@ -2276,7 +2267,14 @@ var Container = /** @class */function () {
     this.isDisabled = true;
   };
   Container.prototype.wrap = function (element) {
-    (0, utils_1.wrap)(element, this.element);
+    if (element.parentNode) {
+      if (element.nextSibling) {
+        element.parentNode.insertBefore(this.element, element.nextSibling);
+      } else {
+        element.parentNode.appendChild(this.element);
+      }
+    }
+    this.element.appendChild(element);
   };
   Container.prototype.unwrap = function (element) {
     if (this.element.parentNode) {
@@ -2297,12 +2295,6 @@ var Container = /** @class */function () {
     (_a = this.element.classList).remove.apply(_a, (0, utils_1.getClassNames)(this.classNames.loadingState));
     this.element.removeAttribute('aria-busy');
     this.isLoading = false;
-  };
-  Container.prototype._onFocus = function () {
-    this.isFocussed = true;
-  };
-  Container.prototype._onBlur = function () {
-    this.isFocussed = false;
   };
   return Container;
 }();
@@ -2339,9 +2331,6 @@ var Dropdown = /** @class */function () {
     enumerable: false,
     configurable: true
   });
-  Dropdown.prototype.getChild = function (selector) {
-    return this.element.querySelector(selector);
-  };
   /**
    * Show dropdown to user by adding active state class
    */
@@ -2436,13 +2425,6 @@ var Input = /** @class */function () {
     },
     set: function (value) {
       this.element.value = value;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(Input.prototype, "rawValue", {
-    get: function () {
-      return this.element.value;
     },
     enumerable: false,
     configurable: true
@@ -2566,9 +2548,6 @@ var List = /** @class */function () {
   List.prototype.append = function (node) {
     this.element.appendChild(node);
   };
-  List.prototype.getChild = function (selector) {
-    return this.element.querySelector(selector);
-  };
   List.prototype.hasChildren = function () {
     return this.element.hasChildNodes();
   };
@@ -2666,7 +2645,7 @@ var WrappedElement = /** @class */function () {
       return this.element.value;
     },
     set: function (value) {
-      // you must define setter here otherwise it will be readonly property
+      this.element.setAttribute('value', value);
       this.element.value = value;
     },
     enumerable: false,
@@ -2760,28 +2739,9 @@ Object.defineProperty(exports, "__esModule", ({
 var wrapped_element_1 = __importDefault(__webpack_require__(617));
 var WrappedInput = /** @class */function (_super) {
   __extends(WrappedInput, _super);
-  function WrappedInput(_a) {
-    var element = _a.element,
-      classNames = _a.classNames,
-      delimiter = _a.delimiter;
-    var _this = _super.call(this, {
-      element: element,
-      classNames: classNames
-    }) || this;
-    _this.delimiter = delimiter;
-    return _this;
+  function WrappedInput() {
+    return _super !== null && _super.apply(this, arguments) || this;
   }
-  Object.defineProperty(WrappedInput.prototype, "value", {
-    get: function () {
-      return this.element.value;
-    },
-    set: function (value) {
-      this.element.setAttribute('value', value);
-      this.element.value = value;
-    },
-    enumerable: false,
-    configurable: true
-  });
   return WrappedInput;
 }(wrapped_element_1.default);
 exports["default"] = WrappedInput;
@@ -2823,8 +2783,13 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 var utils_1 = __webpack_require__(705);
 var wrapped_element_1 = __importDefault(__webpack_require__(617));
-var htmlElementGuards_1 = __webpack_require__(353);
 var choice_input_1 = __webpack_require__(200);
+var isHtmlOption = function (e) {
+  return e.tagName === 'OPTION';
+};
+var isHtmlOptgroup = function (e) {
+  return e.tagName === 'OPTGROUP';
+};
 var WrappedSelect = /** @class */function (_super) {
   __extends(WrappedSelect, _super);
   function WrappedSelect(_a) {
@@ -2849,20 +2814,6 @@ var WrappedSelect = /** @class */function (_super) {
     enumerable: false,
     configurable: true
   });
-  Object.defineProperty(WrappedSelect.prototype, "optionGroups", {
-    get: function () {
-      return Array.from(this.element.getElementsByTagName('OPTGROUP'));
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(WrappedSelect.prototype, "options", {
-    get: function () {
-      return Array.from(this.element.options);
-    },
-    enumerable: false,
-    configurable: true
-  });
   WrappedSelect.prototype.addOptions = function (choices) {
     var _this = this;
     choices.forEach(function (obj) {
@@ -2879,21 +2830,21 @@ var WrappedSelect = /** @class */function (_super) {
     var _this = this;
     var choices = [];
     this.element.querySelectorAll(':scope > option, :scope > optgroup').forEach(function (e) {
-      if ((0, htmlElementGuards_1.isHTMLOption)(e)) {
+      if (isHtmlOption(e)) {
         choices.push(_this._optionToChoice(e));
-      } else if ((0, htmlElementGuards_1.isHTMLOptgroup)(e)) {
+      } else if (isHtmlOptgroup(e)) {
         choices.push(_this._optgroupToChoice(e));
       }
-      // There should only be those two in a <select> and we wouldn't care about others anyways
-      // todo: hr as empty optgroup
+      // todo: hr as empty optgroup, requires displaying empty opt-groups to be useful
     });
     return choices;
   };
   // eslint-disable-next-line class-methods-use-this
   WrappedSelect.prototype._optionToChoice = function (option) {
-    var result = {
+    return {
       id: 0,
       groupId: 0,
+      score: 0,
       value: option.value,
       label: option.innerHTML,
       element: option,
@@ -2907,7 +2858,6 @@ var WrappedSelect = /** @class */function (_super) {
       labelDescription: typeof option.dataset.labelDescription !== 'undefined' ? option.dataset.labelDescription : undefined,
       customProperties: (0, utils_1.parseCustomProperties)(option.dataset.customProperties)
     };
-    return result;
   };
   WrappedSelect.prototype._optgroupToChoice = function (optgroup) {
     var _this = this;
@@ -2915,7 +2865,7 @@ var WrappedSelect = /** @class */function (_super) {
     var choices = Array.from(options).map(function (option) {
       return _this._optionToChoice(option);
     });
-    var result = {
+    return {
       id: 0,
       label: optgroup.label || '',
       element: optgroup,
@@ -2923,7 +2873,6 @@ var WrappedSelect = /** @class */function (_super) {
       disabled: optgroup.disabled,
       choices: choices
     };
-    return result;
   };
   return WrappedSelect;
 }(wrapped_element_1.default);
@@ -3058,126 +3007,6 @@ exports.DEFAULT_CONFIG = {
 
 /***/ }),
 
-/***/ 360:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 405:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 424:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 394:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 689:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-
-var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  var desc = Object.getOwnPropertyDescriptor(m, k);
-  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-    desc = {
-      enumerable: true,
-      get: function () {
-        return m[k];
-      }
-    };
-  }
-  Object.defineProperty(o, k2, desc);
-} : function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  o[k2] = m[k];
-});
-var __exportStar = this && this.__exportStar || function (m, exports) {
-  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-__exportStar(__webpack_require__(360), exports);
-__exportStar(__webpack_require__(405), exports);
-__exportStar(__webpack_require__(424), exports);
-__exportStar(__webpack_require__(394), exports);
-__exportStar(__webpack_require__(13), exports);
-__exportStar(__webpack_require__(536), exports);
-__exportStar(__webpack_require__(641), exports);
-__exportStar(__webpack_require__(411), exports);
-__exportStar(__webpack_require__(364), exports);
-__exportStar(__webpack_require__(89), exports);
-__exportStar(__webpack_require__(638), exports);
-__exportStar(__webpack_require__(512), exports);
-__exportStar(__webpack_require__(132), exports);
-
-/***/ }),
-
-/***/ 13:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 536:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 641:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
 /***/ 411:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -3188,61 +3017,6 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports.ObjectsInConfig = void 0;
 exports.ObjectsInConfig = ['fuseOptions', 'classNames'];
-
-/***/ }),
-
-/***/ 89:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 364:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 638:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 512:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-
-/***/ }),
-
-/***/ 132:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
 
 /***/ }),
 
@@ -3309,6 +3083,8 @@ var mapInputToChoice = function (value, allowGroup) {
     // actual ID will be assigned during _addChoice
     groupId: 0,
     // actual ID will be assigned during _addGroup but before _addChoice
+    score: 0,
+    // used in search
     value: choice.value,
     label: choice.label || choice.value,
     active: coerceBool(choice.active),
@@ -3326,26 +3102,6 @@ exports.mapInputToChoice = mapInputToChoice;
 
 /***/ }),
 
-/***/ 353:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports.isHTMLOptgroup = exports.isHTMLOption = void 0;
-var isHTMLOption = function (e) {
-  return e.tagName === 'OPTION';
-};
-exports.isHTMLOption = isHTMLOption;
-var isHTMLOptgroup = function (e) {
-  return e.tagName === 'OPTGROUP';
-};
-exports.isHTMLOptgroup = isHTMLOptgroup;
-
-/***/ }),
-
 /***/ 705:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -3355,48 +3111,24 @@ exports.isHTMLOptgroup = isHTMLOptgroup;
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.parseDataSetId = exports.parseCustomProperties = exports.getClassNamesSelector = exports.getClassNames = exports.diff = exports.isEmptyObject = exports.cloneObject = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.unwrapStringForEscaped = exports.unwrapStringForRaw = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.wrap = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
+exports.parseCustomProperties = exports.getClassNamesSelector = exports.getClassNames = exports.diff = exports.cloneObject = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.unwrapStringForEscaped = exports.unwrapStringForRaw = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.generateId = void 0;
 var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
-exports.getRandomNumber = getRandomNumber;
 var generateChars = function (length) {
   return Array.from({
     length: length
   }, function () {
-    return (0, exports.getRandomNumber)(0, 36).toString(36);
+    return getRandomNumber(0, 36).toString(36);
   }).join('');
 };
-exports.generateChars = generateChars;
 var generateId = function (element, prefix) {
-  var id = element.id || element.name && "".concat(element.name, "-").concat((0, exports.generateChars)(2)) || (0, exports.generateChars)(4);
+  var id = element.id || element.name && "".concat(element.name, "-").concat(generateChars(2)) || generateChars(4);
   id = id.replace(/(:|\.|\[|\]|,)/g, '');
   id = "".concat(prefix, "-").concat(id);
   return id;
 };
 exports.generateId = generateId;
-var getType = function (obj) {
-  return Object.prototype.toString.call(obj).slice(8, -1);
-};
-exports.getType = getType;
-var isType = function (type, obj) {
-  return obj !== undefined && obj !== null && (0, exports.getType)(obj) === type;
-};
-exports.isType = isType;
-var wrap = function (element, wrapper) {
-  if (wrapper === void 0) {
-    wrapper = document.createElement('div');
-  }
-  if (element.parentNode) {
-    if (element.nextSibling) {
-      element.parentNode.insertBefore(wrapper, element.nextSibling);
-    } else {
-      element.parentNode.appendChild(wrapper);
-    }
-  }
-  return wrapper.appendChild(element);
-};
-exports.wrap = wrap;
 var getAdjacentEl = function (startEl, selector, direction) {
   if (direction === void 0) {
     direction = 1;
@@ -3472,10 +3204,7 @@ var unwrapStringForRaw = function (s) {
       return s.raw;
     }
   }
-  if (s === null || s === undefined) {
-    return '';
-  }
-  return "".concat(s);
+  return '';
 };
 exports.unwrapStringForRaw = unwrapStringForRaw;
 var unwrapStringForEscaped = function (s) {
@@ -3490,10 +3219,7 @@ var unwrapStringForEscaped = function (s) {
       return s.trusted;
     }
   }
-  if (s === null || s === undefined) {
-    return '';
-  }
-  return "".concat(s);
+  return '';
 };
 exports.unwrapStringForEscaped = unwrapStringForEscaped;
 var sortByAlpha = function (_a, _b) {
@@ -3511,11 +3237,7 @@ var sortByAlpha = function (_a, _b) {
 };
 exports.sortByAlpha = sortByAlpha;
 var sortByScore = function (a, b) {
-  var _a = a.score,
-    scoreA = _a === void 0 ? 0 : _a;
-  var _b = b.score,
-    scoreB = _b === void 0 ? 0 : _b;
-  return scoreA - scoreB;
+  return a.score - b.score;
 };
 exports.sortByScore = sortByScore;
 var dispatchEvent = function (element, type, customArgs) {
@@ -3534,19 +3256,6 @@ var cloneObject = function (obj) {
   return JSON.parse(JSON.stringify(obj));
 };
 exports.cloneObject = cloneObject;
-var isEmptyObject = function (obj) {
-  if (!obj || typeof obj !== 'object') {
-    return true;
-  }
-  // eslint-disable-next-line no-restricted-syntax
-  for (var prop in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-      return false;
-    }
-  }
-  return true;
-};
-exports.isEmptyObject = isEmptyObject;
 /**
  * Returns an array of keys present on the first but missing on the second object
  */
@@ -3582,17 +3291,6 @@ var parseCustomProperties = function (customProperties) {
   return {};
 };
 exports.parseCustomProperties = parseCustomProperties;
-var parseDataSetId = function (element) {
-  if (!element) {
-    return undefined;
-  }
-  var id = element.dataset.id;
-  if (!id) {
-    return undefined;
-  }
-  return parseInt(id, 10);
-};
-exports.parseDataSetId = parseDataSetId;
 
 /***/ }),
 
@@ -3613,12 +3311,10 @@ var __spreadArray = this && this.__spreadArray || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.defaultState = void 0;
 exports["default"] = choices;
-exports.defaultState = [];
 function choices(state, action) {
   if (state === void 0) {
-    state = exports.defaultState;
+    state = [];
   }
   if (action === void 0) {
     action = {};
@@ -3689,7 +3385,7 @@ function choices(state, action) {
       }
     case "CLEAR_CHOICES" /* ActionType.CLEAR_CHOICES */:
       {
-        return exports.defaultState;
+        return [];
       }
     default:
       {
@@ -3717,12 +3413,10 @@ var __spreadArray = this && this.__spreadArray || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.defaultState = void 0;
 exports["default"] = groups;
-exports.defaultState = [];
 function groups(state, action) {
   if (state === void 0) {
-    state = exports.defaultState;
+    state = [];
   }
   if (action === void 0) {
     action = {};
@@ -3813,12 +3507,10 @@ var __spreadArray = this && this.__spreadArray || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.defaultState = void 0;
 exports["default"] = items;
-exports.defaultState = [];
 function items(state, action) {
   if (state === void 0) {
-    state = exports.defaultState;
+    state = [];
   }
   if (action === void 0) {
     action = {};
@@ -3893,11 +3585,9 @@ function items(state, action) {
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.defaultState = void 0;
-exports.defaultState = 0;
 var general = function (state, action) {
   if (state === void 0) {
-    state = exports.defaultState;
+    state = 0;
   }
   if (action === void 0) {
     action = {};
@@ -3996,23 +3686,13 @@ var Store = /** @class */function () {
     enumerable: false,
     configurable: true
   });
-  Object.defineProperty(Store.prototype, "activeItems", {
-    /**
-     * @deprecated
-     */
-    get: function () {
-      return this.items;
-    },
-    enumerable: false,
-    configurable: true
-  });
   Object.defineProperty(Store.prototype, "highlightedActiveItems", {
     /**
      * Get highlighted items from store
      */
     get: function () {
       return this.items.filter(function (item) {
-        return item.active && item.highlighted;
+        return !item.disabled && item.active && item.highlighted;
       });
     },
     enumerable: false,
@@ -4034,19 +3714,7 @@ var Store = /** @class */function () {
      */
     get: function () {
       return this.choices.filter(function (choice) {
-        return choice.active;
-      });
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(Store.prototype, "selectableChoices", {
-    /**
-     * Get selectable choices from store
-     */
-    get: function () {
-      return this.choices.filter(function (choice) {
-        return !choice.disabled;
+        return !choice.disabled && choice.active;
       });
     },
     enumerable: false,
@@ -4057,8 +3725,8 @@ var Store = /** @class */function () {
      * Get choices that can be searched (excluding placeholders)
      */
     get: function () {
-      return this.selectableChoices.filter(function (choice) {
-        return !choice.placeholder;
+      return this.choices.filter(function (choice) {
+        return !choice.disabled && !choice.placeholder;
       });
     },
     enumerable: false,
@@ -4070,7 +3738,7 @@ var Store = /** @class */function () {
      */
     get: function () {
       return __spreadArray([], this.choices, true).reverse().find(function (choice) {
-        return choice.placeholder;
+        return !choice.disabled && choice.placeholder;
       });
     },
     enumerable: false,
@@ -4161,6 +3829,26 @@ var escapeForTemplate = function (allowHTML, s) {
   return allowHTML ? (0, utils_1.unwrapStringForEscaped)(s) : (0, utils_1.sanitise)(s);
 };
 exports.escapeForTemplate = escapeForTemplate;
+var isEmptyObject = function (obj) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (var prop in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+      return false;
+    }
+  }
+  return true;
+};
+var assignCustomProperties = function (el, customProperties) {
+  if (!customProperties) {
+    return;
+  }
+  var dataset = el.dataset;
+  if (typeof customProperties === 'string') {
+    dataset.customProperties = customProperties;
+  } else if (typeof customProperties === 'object' && !isEmptyObject(customProperties)) {
+    dataset.customProperties = JSON.stringify(customProperties);
+  }
+};
 var templates = {
   containerOuter: function (_a, dir, isSelectElement, isSelectOneElement, searchEnabled, passedElementType, labelId) {
     var containerOuter = _a.classNames.containerOuter;
@@ -4253,9 +3941,7 @@ var templates = {
     if (labelDescription) {
       div.dataset.labelDescription = labelDescription;
     }
-    if (!(0, utils_1.isEmptyObject)(customProperties)) {
-      div.dataset.customProperties = JSON.stringify(customProperties);
-    }
+    assignCustomProperties(div, customProperties);
     if (active) {
       div.setAttribute('aria-selected', 'true');
     }
@@ -4352,19 +4038,20 @@ var templates = {
       id: elementId,
       className: "".concat((0, utils_1.getClassNames)(item).join(' '), " ").concat((0, utils_1.getClassNames)(itemChoice).join(' '))
     });
-    var descId = "".concat(elementId, "-description");
+    var describedBy = div;
     if (labelClass) {
       var spanLabel = Object.assign(document.createElement('span'), {
         innerHTML: (0, exports.escapeForTemplate)(allowHTML, label),
         className: (0, utils_1.getClassNames)(labelClass).join(' ')
       });
-      spanLabel.setAttribute('aria-describedby', descId);
+      describedBy = spanLabel;
       div.appendChild(spanLabel);
     } else {
       div.innerHTML = (0, exports.escapeForTemplate)(allowHTML, label);
-      div.setAttribute('aria-describedby', descId);
     }
-    if (typeof labelDescription === 'string') {
+    if (labelDescription) {
+      var descId = "".concat(elementId, "-description");
+      describedBy.setAttribute('aria-describedby', descId);
       var spanDesc = Object.assign(document.createElement('span'), {
         innerHTML: (0, exports.escapeForTemplate)(allowHTML, labelDescription),
         id: descId
@@ -4481,9 +4168,7 @@ var templates = {
     if (labelDescription) {
       opt.dataset.labelDescription = labelDescription;
     }
-    if (!(0, utils_1.isEmptyObject)(customProperties)) {
-      opt.dataset.customProperties = JSON.stringify(customProperties);
-    }
+    assignCustomProperties(opt, customProperties);
     opt.disabled = disabled;
     return opt;
   }
@@ -7135,12 +6820,6 @@ var __webpack_exports__ = {};
 /* harmony export */ });
 /* harmony import */ var _scripts_choices__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(472);
 /* harmony import */ var _scripts_choices__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_scripts_choices__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _scripts_interfaces__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(689);
-/* harmony import */ var _scripts_interfaces__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_scripts_interfaces__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _scripts_constants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(493);
-/* harmony import */ var _scripts_defaults__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(468);
-/* harmony import */ var _scripts_templates__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(543);
-/* harmony import */ var _scripts_templates__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_scripts_templates__WEBPACK_IMPORTED_MODULE_4__);
 
 
 
