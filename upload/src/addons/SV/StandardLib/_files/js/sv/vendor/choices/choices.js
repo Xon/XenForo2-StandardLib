@@ -1,4 +1,4 @@
-/*! choices.js v11.0.0 RC3 | © 2024 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! choices.js v11.0.0RC4 | © 2024 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -1587,14 +1587,6 @@ var Choices = /** @class */function () {
       this.showDropdown();
       return;
     }
-    /*
-    Old:
-     - add if there is an input value, add that as an item
-     - add the highlighted item
-          New:
-     - if "press enter to add" is selected then add the input as a new item
-     - otherwise add the highlighted item(s)
-     */
     // add the highlighted item
     if (hasActiveDropdown) {
       var highlightedChoice = this.dropdown.element.querySelector((0, utils_1.getClassNamesSelector)(this.config.classNames.highlightedState));
@@ -3714,7 +3706,7 @@ var Store = /** @class */function () {
      */
     get: function () {
       return this.choices.filter(function (choice) {
-        return !choice.disabled && choice.active;
+        return choice.active;
       });
     },
     enumerable: false,
