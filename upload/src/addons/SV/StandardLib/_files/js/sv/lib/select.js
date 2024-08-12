@@ -72,14 +72,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             this.input.setWidth()
         }
 
-        if (this._isSelectElement)
-        {
-            this._highlightPosition = 0
-            this._isSearching = false
-            this._startLoading()
-            this._addPredefinedChoices(this._presetChoices)
-            this._stopLoading()
-        }
+        this._highlightPosition = 0
+        this._isSearching = false
     };
 
     SV.StandardLib.Choices = XF.Element.newHandler({
@@ -329,7 +323,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 }
                 else
                 {
-                    this.choices._currentState.items.forEach((option) =>
+                    this.choices._store.items.forEach((option) =>
                     {
                         let customProperties = option.customProperties;
                         if (typeof customProperties === 'object' && customProperties.clears)
