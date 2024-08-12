@@ -6,7 +6,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 ;((window, document) =>
 {
     "use strict";
-    var $ = SV.$;
+    var $ = SV.$, xf22 = typeof XF.on !== 'function';
 
     SV.StandardLib.DynamicFilter = XF.extend(XF.Filter, {
         __backup: {
@@ -70,7 +70,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             this.svPerPageDropdown = thisTarget.querySelector(this.options.perPageDropdown);
             if (this.svPerPageDropdown !== null)
             {
-                if (typeof XF.on !== "function") // XF 2.2
+                if (xf22) // XF 2.2
                 {
                     $(this.svPerPageDropdown).on('change', this.svPerPageChange.bind(this));
                 }
@@ -161,7 +161,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         _appendRows: function(rows)
         {
-            if (typeof XF.on !== "function") {
+            if (xf22) {
                 this.svLib__appendRows(rows);
                 return;
             }
@@ -208,82 +208,106 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         {
             var filter = this.xhrFilter,
                 existingRows = this._getSearchRows();
+            if (xf22) {
+                existingRows = existingRows.toArray();
+            }
             if (!filter.text)
             {
-                if (existingRows)
-                {
-                    for (const existingRow_ of existingRows)
-                    {
-                        existingRow_.remove();
-                    }
+                existingRows.forEach((el) => el.remove());
+                existingRows = [];
+            }
 
-                    existingRows = null;
+            result.html.content = '<div>' + result.html.content.trim() + '</div>'
+            XF.setupHtmlInsert(result.html, (html) => {
+                if (xf22) {
+                    this.xhr = null;
+                    html = html.get(0);
+                } else {
+                    this.abortController = null;
                 }
-            }
+                this._clearAjaxRows();
 
-            this.svLib__filterAjaxResponse(result);
+                var rows = html.querySelectorAll(this.options.searchRow);
+                existingRows.forEach((el) => el.classList.add('is-hidden'));
 
-            var oldPageNavWrappers = this.getPageNavWrappers();
-            if (oldPageNavWrappers === null)
-            {
-                return;
-            }
+                this._applyRowGroupLimit();
+                this._toggleNoResults(rows.length === 0);
 
-            var tmpResult;
-            if (typeof XF.createElementFromString === "undefined") // XF 2.2
-            {
-                tmpResult = $.parseHTML('<div>' + result.html.content + '</div>');
-                tmpResult = tmpResult[0];
-            }
-            else
-            {
-                tmpResult = XF.createElementFromString(result.html.content.trim());
-            }
+                if (rows.length)
+                {
+                    if (xf22) {
+                        const $rows = $(rows);
 
-            var newPageNavWrapper = tmpResult.querySelector(this.options.pageNavWrapper);
-            if (newPageNavWrapper === null)
-            {
+                        this._appendRows($rows);
+                        XF.activate($rows);
+                        this.$ajaxRows = $rows;
+                        this._applyFilter($rows, filter.text, filter.prefix);
+                    } else {
+                        this._appendRows(rows);
+                        XF.activateAll(rows);
+                        this.ajaxRows = rows;
+                        this._applyFilter(rows, filter.text, filter.prefix)
+                    }
+                }
+                else
+                {
+                    XF.layoutChange();
+                }
+
+                this.xhrFilter = null;
+
+                var oldPageNavWrappers = this.getPageNavWrappers();
+                if (oldPageNavWrappers === null)
+                {
+                    return;
+                }
+
+
+                var newPageNavWrapper = html.querySelector(this.options.pageNavWrapper);
+                if (newPageNavWrapper === null)
+                {
+                    oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
+                        oldPageNavWrapper.innerHTML = '';
+                    });
+                    return;
+                }
+
                 oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
-                    oldPageNavWrapper.innerHTML = '';
+                    oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
                 });
-                return;
-            }
+                this.shimDynamicPageNav();
 
-            oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
-                oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
+                if (this.inOverlay)
+                {
+                    return;
+                }
+
+                var finalUrlInput = html.querySelector('input[type="hidden"][name="final_url"]');
+                if (finalUrlInput === null)
+                {
+                    console.error('No final URL input was provided.');
+                    return;
+                }
+
+                var finalUrl = finalUrlInput.value;
+                if (!finalUrl)
+                {
+                    console.error('No final URL available.');
+                    return;
+                }
+
+                if ('pushState' in window.history)
+                {
+                    window.history.pushState({
+                        state: 1,
+                        rand: Math.random()
+                    }, '', finalUrl);
+                }
+                else
+                {
+                    window.location = finalUrl; // force
+                }
             });
-            this.shimDynamicPageNav();
-
-            if (this.inOverlay)
-            {
-                return;
-            }
-
-            var finalUrlInput = tmpResult.querySelector('input[type="hidden"][name="final_url"]');
-            if (finalUrlInput === null)
-            {
-                console.error('No final URL input was provided.');
-                return;
-            }
-
-            var finalUrl = finalUrlInput.value;
-            if (!finalUrl)
-            {
-                console.error('No final URL available.');
-                return;
-            }
-
-            if ('pushState' in window.history)
-            {
-                window.history.pushState({
-                    state: 1,
-                    rand: Math.random()
-                }, '', finalUrl);
-            }
-            else
-            {
-                window.location = finalUrl; // force
-            }
         },
 
         update: function() {
@@ -321,20 +345,17 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 return;
             }
 
-            if (typeof XF.on === "function")
-            {
+            if (xf22) {
+                var $wrappers = $(pageNavWrappers);
+                $wrappers.find('.pageNav a[href]').on('click', this.ajaxLoadNewPage.bind(this));
+                XF.activate($wrappers);
+            } else {
                 for (const pageNavWrapper of pageNavWrappers) {
                     for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href]')) {
                         XF.on(pageNavLink, 'click', this.ajaxLoadNewPage.bind(this))
                     }
                     XF.activate(pageNavWrapper);
                 }
-            }
-            else // XF 2.2
-            {
-                var $wrappers = $(pageNavWrappers);
-                $wrappers.find('.pageNav a[href]').on('click', this.ajaxLoadNewPage.bind(this));
-                XF.activate($wrappers);
             }
         },
 
