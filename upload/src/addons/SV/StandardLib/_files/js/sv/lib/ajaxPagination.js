@@ -124,72 +124,68 @@ SV.$ = SV.$ || window.jQuery || null;
                 return;
             }
 
-            var tmpResult;
-            if (typeof XF.createElementFromString === "undefined") // XF 2.2
-            {
-                tmpResult = $.parseHTML('<div>' + result.html.content + '</div>');
-                tmpResult = tmpResult[0];
-            }
-            else
-            {
-                tmpResult = XF.createElementFromString(result.html.content.trim());
-            }
+            result.html.content = '<div>' + result.html.content.trim() + '</div>';
+            XF.setupHtmlInsert(result.html, (html) => {
+                if (typeof XF.createElementFromString === "undefined") { // XF 2.2
+                    html = html.get(0);
+                }
 
-            var newPageNavWrapper = tmpResult.querySelector(this.options.pageNavWrapper),
-                newContentWrapper = tmpResult.querySelector(this.options.contentWrapper);
-            if (newPageNavWrapper === null)
-            {
+                var newPageNavWrapper = html.querySelector(this.options.pageNavWrapper),
+                    newContentWrapper = html.querySelector(this.options.contentWrapper);
+                if (newPageNavWrapper === null)
+                {
+                    oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
+                        oldPageNavWrapper.innerHTML = '';
+                    });
+                    return;
+                }
+                if (newContentWrapper === null)
+                {
+                    oldContentWrapper.innerHTML = '';
+                    return;
+                }
+
                 oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
-                    oldPageNavWrapper.innerHTML = '';
+                    oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
                 });
-                return;
-            }
-            if (newContentWrapper === null)
-            {
-                oldContentWrapper.innerHTML = '';
-                return;
-            }
+                this.shimDynamicPageNav();
 
-            oldPageNavWrappers.forEach(function (oldPageNavWrapper) {
-                oldPageNavWrapper.innerHTML = newPageNavWrapper.innerHTML;
+                oldContentWrapper.innerHTML = newContentWrapper.innerHTML;
+                this.shimDynamicContent();
+
+                if (this.inOverlay)
+                {
+                    return;
+                }
+
+                var finalUrlInput = html.querySelector('input[type="hidden"][name="final_url"]')
+                if (finalUrlInput === null)
+                {
+                    console.error('No final URL input was provided.');
+                    return;
+                }
+
+                var finalUrl = finalUrlInput.value;
+                if (!finalUrl)
+                {
+                    console.error('No final URL available.');
+                    return;
+                }
+
+                this.finalUrl = finalUrl;
+
+                if ('pushState' in window.history)
+                {
+                    window.history.pushState({
+                        state: 1,
+                        rand: Math.random()
+                    }, '', finalUrl);
+                }
+                else
+                {
+                    window.location = finalUrl; // force
+                }
             });
-            this.shimDynamicPageNav();
-
-            oldContentWrapper.innerHTML = newContentWrapper.innerHTML;
-            this.shimDynamicContent();
-
-            if (this.inOverlay)
-            {
-                return;
-            }
-
-            var finalUrlInput = tmpResult.querySelector('input[type="hidden"][name="final_url"]')
-            if (finalUrlInput === null)
-            {
-                console.error('No final URL input was provided.');
-                return;
-            }
-
-            var finalUrl = finalUrlInput.value;
-            if (!finalUrl)
-            {
-                console.error('No final URL available.');
-                return;
-            }
-
-            this.finalUrl = finalUrl;
-
-            if ('pushState' in window.history)
-            {
-                window.history.pushState({
-                    state: 1,
-                    rand: Math.random()
-                }, '', finalUrl);
-            }
-            else
-            {
-                window.location = finalUrl; // force
-            }
         },
 
         shimDynamicPageNav: function()
