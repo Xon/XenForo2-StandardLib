@@ -1,7 +1,5 @@
 var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
-SV.StandardLib.XF = SV.StandardLib.XF || {};
-SV.StandardLib.XF.Filter = SV.StandardLib.XF.Filter || {};
 SV.$ = SV.$ || window.jQuery || null;
 SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
@@ -9,19 +7,6 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 {
     "use strict";
     var $ = SV.$;
-
-    SV.StandardLib.XF.Filter.BaseOpts = {
-        svLoadInOverlay: true,
-        pageNavWrapper: '.block-outer--page-nav-wrapper',
-        searchTarget: '.userList',
-        searchRow: '.userList-row',
-        searchRowGroup: null,
-        searchLimit: '.username',
-        noResultsFormat: '<div class="blockMessage js-filterNoResults">%s</div>',
-        globalFind: true,
-        perPageDropdown: 'select[name="per_page"]',
-        perPageCookiePrefix: null
-    }
 
     SV.StandardLib.DynamicFilter = XF.extend(XF.Filter, {
         __backup: {
@@ -32,7 +17,18 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             '_filterAjaxResponse': 'svLib__filterAjaxResponse',
             '_appendRows': 'svLib__appendRows'
         },
-        options: SV.extendObject({}, XF.Filter.prototype.options, SV.StandardLib.XF.Filter.BaseOpts),
+        options: SV.extendObject({}, XF.Filter.prototype.options, {
+            svLoadInOverlay: true,
+            pageNavWrapper: '.block-outer--page-nav-wrapper',
+            searchTarget: '.userList',
+            searchRow: '.userList-row',
+            searchRowGroup: null,
+            searchLimit: '.username',
+            noResultsFormat: '<div class="blockMessage js-filterNoResults">%s</div>',
+            globalFind: true,
+            perPageDropdown: 'select[name="per_page"]',
+            perPageCookiePrefix: null
+        }),
 
         resetPage: true,
         skipUpdate: false,
@@ -46,7 +42,6 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             return null;
         },
         _updateStoredValue: function(val, prefix) {
-            return;
         },
 
         init: function ()
