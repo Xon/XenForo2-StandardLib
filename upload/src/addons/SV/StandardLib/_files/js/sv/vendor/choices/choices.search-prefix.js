@@ -3559,6 +3559,9 @@
             this._store.withTxn(function () {
                 _this._addPredefinedChoices(_this._presetChoices, _this._isSelectOneElement && !_this._hasNonChoicePlaceholder, false);
             });
+            if (this._isSelectOneElement && this._hasNonChoicePlaceholder) {
+                this._render({ choices: false, groups: false, items: true });
+            }
         };
         Choices.prototype._addPredefinedChoices = function (choices, selectFirstOption, withEvents) {
             var _this = this;
