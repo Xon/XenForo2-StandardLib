@@ -262,8 +262,8 @@ Support for date/time/timezone input, returned as a unix timestamp
 ```php
 $scheduledStartDate = $this->filter('scheduled_start_date', 'sv-datetime');
 ```
-Compatibility note; `$useNativeTimeInputs` is forced enabled for XF2.3+. 
-For php code, `sv-datetime` input abstracts the differences between native time inputs and older inputs. 
+Compatibility note; `$useNativeTimeInputs` is forced enabled for XF2.3+.
+For php code, `sv-datetime` input abstracts the differences between native time inputs and older inputs.
 However, for javascript code referencing the individual fields this is a backwards compatibility breaking change.
 
 ## Helper code

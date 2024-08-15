@@ -255,7 +255,7 @@ Support for date/time/timezone input, returned as a unix timestamp
 ```html
 <xf:macro name="svStandardLib_helper_macros::date_time_input{{ $asRow ? '_row' : '' }}"
           arg-name="scheduled_start_date"
-          arg-useNativeTime="{{ true }}"
+          arg-useNativeTimeInputs="{{ true }}"
           arg-timestamp="{$xf.time}" />
 ```
 
