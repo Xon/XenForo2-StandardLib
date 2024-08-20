@@ -1061,7 +1061,6 @@
             }
             case ActionType.ADD_ITEM:
             case ActionType.REMOVE_ITEM: {
-                update = true;
                 break;
             }
             case ActionType.FILTER_CHOICES: {
@@ -1320,7 +1319,7 @@
                 return {
                     item: value,
                     score: index,
-                    rank: index,
+                    rank: index + 1,
                 };
             });
         };
@@ -1597,7 +1596,7 @@
             if (placeholderValue) {
                 inp.setAttribute('aria-label', placeholderValue);
             }
-            if (!labelId) {
+            else if (!labelId) {
                 addAriaLabel(this._docRoot, this.passedElement.element.id, inp);
             }
             return inp;
@@ -2400,31 +2399,14 @@
             if (fragment === void 0) { fragment = document.createDocumentFragment(); }
             if (withinGroup === void 0) { withinGroup = false; }
             // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-            var config = this.config;
-            var renderSelectedChoices = config.renderSelectedChoices, searchResultLimit = config.searchResultLimit, renderChoiceLimit = config.renderChoiceLimit;
+            var _a = this, config = _a.config, isSearching = _a._isSearching, isSelectOneElement = _a._isSelectOneElement;
+            var searchResultLimit = config.searchResultLimit, renderChoiceLimit = config.renderChoiceLimit;
             var groupLookup = [];
-            var appendGroupInSearch = config.appendGroupInSearch && this._isSearching;
+            var appendGroupInSearch = config.appendGroupInSearch && isSearching;
             if (appendGroupInSearch) {
                 this._store.groups.forEach(function (group) {
                     groupLookup[group.id] = group.label;
                 });
-            }
-            var appendChoice = function (choice) {
-                var shouldRender = renderSelectedChoices === 'auto' ? _this._isSelectOneElement || !choice.selected : true;
-                if (shouldRender) {
-                    var dropdownItem = _this._templates.choice(config, choice, config.itemSelectText);
-                    if (appendGroupInSearch && choice.groupId > 0) {
-                        var groupName = groupLookup[choice.groupId];
-                        if (groupName) {
-                            dropdownItem.innerHTML += " (".concat(groupName, ")");
-                        }
-                    }
-                    fragment.appendChild(dropdownItem);
-                }
-            };
-            var rendererableChoices = choices;
-            if (renderSelectedChoices === 'auto' && !this._isSelectOneElement) {
-                rendererableChoices = choices.filter(function (choice) { return !choice.selected; });
             }
             if (this._isSelectElement) {
                 var backingOptions = choices.filter(function (choice) { return !choice.element; });
@@ -2432,23 +2414,21 @@
                     this.passedElement.addOptions(backingOptions);
                 }
             }
+            var skipSelected = config.renderSelectedChoices === 'auto' && !isSelectOneElement;
             var placeholderChoices = [];
             var normalChoices = [];
-            if (this._hasNonChoicePlaceholder) {
-                normalChoices = rendererableChoices;
-            }
-            else {
-                // Split array into placeholders and "normal" choices
-                rendererableChoices.forEach(function (choice) {
-                    if (choice.placeholder) {
-                        placeholderChoices.push(choice);
-                    }
-                    else {
-                        normalChoices.push(choice);
-                    }
-                });
-            }
-            if (this._isSearching) {
+            choices.forEach(function (choice) {
+                if ((isSearching && !choice.rank) || (skipSelected && choice.selected)) {
+                    return;
+                }
+                if (_this._hasNonChoicePlaceholder || !choice.placeholder) {
+                    normalChoices.push(choice);
+                }
+                else {
+                    placeholderChoices.push(choice);
+                }
+            });
+            if (isSearching) {
                 // sortByRank is used to ensure stable sorting, as scores are non-unique
                 // this additionally ensures fuseOptions.sortFn is not ignored
                 normalChoices.sort(sortByRank);
@@ -2456,20 +2436,31 @@
             else if (config.shouldSort) {
                 normalChoices.sort(config.sorter);
             }
-            var choiceLimit = rendererableChoices.length;
-            var sortedChoices = this._isSelectOneElement && placeholderChoices.length ? __spreadArray(__spreadArray([], placeholderChoices, true), normalChoices, true) : normalChoices;
-            if (this._isSearching) {
-                choiceLimit = searchResultLimit;
+            var sortedChoices = isSelectOneElement && placeholderChoices.length ? __spreadArray(__spreadArray([], placeholderChoices, true), normalChoices, true) : normalChoices;
+            var choiceLimit = sortedChoices.length;
+            var limit = choiceLimit;
+            if (isSearching && searchResultLimit > 0) {
+                limit = searchResultLimit;
             }
-            else if (renderChoiceLimit && renderChoiceLimit > 0 && !withinGroup) {
-                choiceLimit = renderChoiceLimit;
+            else if (renderChoiceLimit > 0 && !withinGroup) {
+                limit = renderChoiceLimit;
             }
+            if (limit < choiceLimit) {
+                choiceLimit = limit;
+            }
+            choiceLimit--;
             // Add each choice to dropdown within range
-            for (var i = 0; i < choiceLimit; i += 1) {
-                if (sortedChoices[i]) {
-                    appendChoice(sortedChoices[i]);
+            sortedChoices.every(function (choice, index) {
+                var dropdownItem = _this._templates.choice(config, choice, config.itemSelectText);
+                if (appendGroupInSearch && choice.groupId > 0) {
+                    var groupName = groupLookup[choice.groupId];
+                    if (groupName) {
+                        dropdownItem.innerHTML += " (".concat(groupName, ")");
+                    }
                 }
-            }
+                fragment.appendChild(dropdownItem);
+                return index < choiceLimit;
+            });
             return fragment;
         };
         Choices.prototype._createItemsFragment = function (items, fragment) {
