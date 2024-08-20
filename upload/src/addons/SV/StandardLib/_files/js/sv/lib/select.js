@@ -78,19 +78,19 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
     SV.StandardLib.Choices = XF.Element.newHandler({
         options: {
-            addChoices: false,
             resetOnSubmit: false,
             placeholder: null,
-            maxItemCount: -1,
             removeItemButton: true,
+            removeItemButtonAlignLeft: true,
             shouldSort: false,
             shouldSortItems: false,
             editItems: false,
             resetScrollPosition: false,
-            renderSelectedChoices: 'always',//'auto'
-            renderChoiceLimit: false,
-            appendGroupInSearch: false,
-            removeItemButtonAlignLeft: true,
+            renderSelectedChoices: 'always',
+            renderChoiceLimit: -1,
+            searchResultLimit: -1,
+            appendGroupInSearch: true,
+
             // to append a class to various styling elements, use `containerOuter` => `data-class-container-outer`
             // see https://github.com/Xon/Choices.js?tab=readme-ov-file#classnames for class keys
         },
@@ -140,6 +140,24 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 config.maxItemCount = 1;
                 this.options.maxItemCount = 1;
             }
+            // support arbitrary choices.js config options as data-* attributes
+            const dataset = (this.target || this.$target.get(0)).dataset,
+                defaultOptions = Choices.defaults.allOptions;
+            Object.keys(defaultOptions).forEach((key) =>
+            {
+                if (key in config) {
+                    return;
+                }
+
+                const defaultValue = defaultOptions[key];
+                if (typeof defaultValue !== 'string' && typeof defaultValue !== 'number' && typeof defaultValue !== 'boolean') {
+                    return;
+                }
+                const value = dataset[key];
+                if (typeof value === 'string') {
+                    config[key] = value;
+                }
+            });
 
             return config;
         },
@@ -222,14 +240,13 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 classNames.containerOuter.push('svChoices--select-prompt');
             }
 
-            const theTarget = this.target || this.$target.get(0),
-                options = Choices.defaults.allOptions,
-                defaultClassNames = options.classNames;
+            const dataset = (this.target || this.$target.get(0)).dataset,
+                defaultClassNames = Choices.defaults.allOptions.classNames;
 
             Object.keys(defaultClassNames).forEach((key) =>
             {
                 const datasetKey = 'class' + ucfirst(key)
-                const fromDataset = theTarget.dataset[datasetKey]
+                const fromDataset = dataset[datasetKey]
 
                 if (typeof fromDataset !== 'undefined')
                 {
