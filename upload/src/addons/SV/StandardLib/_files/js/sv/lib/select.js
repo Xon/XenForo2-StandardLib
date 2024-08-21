@@ -145,17 +145,40 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 defaultOptions = Choices.defaults.allOptions;
             Object.keys(defaultOptions).forEach((key) =>
             {
-                if (key in config) {
+                if (key in config || !(key in dataset)) {
                     return;
                 }
 
-                const defaultValue = defaultOptions[key];
-                if (typeof defaultValue !== 'string' && typeof defaultValue !== 'number' && typeof defaultValue !== 'boolean') {
-                    return;
+                let v = dataset[key];
+                let setValue = true;
+                switch(typeof defaultOptions[key]) {
+                    case 'string':
+                        // is this JSON? try to parse to an object
+                        try
+                        {
+                            v = JSON.parse(v)
+                        }
+                        catch (error)
+                        {
+                            // ignore
+                        }
+                        break;
+                    case 'number':
+                        v = Number(v)
+                        if (isNaN(v))
+                        {
+                            setValue = false
+                        }
+                        break;
+                    case 'boolean':
+                        v = XF.toBoolean(v);
+                        break;
+                    default:
+                        return;
                 }
-                const value = dataset[key];
-                if (typeof value === 'string') {
-                    config[key] = value;
+
+                if (setValue) {
+                    config[key] = v;
                 }
             });
 
