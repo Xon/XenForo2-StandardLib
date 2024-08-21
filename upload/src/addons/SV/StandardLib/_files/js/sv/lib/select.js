@@ -80,6 +80,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         options: {
             resetOnSubmit: false,
             placeholder: null,
+            maxItemCount: -1,
             removeItemButton: true,
             removeItemButtonAlignLeft: true,
             shouldSort: false,
