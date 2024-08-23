@@ -687,6 +687,10 @@ trait InstallerHelper
 
     protected function checkElasticSearchOptimizableState(): void
     {
+        if (!Helper::isAddOnActive('XFES')) {
+            return;
+        }
+
         $es = Listener::getElasticsearchApi();
 
         $configurer = Helper::service(Configurer::class, $es);
