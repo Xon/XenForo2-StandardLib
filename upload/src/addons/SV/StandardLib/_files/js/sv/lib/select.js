@@ -87,6 +87,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             shouldSort: false,
             shouldSortItems: false,
             editItems: false,
+            position: 'bottom',
             resetScrollPosition: false,
             renderSelectedChoices: 'always',
             renderChoiceLimit: -1,
