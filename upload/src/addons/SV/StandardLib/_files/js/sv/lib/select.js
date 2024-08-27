@@ -79,6 +79,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
     SV.StandardLib.Choices = XF.Element.newHandler({
         options: {
             resetOnSubmit: false,
+            // choices.js options (better defaults)
             placeholder: null,
             maxItemCount: -1,
             removeItemButton: true,
@@ -246,27 +247,28 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getClassNames: function ()
         {
-            // This classes should match public:svStandardLib_macros::choices_static_render
-            const classNames = {
-                containerOuter: [
-                    'choices',
-                    'inputGroup',
-                    'svChoices--inputGroup',
-                ],
-                containerInner: [
-                    'choices__inner',
-                    'input',
-                ],
-            };
-
-            if (XF.phrases['svChoices_itemSelectText'])
-            {
-                classNames.containerOuter.push('svChoices--select-prompt');
-            }
-
-            const dataset = (this.target || this.$target.get(0)).dataset,
+            const classNames = [],
                 defaultClassNames = Choices.defaults.allOptions.classNames;
 
+            const appendClasses = function (key, parts) {
+                if (parts.length) {
+                    if (!(key in classNames)) {
+                        classNames[key] = [];
+                        defaultClassNames[key].forEach(part => classNames[key].push(part));
+                    }
+
+                    parts.forEach(part => classNames[key].push(part));
+                }
+            };
+
+            appendClasses('containerOuter', ['inputGroup', 'svChoices--inputGroup']);
+            appendClasses('containerInner', ['input']);
+            if (XF.phrases['svChoices_itemSelectText'])
+            {
+                appendClasses('containerOuter', ['svChoices--select-prompt']);
+            }
+
+            const dataset = (this.target || this.$target.get(0)).dataset;
             Object.keys(defaultClassNames).forEach((key) =>
             {
                 const datasetKey = 'class' + ucfirst(key)
@@ -274,17 +276,8 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
                 if (typeof fromDataset !== 'undefined')
                 {
-                    const parts = ('' + fromDataset).split(' ')
-                    if (parts.length !== 0)
-                    {
-                        if (!(key in classNames))
-                        {
-                            classNames[key] = []
-                        }
-
-                        defaultClassNames[key].forEach(part => classNames[key].push(part));
-                        parts.forEach(part => classNames[key].push(part));
-                    }
+                    const parts = ('' + fromDataset).split(' ');
+                    appendClasses(key, parts);
                 }
             });
 
