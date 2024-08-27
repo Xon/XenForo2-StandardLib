@@ -29,6 +29,11 @@
 	padding-left: 0;
 	list-style: none;
 }
+
+.choices__item {
+	font-size: 120%;
+}
+
 .choices__list--single {
   display: inline-block;
   padding: 4px 16px 4px 4px;
@@ -45,18 +50,18 @@
 .choices__list--multiple {
   display: inline;
 }
+
 .choices__list--multiple .choices__item {
 	display: inline-block;
 	vertical-align: middle;
 	border-radius: 20px;
 	padding: @xf-paddingSmall @xf-paddingSmall;
-	font-size: 0.75rem;
 	font-weight: 500;
 	margin-right: 3.75px;
 	word-break: break-all;
 	box-sizing: border-box;
 	align-items: center;
-	font-size: 15px;
+	
 	border-radius: @xf-borderRadiusMedium;
 	.xf-chip();
 }
@@ -113,7 +118,6 @@
 .choices__list--dropdown .choices__item, .choices__list[aria-expanded] .choices__item {
   position: relative;
   padding: 10px;
-  font-size: 0.875rem;
 }
 [dir=rtl] .choices__list--dropdown .choices__item, [dir=rtl] .choices__list[aria-expanded] .choices__item {
   text-align: right;
@@ -129,7 +133,6 @@
 		.choices__list--dropdown .choices__item--selectable::after, 
 		.choices__list[aria-expanded] .choices__item--selectable::after {
 			content: attr(data-select-text);
-			font-size: 0.75rem;
 			opacity: 0;
 			position: absolute;
 			right: 10px;
@@ -175,7 +178,6 @@
 .choices__heading {
 	padding: @xf-paddingMedium  @xf-paddingNormal;
 	margin: 0;
-	font-size: @xf-fontSizeSmallest;
 	font-weight: @xf-fontWeightNormal;
 	color: @xf-majorHeadingTextColor;
 	text-decoration: none;
@@ -199,7 +201,7 @@
   display: inline-block;
   vertical-align: baseline;
   background-color: @xf-inputBgColor;
-  font-size: 0.875rem;
+  font-size: @xf-fontSizeNormal;
   border: 0;
   border-radius: 0;
   max-width: 100%;
