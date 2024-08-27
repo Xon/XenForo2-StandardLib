@@ -94,7 +94,7 @@
 	&--dropdown,
 	&[aria-expanded]
 	{
-		visibility: hidden;
+		display: none;
 		z-index: 999;
 		position: absolute;
 		width: 100%;
@@ -106,11 +106,10 @@
 		border-bottom-right-radius: 2.5px;
 		overflow: hidden;
 		word-break: break-all;
-		will-change: visibility;
 
 		.is-active&
 		{
-			visibility: visible;
+			display: block;
 		}
 		.is-open &
 		{
