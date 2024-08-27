@@ -127,13 +127,15 @@ class Templater extends XFCP_Templater
                 if ($type == 'optgroup')
                 {
                     $extractChoices($choice['options']);
+                    continue;
                 }
-                else if ($this->isChoiceSelected($choice, $value, $multiple))
+
+                if ($this->isChoiceSelected($choice, $value, $multiple))
                 {
                     $choice['span'] = $choice['data-label-class'] ?? '';
                     $selectedChoices[$i] = $choice;
-                    $i++;
                 }
+                $i++;
             }
         };
         $extractChoices($choices);

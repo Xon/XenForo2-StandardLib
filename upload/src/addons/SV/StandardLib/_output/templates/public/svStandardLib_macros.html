@@ -33,7 +33,7 @@
 			{$selectHtml|raw}
 			<div class="choices__list {$class.list} choices__list--multiple {$class.listItems} u-JsOnly" role="listbox"><xf:trim>
 				<xf:foreach loop="$selectedChoices" key="$i" value="$choice"><xf:trim>
-					<div class="choices__item {$class.item} choices__item--itemSelectable {$class.itemSelectable}" data-item="" data-id="{$i}" data-value="{$choice.value}" aria-selected="true" role="option" data-deletable=""><button type="button" class="choices__button" aria-label="{{ phrase('svChoices.removeItemLabel', {'value': $choice.value} )|for_attr }}" data-button=""></button>{{
+					<div class="choices__item {$class.item} choices__item--selectable {$class.itemSelectable}" data-item="" data-id="{$i}" data-value="{$choice.value}" aria-selected="true" role="option" data-deletable=""><button type="button" class="choices__button" aria-label="{{ phrase('svChoices.removeItemLabel', {'value': $choice.value} )|for_attr }}" data-button=""></button>{{
 						$choice.span
 						? '<span class="' . $choice.span .'">'. $choice.label .'</span>'
 						: $choice.label
