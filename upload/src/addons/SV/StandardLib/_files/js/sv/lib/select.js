@@ -263,10 +263,6 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             appendClasses('containerOuter', ['inputGroup', 'svChoices--inputGroup']);
             appendClasses('containerInner', ['input']);
-            if (XF.phrases['svChoices_itemSelectText'])
-            {
-                appendClasses('containerOuter', ['svChoices--select-prompt']);
-            }
 
             const dataset = (this.target || this.$target.get(0)).dataset;
             Object.keys(defaultClassNames).forEach((key) =>

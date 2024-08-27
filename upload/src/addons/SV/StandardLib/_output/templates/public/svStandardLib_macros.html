@@ -28,7 +28,7 @@
 		  arg-selectedChoices="!"
 		  arg-class="{{ [] }}"
 		  >
-	<div class="choices inputGroup svChoices--inputGroup {$class.containerOuter}{{ (strlen(phrase('svChoices.itemSelectText')) > 0) ? ' svChoices--select-prompt': '' }}" data-type="select-multiple" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false">
+	<div class="choices inputGroup svChoices--inputGroup {$class.containerOuter}" data-type="select-multiple" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false">
 		<div class="choices__inner input {$class.containerInner}">
 			{$selectHtml|raw}
 			<div class="choices__list {$class.list} choices__list--multiple {$class.listItems} u-JsOnly" role="listbox"><xf:trim>
