@@ -198,6 +198,7 @@
 		  arg-triggerEvent="{{ null }}"
 		  arg-triggerEventOnSelector="{{ null }}"
 		  arg-maximumDateParts="{{ 0 }}"
+		  arg-showSeconds="{{ false }}"
 		  arg-countUp="{{ false }}"><xf:trim>
 	<xf:macro name="relative_timestamp_prerequisites" />
 
@@ -207,6 +208,7 @@
 		  data-date-format="{$xf.language.date_format}"
 		  data-time-format="{$xf.language.time_format}"
 		  data-maximum-date-parts="{$maximumDateParts}"
+	      {{ $showSeconds ? data-show-seconds="1" : '' }}
 		  {{ $triggerEvent is not empty ? 'data-trigger-event="' . $triggerEvent|for_attr . '" ' . ($triggerEventOnSelector is not empty ? ' data-trigger-event-on-selector="' . $triggerEventOnSelector|for_attr . '" ' : '') : '' }}><xf:trim>
 		{$timeStr}
 	</xf:trim></span>

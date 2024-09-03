@@ -499,7 +499,8 @@ class TemplaterHelper
     public function fnRelativeTimestamp(
         BaseTemplater $templater, bool &$escape, int $nowTimestamp, int $otherTimestamp,
         int $maximumDateParts = 0, bool $countUp = false, string $class = '', string $triggerEvent = '',
-        string $triggerEventOnSelector = ''
+        string $triggerEventOnSelector = '',
+        bool $showSeconds = false
     )
     {
         $escape = false;
@@ -510,7 +511,7 @@ class TemplaterHelper
 
         if (isset($interval['invert']) && (!$countUp && !$interval['invert'] || $countUp && $interval['invert']))
         {
-            $dateArr = $repo->buildRelativeDateString($interval, $maximumDateParts);
+            $dateArr = $repo->buildRelativeDateString($interval, $maximumDateParts, 'raw', $showSeconds);
             if ($dateArr)
             {
                 $timeStr = trim(implode(', ', $dateArr));
@@ -528,7 +529,8 @@ class TemplaterHelper
             'triggerEventOnSelector' => $triggerEventOnSelector,
             'timeStr' => $timeStr,
             'otherTimestamp' => $otherTimestamp,
-            'maximumDateParts' => $maximumDateParts
+            'maximumDateParts' => $maximumDateParts,
+            'showSeconds' => $showSeconds,
         ]);
     }
 

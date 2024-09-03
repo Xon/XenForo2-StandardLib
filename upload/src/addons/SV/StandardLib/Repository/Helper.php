@@ -184,7 +184,7 @@ class Helper extends Repository
      * @param string              $phraseContext
      * @return array
      */
-    public function buildRelativeDateString($interval, int $maximumDateParts = 0, string $phraseContext = 'raw'): array
+    public function buildRelativeDateString($interval, int $maximumDateParts = 0, string $phraseContext = 'raw', bool $showSeconds = false): array
     {
         if ($interval instanceof \DateInterval)
         {
@@ -207,6 +207,12 @@ class Helper extends Repository
             'i' => 'minute',
             's' => 'second',
         ];
+
+        // only show seconds in the last 2 minutes
+        if (!$showSeconds && ($interval['y'] || $interval['m'] || $interval['d'] || $interval['h'] || $interval['i'] > 2))
+        {
+            unset($formatMaps['s']);
+        }
 
         $dateArr = [];
         foreach ($formatMaps AS $format => $phrase)

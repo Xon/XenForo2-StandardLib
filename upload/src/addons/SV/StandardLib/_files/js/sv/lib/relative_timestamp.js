@@ -105,11 +105,14 @@ SV.$ = SV.$ || window.jQuery || null;
             timeFormat: null,
             triggerEvent: null,
             triggerEventOnSelector: null,
-            maximumDateParts: 0
+            maximumDateParts: 0,
+            showSeconds: false,
         },
 
         field: null,
         timer: null,
+        interval: 0,
+        showSecondsThreshold: 2 * 60 * 1000,
 
         init: function()
         {
@@ -138,13 +141,25 @@ SV.$ = SV.$ || window.jQuery || null;
             }
 
             // noinspection JSUnresolvedReference
-            this.field = this.target || this.$target.get(0)
-            this.timer = setInterval(this.updateTime.bind(this), 1000);
+            this.field = this.target || this.$target.get(0);
+
+            const now = Math.floor(Date.now() / 1000) * 1000,
+                end = this.options.timestamp * 1000;
+            this.updateTimer(now, end);
+        },
+
+        updateTimer(now, end) {
+            let interval = Math.abs(now - end) <= this.showSecondsThreshold ? 1000 : 10000;
+            if (this.interval !== interval) {
+                clearInterval(this.timer);
+                this.timer = setInterval(this.updateTime.bind(this), interval);
+                this.interval = interval;
+            }
         },
 
         updateTime: function ()
         {
-            let now = Math.floor(Date.now() / 1000) * 1000,
+            const now = Math.floor(Date.now() / 1000) * 1000,
                 end = this.options.timestamp * 1000;
 
             if (now <= end)
@@ -159,6 +174,8 @@ SV.$ = SV.$ || window.jQuery || null;
             {
                 this.handleCountDownEnd(end);
             }
+
+            this.updateTimer(now, end);
         },
 
         handleCountDown: function (nowTimestamp, endTimestamp)
@@ -217,6 +234,7 @@ SV.$ = SV.$ || window.jQuery || null;
         {
             let self = this,
                 timeArr = [],
+                showSeconds = this.options.showSeconds || momentObj.asMilliseconds() <= this.showSecondsThreshold,
                 maximumDateParts = this.options.maximumDateParts;
 
             ['year', 'month', 'day', 'hour', 'minute', 'second'].forEach((type) => {
@@ -229,6 +247,10 @@ SV.$ = SV.$ || window.jQuery || null;
                     if (maximumDateParts > 0 && timeArr.length > 0) {
                         maximumDateParts = timeArr.length;
                     }
+                    return;
+                }
+
+                if (!showSeconds && type === 'second'&& timeArr.length !== 0) {
                     return;
                 }
 
