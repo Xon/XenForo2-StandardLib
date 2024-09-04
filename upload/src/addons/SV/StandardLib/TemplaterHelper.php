@@ -509,6 +509,11 @@ class TemplaterHelper
         $repo = StandardLibHelper::repo();
         $interval = $repo->momentJsCompatibleTimeDiff($nowTimestamp, $otherTimestamp);
 
+        if (!$showSeconds && abs($nowTimestamp - $otherTimestamp) < 2 * 60)
+        {
+            $showSeconds = true;
+        }
+
         if (isset($interval['invert']) && (!$countUp && !$interval['invert'] || $countUp && $interval['invert']))
         {
             $dateArr = $repo->buildRelativeDateString($interval, $maximumDateParts, 'raw', $showSeconds);
