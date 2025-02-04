@@ -133,29 +133,32 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
          */
         _filterAjax: function(text, prefix)
         {
-            var currentPage = this.getCurrentPage() || 1;
-            var data = {
-                _xfFilter: {
-                    text: text,
-                    prefix: prefix ? 1 : 0
-                }
+            let currentPage = this.getCurrentPage() || 1;
+            let finalUrl = this.options.ajax;
+            let data = {
+                page: currentPage,
             };
 
-            if (currentPage != 1)
-            {
-                data['page'] = currentPage;
+            const params = Object.entries({
+                text,
+                prefix: prefix ? 1 : 0,
+            }).map(([key, value]) => `_xfFilter[${key}]=${encodeURIComponent(value)}`).join('&')
+
+            finalUrl = finalUrl + '&' + params
+
+            this.xhrFilter = {
+                text,
+                prefix,
             }
 
-            var finalUrl = this.options.ajax;
             if (this.svPerPageDropdown)
             {
-                var currentUrl = new Url(this.options.ajax);
+                let currentUrl = new Url(finalUrl);
                 currentUrl.query['per_page'] = this.svPerPageDropdown.value;
 
                 finalUrl = currentUrl.toString();
             }
 
-            this.xhrFilter = data['_xfFilter'];
             XF.ajax('GET', finalUrl, data, this._filterAjaxResponse.bind(this));
         },
 
