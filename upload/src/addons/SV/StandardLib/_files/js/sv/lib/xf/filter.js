@@ -133,18 +133,13 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
          */
         _filterAjax: function(text, prefix)
         {
-            let currentPage = this.getCurrentPage() || 1;
-            let finalUrl = this.options.ajax;
-            let data = {
-                page: currentPage,
+            const data = {
+                page: this.getCurrentPage() || 1,
             };
 
-            const params = Object.entries({
-                text,
-                prefix: prefix ? 1 : 0,
-            }).map(([key, value]) => `_xfFilter[${key}]=${encodeURIComponent(value)}`).join('&')
-
-            finalUrl = finalUrl + '&' + params
+            const currentUrl = new Url(this.options.ajax);
+            currentUrl.query['_xfFilter[text]'] = text;
+            currentUrl.query['_xfFilter[prefix]'] = prefix ? 1 : 0;
 
             this.xhrFilter = {
                 text,
@@ -153,11 +148,9 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             if (this.svPerPageDropdown)
             {
-                let currentUrl = new Url(finalUrl);
                 currentUrl.query['per_page'] = this.svPerPageDropdown.value;
-
-                finalUrl = currentUrl.toString();
             }
+            const finalUrl = currentUrl.toString();
 
             XF.ajax('GET', finalUrl, data, this._filterAjaxResponse.bind(this));
         },
@@ -214,7 +207,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             if (xf22) {
                 existingRows = existingRows.toArray();
             }
-            if (!filter.text)
+            if (!filter || !filter.text)
             {
                 existingRows.forEach((el) => el.remove());
                 existingRows = [];
