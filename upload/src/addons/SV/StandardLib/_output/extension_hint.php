@@ -4,6 +4,7 @@
 // DO NOT EDIT DIRECTLY. EDIT THE CLASS EXTENSIONS IN THE CONTROL PANEL.
 
 /**
+ * @noinspection PhpMultipleClassesDeclarationsInOneFile
  * @noinspection PhpIllegalPsrClassPathInspection
  */
 
