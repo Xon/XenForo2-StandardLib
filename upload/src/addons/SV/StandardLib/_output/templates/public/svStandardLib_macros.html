@@ -35,8 +35,8 @@
 				<xf:foreach loop="$selectedChoices" key="$i" value="$choice"><xf:trim>
 					<div class="choices__item {$class.item} choices__item--selectable {$class.itemSelectable}" data-item="" data-id="{$i}" data-value="{$choice.value}" aria-selected="true" role="option" data-deletable=""><button type="button" class="choices__button" aria-label="{{ phrase('svChoices.removeItemLabel', {'value': $choice.value} )|for_attr }}" data-button=""></button>{{
 						$choice.span
-						? '<span class="' . $choice.span .'">'. $choice.label .'</span>'
-						: $choice.label
+						? '<span class="' . $choice.span .'">'. ($choice.escape ? $choice.label : $choice.label|raw) .'</span>'
+						: ($choice.escape ? $choice.label : $choice.label|raw)
 					}}</div>
 				</xf:trim></xf:foreach>
 			</xf:trim></div>
