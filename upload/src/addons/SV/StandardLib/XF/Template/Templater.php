@@ -133,7 +133,7 @@ class Templater extends XFCP_Templater
                 if ($this->isChoiceSelected($choice, $value, $multiple))
                 {
                     $choice['span'] = $choice['data-label-class'] ?? '';
-                    $choice['escape'] = array_key_exists('label', $choice) && $choice instanceof \XF\Phrase;
+                    $choice['escape'] = isset($choice['label']) && $choice['label'] instanceof \XF\Phrase;
                     $selectedChoices[$i] = $choice;
                 }
                 $i++;
