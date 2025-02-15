@@ -1,4 +1,4 @@
-/*! choices.js v11.0.3 | © 2024 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! choices.js v11.0.3 | © 2025 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -2592,9 +2592,7 @@
                 _this._removeItem(itemToRemove);
                 _this._triggerChange(itemToRemove.value);
                 if (_this._isSelectOneElement && !_this._hasNonChoicePlaceholder) {
-                    var placeholderChoice = _this._store.choices
-                        .reverse()
-                        .find(function (choice) { return !choice.disabled && choice.placeholder; });
+                    var placeholderChoice = (_this.config.shouldSort ? _this._store.choices.reverse() : _this._store.choices).find(function (choice) { return !choice.disabled && choice.placeholder; });
                     if (placeholderChoice) {
                         _this._addItem(placeholderChoice);
                         _this.unhighlightAll();
@@ -3257,6 +3255,10 @@
                 else if (target === this.containerOuter.element) {
                     // Remove the focus state when the past outerContainer was the target
                     containerOuter.removeFocusState();
+                    // Also close the dropdown if search is disabled
+                    if (!this._canSearch) {
+                        this.hideDropdown(true);
+                    }
                 }
             }
             else {
