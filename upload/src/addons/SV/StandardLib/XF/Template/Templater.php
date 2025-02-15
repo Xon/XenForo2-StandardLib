@@ -111,7 +111,7 @@ class Templater extends XFCP_Templater
         $multiple = (bool)($controlOptions['multiple'] ?? false);
         if ($multiple)
         {
-            if ($name && substr($name, -2) != '[]')
+            if ($name && substr($name, -2) !== '[]')
             {
                 $name .= '[]';
             }
@@ -124,7 +124,7 @@ class Templater extends XFCP_Templater
             foreach ($choices as $choice)
             {
                 $type = $choice['_type'] ?? 'option';
-                if ($type == 'optgroup')
+                if ($type === 'optgroup')
                 {
                     $extractChoices($choice['options']);
                     continue;
@@ -133,7 +133,7 @@ class Templater extends XFCP_Templater
                 if ($this->isChoiceSelected($choice, $value, $multiple))
                 {
                     $choice['span'] = $choice['data-label-class'] ?? '';
-                    $choice['escape'] = ($choice['label'] ?? null) instanceof \XF\Phrase;
+                    $choice['escape'] = ($choice['label'] ?? null) instanceof Phrase;
                     $selectedChoices[$i] = $choice;
                 }
                 $i++;
