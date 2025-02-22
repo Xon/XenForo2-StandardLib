@@ -2284,18 +2284,7 @@
             }
             return this;
         };
-        Choices.prototype.clearChoices = function () {
-            var _this = this;
-            this._store.withTxn(function () {
-                _this._store.choices.forEach(function (choice) {
-                    _this._store.dispatch(removeChoice(choice));
-                });
-            });
-            // @todo integrate with Store
-            this._searcher.reset();
-            return this;
-        };
-        Choices.prototype.clearStore = function (clearOptions) {
+        Choices.prototype.clearChoices = function (clearOptions) {
             if (clearOptions === void 0) { clearOptions = true; }
             if (clearOptions) {
                 this.passedElement.element.replaceChildren('');
@@ -2304,11 +2293,16 @@
             this.choiceList.element.replaceChildren('');
             this._clearNotice();
             this._store.reset();
-            this._lastAddedChoiceId = 0;
-            this._lastAddedGroupId = 0;
-            this._stopSearch();
             // @todo integrate with Store
             this._searcher.reset();
+            return this;
+        };
+        Choices.prototype.clearStore = function (clearOptions) {
+            if (clearOptions === void 0) { clearOptions = true; }
+            this.clearChoices(clearOptions);
+            this._stopSearch();
+            this._lastAddedChoiceId = 0;
+            this._lastAddedGroupId = 0;
             return this;
         };
         Choices.prototype.clearInput = function () {
