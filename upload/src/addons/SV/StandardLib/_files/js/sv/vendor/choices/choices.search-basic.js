@@ -1,4 +1,4 @@
-/*! choices.js v11.0.3 | © 2025 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! choices.js v11.0.4 | © 2025 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -1248,7 +1248,7 @@
              * Get highlighted items from store
              */
             get: function () {
-                return this.items.filter(function (item) { return !item.disabled && item.active && item.highlighted; });
+                return this.items.filter(function (item) { return item.active && item.highlighted; });
             },
             enumerable: false,
             configurable: true
@@ -1275,7 +1275,7 @@
         });
         Object.defineProperty(Store.prototype, "searchableChoices", {
             /**
-             * Get choices that can be searched (excluding placeholders)
+             * Get choices that can be searched (excluding placeholders or disabled choices)
              */
             get: function () {
                 return this.choices.filter(function (choice) { return !choice.disabled && !choice.placeholder; });
@@ -3356,7 +3356,11 @@
                         if (!isDefaultLabel || !isDefaultValue) {
                             choice = __assign(__assign({}, choice), { value: choice[value], label: choice[label] });
                         }
-                        _this._addChoice(mapInputToChoice(choice, false));
+                        var choiceFull = mapInputToChoice(choice, false);
+                        _this._addChoice(choiceFull);
+                        if (choiceFull.placeholder && !_this._hasNonChoicePlaceholder) {
+                            _this._placeholderValue = unwrapStringForEscaped(choiceFull.label);
+                        }
                     }
                 });
                 _this.unhighlightAll();
@@ -3382,7 +3386,7 @@
                 var existingItems = {};
                 if (!deselectAll) {
                     _this._store.items.forEach(function (choice) {
-                        if (choice.id && choice.active && choice.selected && !choice.disabled) {
+                        if (choice.id && choice.active && choice.selected) {
                             existingItems[choice.value] = true;
                         }
                     });
@@ -3442,9 +3446,7 @@
             var _this = this;
             this._store.withTxn(function () {
                 _this._store.choices.forEach(function (choice) {
-                    if (!choice.selected) {
-                        _this._store.dispatch(removeChoice(choice));
-                    }
+                    _this._store.dispatch(removeChoice(choice));
                 });
             });
             // @todo integrate with Store
@@ -3453,7 +3455,6 @@
         };
         Choices.prototype.clearStore = function (clearOptions) {
             if (clearOptions === void 0) { clearOptions = true; }
-            this._stopSearch();
             if (clearOptions) {
                 this.passedElement.element.replaceChildren('');
             }
@@ -3463,6 +3464,7 @@
             this._store.reset();
             this._lastAddedChoiceId = 0;
             this._lastAddedGroupId = 0;
+            this._stopSearch();
             // @todo integrate with Store
             this._searcher.reset();
             return this;
@@ -3546,7 +3548,7 @@
                     var dropdownItem = choice.choiceEl || _this._templates.choice(config, choice, config.itemSelectText, groupLabel);
                     choice.choiceEl = dropdownItem;
                     fragment.appendChild(dropdownItem);
-                    if (!choice.disabled && (isSearching || !choice.selected)) {
+                    if (isSearching || !choice.selected) {
                         selectableChoices = true;
                     }
                     return index < choiceLimit;
@@ -3585,7 +3587,7 @@
                     renderChoices(renderableChoices(activeChoices), false, undefined);
                 }
             }
-            if (!selectableChoices) {
+            if (!selectableChoices && (isSearching || !fragment.children.length || !config.renderSelectedChoices)) {
                 if (!this._notice) {
                     this._notice = {
                         text: resolveStringFunction(isSearching ? config.noResultsText : config.noChoicesText),
@@ -3620,26 +3622,26 @@
             };
             // new items
             items.forEach(addItemToFragment);
-            var addItems = !!fragment.childNodes.length;
-            if (this._isSelectOneElement && this._hasNonChoicePlaceholder) {
+            var addedItems = !!fragment.childNodes.length;
+            if (this._isSelectOneElement) {
                 var existingItems = itemList.children.length;
-                if (addItems || existingItems > 1) {
+                if (addedItems || existingItems > 1) {
                     var placeholder = itemList.querySelector(getClassNamesSelector(config.classNames.placeholder));
                     if (placeholder) {
                         placeholder.remove();
                     }
                 }
-                else if (!existingItems) {
-                    addItems = true;
+                else if (!addedItems && !existingItems && this._placeholderValue) {
+                    addedItems = true;
                     addItemToFragment(mapInputToChoice({
                         selected: true,
                         value: '',
-                        label: config.placeholderValue || '',
+                        label: this._placeholderValue,
                         placeholder: true,
                     }, false));
                 }
             }
-            if (addItems) {
+            if (addedItems) {
                 itemList.append(fragment);
                 if (config.shouldSortItems && !this._isSelectOneElement) {
                     items.sort(config.sorter);
@@ -3750,7 +3752,7 @@
                 _this._removeItem(itemToRemove);
                 _this._triggerChange(itemToRemove.value);
                 if (_this._isSelectOneElement && !_this._hasNonChoicePlaceholder) {
-                    var placeholderChoice = (_this.config.shouldSort ? _this._store.choices.reverse() : _this._store.choices).find(function (choice) { return !choice.disabled && choice.placeholder; });
+                    var placeholderChoice = (_this.config.shouldSort ? _this._store.choices.reverse() : _this._store.choices).find(function (choice) { return choice.placeholder; });
                     if (placeholderChoice) {
                         _this._addItem(placeholderChoice);
                         _this.unhighlightAll();
@@ -3918,6 +3920,9 @@
                 this._displayNotice(typeof maxItemText === 'function' ? maxItemText(maxItemCount) : maxItemText, NoticeTypes.addChoice);
                 return false;
             }
+            if (this._notice && this._notice.type === NoticeTypes.addChoice) {
+                this._clearNotice();
+            }
             return true;
         };
         Choices.prototype._canCreateItem = function (value) {
@@ -3930,15 +3935,13 @@
             }
             if (canAddItem) {
                 var foundChoice = this._store.choices.find(function (choice) { return config.valueComparer(choice.value, value); });
-                if (this._isSelectElement) {
-                    // for exact matches, do not prompt to add it as a custom choice
-                    if (foundChoice) {
+                if (foundChoice) {
+                    if (this._isSelectElement) {
+                        // for exact matches, do not prompt to add it as a custom choice
                         this._displayNotice('', NoticeTypes.addChoice);
                         return false;
                     }
-                }
-                else if (this._isTextElement && !config.duplicateItemsAllowed) {
-                    if (foundChoice) {
+                    if (!config.duplicateItemsAllowed) {
                         canAddItem = false;
                         notice = resolveNoticeFunction(config.uniqueItemText, value);
                     }
@@ -4318,6 +4321,7 @@
             if (target === this.input.element) {
                 return;
             }
+            var preventDefault = true;
             var item = target.closest('[data-button],[data-item],[data-choice]');
             if (item instanceof HTMLElement) {
                 if ('button' in item.dataset) {
@@ -4325,12 +4329,16 @@
                 }
                 else if ('item' in item.dataset) {
                     this._handleItemAction(item, event.shiftKey);
+                    // don't prevent default to support dragging
+                    preventDefault = false;
                 }
                 else if ('choice' in item.dataset) {
                     this._handleChoiceAction(item);
                 }
             }
-            event.preventDefault();
+            if (preventDefault) {
+                event.preventDefault();
+            }
         };
         /**
          * Handles mouseover event over this.dropdown
@@ -4516,8 +4524,7 @@
                 throw new TypeError('Can not re-add a choice which has already been added');
             }
             var config = this.config;
-            if ((this._isSelectElement || !config.duplicateItemsAllowed) &&
-                this._store.choices.find(function (c) { return config.valueComparer(c.value, choice.value); })) {
+            if (!config.duplicateItemsAllowed && this._store.choices.find(function (c) { return config.valueComparer(c.value, choice.value); })) {
                 return;
             }
             // Generate unique id, in-place update is required so chaining _addItem works as expected
@@ -4723,7 +4730,7 @@
                 throw new TypeError("".concat(caller, " called for an element which has multiple instances of Choices initialised on it"));
             }
         };
-        Choices.version = '11.0.3';
+        Choices.version = '11.0.4';
         return Choices;
     }());
 
