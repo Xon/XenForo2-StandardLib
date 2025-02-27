@@ -1,4 +1,4 @@
-/*! choices.js v11.0.4 | © 2025 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! choices.js v11.0.6 | © 2025 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -3287,13 +3287,14 @@
          * }], 'value', 'label', false);
          * ```
          */
-        Choices.prototype.setChoices = function (choicesArrayOrFetcher, value, label, replaceChoices, clearSearchFlag) {
+        Choices.prototype.setChoices = function (choicesArrayOrFetcher, value, label, replaceChoices, clearSearchFlag, replaceItems) {
             var _this = this;
             if (choicesArrayOrFetcher === void 0) { choicesArrayOrFetcher = []; }
             if (value === void 0) { value = 'value'; }
             if (label === void 0) { label = 'label'; }
             if (replaceChoices === void 0) { replaceChoices = false; }
             if (clearSearchFlag === void 0) { clearSearchFlag = true; }
+            if (replaceItems === void 0) { replaceItems = false; }
             if (!this.initialisedOK) {
                 this._warnChoicesInitFailed('setChoices');
                 return this;
@@ -3304,10 +3305,6 @@
             if (typeof value !== 'string' || !value) {
                 throw new TypeError("value parameter must be a name of 'value' field in passed objects");
             }
-            // Clear choices if needed
-            if (replaceChoices) {
-                this.clearChoices();
-            }
             if (typeof choicesArrayOrFetcher === 'function') {
                 // it's a choices fetcher function
                 var fetcher_1 = choicesArrayOrFetcher(this);
@@ -3317,7 +3314,9 @@
                     return new Promise(function (resolve) { return requestAnimationFrame(resolve); })
                         .then(function () { return _this._handleLoadingState(true); })
                         .then(function () { return fetcher_1; })
-                        .then(function (data) { return _this.setChoices(data, value, label, replaceChoices); })
+                        .then(function (data) {
+                        return _this.setChoices(data, value, label, replaceChoices, clearSearchFlag, replaceItems);
+                    })
                         .catch(function (err) {
                         if (!_this.config.silent) {
                             console.error(err);
@@ -3340,6 +3339,10 @@
             this._store.withTxn(function () {
                 if (clearSearchFlag) {
                     _this._isSearching = false;
+                }
+                // Clear choices if needed
+                if (replaceChoices) {
+                    _this.clearChoices(true, replaceItems);
                 }
                 var isDefaultValue = value === 'value';
                 var isDefaultLabel = label === 'label';
@@ -3442,22 +3445,38 @@
             }
             return this;
         };
-        Choices.prototype.clearChoices = function (clearOptions) {
+        Choices.prototype.clearChoices = function (clearOptions, clearItems) {
+            var _this = this;
             if (clearOptions === void 0) { clearOptions = true; }
+            if (clearItems === void 0) { clearItems = false; }
             if (clearOptions) {
-                this.passedElement.element.replaceChildren('');
+                if (clearItems) {
+                    this.passedElement.element.replaceChildren('');
+                }
+                else {
+                    this.passedElement.element.querySelectorAll(':not([selected])').forEach(function (el) {
+                        el.remove();
+                    });
+                }
             }
             this.itemList.element.replaceChildren('');
             this.choiceList.element.replaceChildren('');
             this._clearNotice();
-            this._store.reset();
+            this._store.withTxn(function () {
+                var items = clearItems ? [] : _this._store.items;
+                _this._store.reset();
+                items.forEach(function (item) {
+                    _this._store.dispatch(addChoice(item));
+                    _this._store.dispatch(addItem(item));
+                });
+            });
             // @todo integrate with Store
             this._searcher.reset();
             return this;
         };
         Choices.prototype.clearStore = function (clearOptions) {
             if (clearOptions === void 0) { clearOptions = true; }
-            this.clearChoices(clearOptions);
+            this.clearChoices(clearOptions, true);
             this._stopSearch();
             this._lastAddedChoiceId = 0;
             this._lastAddedGroupId = 0;
@@ -4315,7 +4334,6 @@
             if (target === this.input.element) {
                 return;
             }
-            var preventDefault = true;
             var item = target.closest('[data-button],[data-item],[data-choice]');
             if (item instanceof HTMLElement) {
                 if ('button' in item.dataset) {
@@ -4323,16 +4341,12 @@
                 }
                 else if ('item' in item.dataset) {
                     this._handleItemAction(item, event.shiftKey);
-                    // don't prevent default to support dragging
-                    preventDefault = false;
                 }
                 else if ('choice' in item.dataset) {
                     this._handleChoiceAction(item);
                 }
             }
-            if (preventDefault) {
-                event.preventDefault();
-            }
+            event.preventDefault();
         };
         /**
          * Handles mouseover event over this.dropdown
@@ -4724,7 +4738,7 @@
                 throw new TypeError("".concat(caller, " called for an element which has multiple instances of Choices initialised on it"));
             }
         };
-        Choices.version = '11.0.4';
+        Choices.version = '11.0.6';
         return Choices;
     }());
 
