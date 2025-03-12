@@ -25,6 +25,11 @@ namespace SV\StandardLib\XF
 	class XFCP_InputFilterer extends \XF\InputFilterer {}
 }
 
+namespace SV\StandardLib\XF\Entity
+{
+	class XFCP_Option extends \XF\Entity\Option {}
+}
+
 namespace SV\StandardLib\XF\Mvc
 {
 	class XFCP_Router extends \XF\Mvc\Router {}

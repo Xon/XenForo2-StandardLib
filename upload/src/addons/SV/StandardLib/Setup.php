@@ -7,6 +7,7 @@ use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
 use XF\Entity\Phrase;
+use XF\Repository\Option as OptionRepo;
 
 class Setup extends AbstractSetup
 {
@@ -45,6 +46,7 @@ class Setup extends AbstractSetup
         parent::postInstall($stateChanges);
         Helper::repo()->rebuildAddOnVersionCache();
         Helper::repo()->clearShimCache();
+        Helper::repository(OptionRepo::class)->rebuildOptionCache();
     }
 
     public function postUpgrade($previousVersion, array &$stateChanges)// : void
@@ -52,6 +54,7 @@ class Setup extends AbstractSetup
         parent::postUpgrade($previousVersion, $stateChanges);
         Helper::repo()->rebuildAddOnVersionCache();
         Helper::repo()->clearShimCache();
+        Helper::repository(OptionRepo::class)->rebuildOptionCache();
     }
 
     public function postRebuild()// : void
@@ -59,5 +62,6 @@ class Setup extends AbstractSetup
         parent::postRebuild();
         Helper::repo()->rebuildAddOnVersionCache();
         Helper::repo()->clearShimCache();
+        Helper::repository(OptionRepo::class)->rebuildOptionCache();
     }
 }
