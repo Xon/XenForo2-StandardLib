@@ -4,6 +4,8 @@ namespace SV\StandardLib\XF\Entity;
 
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Structure;
+use function floatval;
+use function strval;
 
 /**
  * @extends \XF\Entity\Option
@@ -16,7 +18,8 @@ class Option extends XFCP_Option
         // int/bool types are not cast as expected, which is then cached into \XF::options()
         if ($this->isDataTypeNumeric())
         {
-            return (int)$this->option_value_;
+            /** @noinspection PhpWrongStringConcatenationInspection */
+            return strval(floatval($this->option_value_)) + 0;
         }
         else if ($this->data_type === 'bool')
         {
