@@ -5,6 +5,7 @@ namespace SV\StandardLib\XF\Template;
 use XF\Mvc\Entity\Entity;
 use XF\Phrase;
 use function array_replace;
+use function array_slice;
 use function explode;
 use function in_array;
 use function is_array;
@@ -140,6 +141,11 @@ class Templater extends XFCP_Templater
             }
         };
         $extractChoices($choices);
+        // in non-multi mode, the last choice wins to match HTML <select> behavior
+        if (!$multiple && count($selectedChoices) > 1)
+        {
+            $selectedChoices = array_slice($selectedChoices, -1, 1, true);
+        }
 
         // signal to javascript about pre-rendering
         $controlOptions['data-rendered'] = 1;
