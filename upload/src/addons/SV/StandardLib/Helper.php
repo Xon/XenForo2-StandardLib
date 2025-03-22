@@ -46,6 +46,7 @@ class Helper
     }
 
     /**
+     * Note; `new`/`T::__construct` is executed in the context of T
      * @template T
      * @param class-string<T> $classname
      * @param        ...$args
@@ -54,8 +55,15 @@ class Helper
     public static function newExtendedClass(string $classname, ...$args)
     {
         $classname = \XF::extendClass($classname);
+
+        // allow private/protected constructors to be called
+        $newFunc = \Closure::bind(function () use ($classname, $args) {
+            return new $classname(...$args);
+        }, null, $classname);
+
         /** @var T $obj */
-        $obj = new $classname(...$args);
+        $obj = $newFunc();
+
         return $obj;
     }
 
