@@ -6,6 +6,7 @@ use DateInterval;
 use LogicException;
 use SV\InstallerAppHelper\InstallAppBootstrap;
 use SV\StandardLib\Helper as HelperUtil;
+use SV\StandardLib\XF\ExtensionAccess;
 use XF\Container;
 use XF\Entity\AddOn;
 use XF\Entity\User as UserEntity;
@@ -392,9 +393,10 @@ class Helper extends Repository
     /**
      * @param class-string $destClass
      * @param class-string $srcClass
+     * @param class-string|null $baseClass
      * @return void
      */
-    public function aliasClass(string $destClass, string $srcClass): void
+    public function aliasClass(string $destClass, string $srcClass, ?string $baseClass = null): void
     {
         if ($destClass === '')
         {
@@ -413,14 +415,45 @@ class Helper extends Repository
             $srcClass = '\\' . $srcClass;
         }
 
-        if (\XF::$versionId < 2021300)
+        if ($baseClass !== null || \XF::$versionId < 2021300)
         {
-            $this->aliasClassSimple($destClass, $srcClass);
+            $this->aliasClassPatch($destClass, $srcClass, $baseClass);
 
             return;
         }
 
         $this->aliasClassStubFile($destClass, $srcClass);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function aliasClassSimple(string $destClass, string $srcClass): void
+    {
+        $this->aliasClassPatch($destClass, $srcClass, null);
+    }
+
+    /**
+     * XF2.2.13+ implements \XF\Extension::inverseExtensionMap, which simplifies resolveExtendedClassToRoot significantly
+     * However this is incompatible with class_alias for the top-level class extension without patching inverseExtensionMap
+     *
+     * @param class-string $destClass
+     * @param class-string $srcClass
+     * @param class-string|null $baseClass
+     * @ret
+     */
+    public function aliasClassPatch(string $destClass, string $srcClass, ?string $baseClass): void
+    {
+        class_alias($srcClass, $destClass);
+
+        [$destXFCP, $srcXFCP] = $this->getClassAliases($destClass, $srcClass);
+
+        class_alias($destXFCP, $srcXFCP, false);
+
+        if ($baseClass !== null)
+        {
+            ExtensionAccess::patchInverseMap($srcClass, $baseClass);
+        }
     }
 
     /**
@@ -442,6 +475,11 @@ class Helper extends Repository
     }
 
 
+    /**
+     * @param class-string $destClass
+     * @param class-string $srcClass
+     * @return void
+     */
     public function aliasClassStubFile(string $destClass, string $srcClass): void
     {
         $file = '/svShim/' . md5($destClass . '-' . $srcClass) . '.php';
@@ -476,6 +514,11 @@ class Helper extends Repository
         }
     }
 
+    /**
+     * @param class-string $srcClass
+     * @param class-string $destClass
+     * @return string
+     */
     protected function buildShimStubFile(string $srcClass, string $destClass): string
     {
         [$destXFCP, $srcXFCP, $namespace, $class] = $this->getClassAliases($destClass, $srcClass);
@@ -524,22 +567,5 @@ EOL;
         {
             \XF::logException($e, false, 'Suppressed:');
         }
-    }
-
-    /**
-     * XF2.2.13+ implements \XF\Extension::inverseExtensionMap, which simplifies resolveExtendedClassToRoot significantly
-     * However this is incompatible with class_alias for the top-level class extension
-     *
-     * @param string $destClass
-     * @param string $srcClass
-     * @return void
-     */
-    public function aliasClassSimple(string $destClass, string $srcClass): void
-    {
-        class_alias($srcClass, $destClass);
-
-        [$destXFCP, $srcXFCP] = $this->getClassAliases($destClass, $srcClass);
-
-        class_alias($destXFCP, $srcXFCP, false);
     }
 }
