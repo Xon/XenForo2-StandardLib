@@ -10,8 +10,11 @@ namespace SV\StandardLib\Finder;
 use XF\Db\AbstractAdapter;
 use function array_fill_keys;
 use function array_slice;
+use function call_user_func_array;
 use function count;
 use function explode;
+use function func_get_args;
+use function func_num_args;
 use function implode;
 use function is_array;
 use function is_string;
@@ -94,7 +97,7 @@ trait SqlJoinTrait
     public function sqlJoin(string $rawJoinTable, string $alias, array $columns, bool $mustExist = false, bool $hasTableExpr = false)
     {
         $columns = array_fill_keys($columns, true);
-        $this->rawJoins[$alias] = isset($this->rawJoins[$alias]) ? $this->rawJoins[$alias] + $columns : $columns;
+        $this->rawJoins[$alias] = ($this->rawJoins[$alias] ?? []) + $columns;
 
         if (isset($this->joins[$alias]))
         {
@@ -220,7 +223,7 @@ trait SqlJoinTrait
         if (count($parts) === 2)
         {
             [$alias, $column] = $parts;
-            if (isset($this->rawJoins[$alias][$column]))
+            if ($this->rawJoins[$alias][$column] ?? false)
             {
                 if ($markJoinFundamental)
                 {
@@ -233,5 +236,27 @@ trait SqlJoinTrait
         }
 
         return parent::resolveFieldToTableAndColumn($field, $markJoinFundamental);
+    }
+
+    public function buildCondition($condition, $operator = null, $value = null)
+    {
+        // detect left join ... where id is null, and mark this as not truly fundamental
+        if (func_num_args() > 0 && is_string($condition) && ($operator === null || $operator === '=') && $value === null)
+        {
+            $parts = explode('.', $condition);
+            if (count($parts) === 2)
+            {
+                [$alias, $column] = $parts;
+                if (($this->rawJoins[$alias][$column] ?? false) && !$this->joins[$alias]['exists'])
+                {
+                    $this->joins[$alias]['fundamental'] = true;
+                    $this->joins[$alias]['reallyFundamental'] = false;
+
+                    return "`$alias`.`$column` IS NULL";
+                }
+            }
+        }
+
+        return call_user_func_array([parent::class, 'buildCondition'], func_get_args());
     }
 }
