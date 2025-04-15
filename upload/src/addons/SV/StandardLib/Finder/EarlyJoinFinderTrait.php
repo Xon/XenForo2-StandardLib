@@ -164,15 +164,14 @@ trait EarlyJoinFinderTrait
         $srcJoins = $allJoins ?? $this->joins;
         foreach ($srcJoins AS $join)
         {
-            if ($join['exists'] && !$join['fetch'] && !$join['fundamental'])
+            $isInnerJoin = $join['exists'];
+            $isFetch = $join['fetch'];
+            if ($isInnerJoin && !$isFetch && !$join['fundamental'])
             {
                 // prune if this isn't actually required
                 continue;
             }
 
-            $joinType = $join['exists'] ? 'INNER' : 'LEFT';
-            $indexHintArr = $join['indexHints'] ?? [];
-            $joinHints = count($indexHintArr) === 0 ? '' : ' ' . implode(' ', $indexHintArr);
             $table = $join['table'];
             if ($join['hasTableExpr'] ?? false)
             {
@@ -188,10 +187,15 @@ trait EarlyJoinFinderTrait
                 $table = '`'.$table.'`';
             }
 
-            $joins[] = "$joinType JOIN $table AS `$join[alias]`$joinHints ON ($join[condition])";
-            if ($join['fetch'] && !is_array($fetchOnly))
+            $joinType = $isInnerJoin ? 'INNER' : 'LEFT';
+            $alias = $join['alias'];
+            $indexHintArr = $join['indexHints'] ?? [];
+            $joinHints = count($indexHintArr) === 0 ? '' : ' ' . implode(' ', $indexHintArr);
+
+            $joins[] = "$joinType JOIN $table AS `$alias`$joinHints ON ($join[condition])";
+            if ($isFetch && !is_array($fetchOnly))
             {
-                $fetch[] = "`$join[alias]`.*";
+                $fetch[] = "`$alias`.*";
             }
         }
 
