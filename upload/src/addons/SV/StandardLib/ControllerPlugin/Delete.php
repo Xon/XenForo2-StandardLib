@@ -63,13 +63,13 @@ class Delete extends AbstractPlugin
         if ($this->isPost())
 		{
 			$id = $entity->getIdentifierValues();
-			if (!$id || count($id) != 1)
+			if (!$id || count($id) !== 1)
 			{
 				throw new \InvalidArgumentException('Entity does not have an ID or does not have a simple key');
 			}
 			$entityId = intval(reset($id));
 
-			if ($entity->{$stateKey} == 'deleted')
+			if ($entity->{$stateKey} === 'deleted')
 			{
 				$linkHash = $this->buildLinkHash($entityId);
 

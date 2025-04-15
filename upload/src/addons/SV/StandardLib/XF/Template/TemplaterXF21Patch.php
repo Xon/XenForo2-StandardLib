@@ -19,7 +19,7 @@ if (\XF::$versionId < 2012000)
                 if (!$template)
                 {
                     $nameParts = explode('::', $name, 2);
-                    if (count($nameParts) == 2)
+                    if (count($nameParts) === 2)
                     {
                         $template = $nameParts[0];
                         $name = $nameParts[1];
