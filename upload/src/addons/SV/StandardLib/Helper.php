@@ -12,6 +12,7 @@ use XF\Mvc\Entity\Repository;
 use XF\Mvc\Entity\Structure;
 use XF\Service\AbstractService;
 use function class_exists;
+use function count;
 use function str_replace;
 use function strpos;
 

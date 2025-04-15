@@ -2,8 +2,6 @@
 
 namespace SV\StandardLib\XF\Entity;
 
-use XF\Mvc\Entity\Entity;
-use XF\Mvc\Entity\Structure;
 use function floatval;
 use function strval;
 

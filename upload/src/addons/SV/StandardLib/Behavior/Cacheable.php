@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib\Behavior;
 
+use LogicException;
 use SV\StandardLib\Helper;
 use XF\Mvc\Entity\Behavior;
 use function is_callable;
@@ -59,7 +60,7 @@ class Cacheable extends Behavior
         }
         else if (\XF::$developmentMode || \XF::$debugMode)
         {
-            $e = new \LogicException('Expected '.$class.'::'.$func.' method to exist');
+            $e = new LogicException('Expected '.$class.'::'.$func.' method to exist');
             if (\XF::$developmentMode)
             {
                 throw $e;

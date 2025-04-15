@@ -13,6 +13,7 @@ use XF\Entity\Template as TemplateEntity;
 use XF\Repository\TemplateModification as TemplateModificationRepo;
 use XF\Mvc\Reply\Exception as ExceptionReply;
 use XF\Template\Compiler\Exception as TemplateCompilerException;
+use function array_map;
 use function in_array;
 use function is_numeric;
 
@@ -130,7 +131,7 @@ class Template extends XFCP_Template
                 {
                     $viewParams['compiledTemplate'] = \XF::app()->templateCompiler()->compile($templateStr);
                 }
-                /** @noinspection PhpRedundantCatchClauseInspection */
+                    /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (TemplateCompilerException $exception)
                 {
                     $viewParams['compilerErrors'] = $exception->getMessages();
@@ -156,9 +157,9 @@ class Template extends XFCP_Template
     protected function getTemplateModificationFinderForSvStandardLib(string $type, string $template)
     {
         return Helper::finder(\XF\Finder\TemplateModification::class)
-            ->where('type', $type)
-            ->where('template', $template)
-            ->whereAddOnActive()
-            ->order(\XF::$versionId >= 2010872  ? ['execution_order', 'modification_key'] : ['execution_order']);
+                     ->where('type', $type)
+                     ->where('template', $template)
+                     ->whereAddOnActive()
+                     ->order(\XF::$versionId >= 2010872  ? ['execution_order', 'modification_key'] : ['execution_order']);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib\Repository;
 
+use Closure;
 use XF\Mvc\Entity\Repository;
 use XF\Mvc\Router;
 
@@ -34,7 +35,7 @@ class LinkBuilder extends Repository
             return;
         }
 
-        $callable = \Closure::fromCallable($callable);
+        $callable = Closure::fromCallable($callable);
 
         foreach ($routeSection as $subSection => $route)
         {
@@ -60,7 +61,7 @@ class LinkBuilder extends Repository
             return;
         }
 
-        $callable = \Closure::fromCallable($callable);
+        $callable = Closure::fromCallable($callable);
 
         $route['build_callback_list'][] = $callable;
         $router->addRoute($routeLabel, $subSection, $route);

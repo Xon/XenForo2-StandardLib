@@ -6,6 +6,7 @@ use XF\Mvc\Entity\Entity;
 use XF\Phrase;
 use function array_replace;
 use function array_slice;
+use function count;
 use function explode;
 use function in_array;
 use function is_array;

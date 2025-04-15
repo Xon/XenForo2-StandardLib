@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib;
 
+use LogicException;
 use SV\StandardLib\Db\AlterColumnUnwrapper;
 use SV\StandardLib\Db\AlterTableUnwrapper;
 use XF\AddOn\AddOn;
@@ -22,13 +23,19 @@ use XFES\Elasticsearch\Exception;
 use XFES\Listener;
 use XFES\Service\Configurer;
 use XFES\Service\Optimizer;
+use function array_keys;
 use function count;
 use function explode;
 use function file_exists;
+use function in_array;
 use function is_array;
 use function phpversion;
+use function preg_replace;
+use function str_replace;
 use function strlen;
 use function strpos;
+use function strtolower;
+use function unserialize;
 use function version_compare;
 use function sprintf;
 
@@ -140,7 +147,7 @@ trait InstallerHelper
         $option = Helper::find(Option::class, 'registrationDefaults');
         if ($option === null)
         {
-            throw new \LogicException("XenForo installation is damaged. Expected option 'registrationDefaults' to exist.");
+            throw new LogicException("XenForo installation is damaged. Expected option 'registrationDefaults' to exist.");
         }
 
         $registrationDefaults = $option->option_value;
@@ -225,9 +232,9 @@ trait InstallerHelper
 
         foreach ($map AS $from => $to)
         {
-            $mySqlRegex = '^' . \str_replace('*', '[a-zA-Z0-9_]+', $from) . '$';
-            $phpRegex = '/^' . \str_replace('*', '([a-zA-Z0-9_]+)', $from) . '$/';
-            $replacePhrase = \str_replace('*', '$1', $to);
+            $mySqlRegex = '^' . str_replace('*', '[a-zA-Z0-9_]+', $from) . '$';
+            $phpRegex = '/^' . str_replace('*', '([a-zA-Z0-9_]+)', $from) . '$/';
+            $replacePhrase = str_replace('*', '$1', $to);
 
             $results = $db->fetchPairs("
 				SELECT phrase_id, title
@@ -238,23 +245,22 @@ trait InstallerHelper
 
             if ($results)
             {
-                $em = \XF::em();
                 /** @var PhraseEntity[] $phrases */
-                $phrases = Helper::findByIds(PhraseEntity::class, \array_keys($results));
+                $phrases = Helper::findByIds(PhraseEntity::class, array_keys($results));
                 foreach ($results AS $phraseId => $oldTitle)
                 {
                     if (isset($phrases[$phraseId]))
                     {
-                        $newTitle = \preg_replace($phpRegex, $replacePhrase, $oldTitle);
+                        $newTitle = preg_replace($phpRegex, $replacePhrase, $oldTitle);
                         $phrase = $phrases[$phraseId];
 
                         $db->beginTransaction();
 
                         /** @var PhraseEntity $newPhrase */
                         $newPhrase = $replace
-                            ? \SV\StandardLib\Helper::finder(\XF\Finder\Phrase::class, false)
-                                 ->where('title', '=', $newTitle)
-                                 ->fetchOne()
+                            ? Helper::finder(PhraseFinder::class)
+                                    ->where('title', '=', $newTitle)
+                                    ->fetchOne()
                             : null;
 
                         if ($newPhrase)
@@ -392,7 +398,7 @@ trait InstallerHelper
                 else if ($hasOldNames)
                 {
                     $colName = $changeColumn->getName();
-                    if (\in_array($colName, $oldNames, true))
+                    if (in_array($colName, $oldNames, true))
                     {
                         return $changeColumn->renameTo($name);
                     }
@@ -415,7 +421,7 @@ trait InstallerHelper
             return $table->addColumn($name, $type, $length);
         }
 
-        throw new \LogicException('Unknown schema DDL type ' . \get_class($table));
+        throw new LogicException('Unknown schema DDL type ' . \get_class($table));
     }
 
     /**
@@ -511,7 +517,7 @@ trait InstallerHelper
             return false;
         }
 
-        $totals = @\unserialize($totals);
+        $totals = @unserialize($totals);
         if (!$totals)
         {
             return false;
@@ -579,12 +585,12 @@ trait InstallerHelper
      *
      * An example;
     "require-soft" :{
-        "SV/Threadmarks": [
-            2000370,
-            "Threadmarks v2.0.3+",
-            false,
-            "Please provide feedback if you are unable to upgrade."
-        ]
+    "SV/Threadmarks": [
+    2000370,
+    "Threadmarks v2.0.3+",
+    false,
+    "Please provide feedback if you are unable to upgrade."
+    ]
     },
      * The 3rd array argument has 3 supported values, null/true/false
      *   null/no exists - this is advisory for "Extra Cli Tools" when determining bulk install order, and isn't actually checked
@@ -645,7 +651,7 @@ trait InstallerHelper
                 if ($mySqlVersion)
                 {
                     $enabled = true;
-                    $versionValid = version_compare(\strtolower($mySqlVersion), $version, 'ge');
+                    $versionValid = version_compare(strtolower($mySqlVersion), $version, 'ge');
                 }
             }
             else

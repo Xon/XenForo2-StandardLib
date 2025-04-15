@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib\Repository;
 
+use DateInterval;
 use SV\InstallerAppHelper\InstallAppBootstrap;
 use XF\Container;
 use XF\Entity\AddOn;
@@ -9,17 +10,23 @@ use XF\Entity\User as UserEntity;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Repository;
 use XF\Util\File as FileUtil;
+use function abs;
 use function assert;
+use function ceil;
 use function class_alias;
+use function count;
+use function floor;
 use function in_array;
 use function is_numeric;
 use function is_string;
+use function mb_strtolower;
 use function md5;
 use function preg_replace;
 use function str_replace;
 use function strpos;
 use function strrpos;
 use function substr;
+use function trim;
 use function version_compare;
 
 class Helper extends Repository
@@ -51,7 +58,7 @@ class Helper extends Repository
 
         if (is_string($targetVersion))
         {
-            $addOnEntity = \SV\StandardLib\Helper::findCached(\XF\Entity\AddOn::class, $addonId);
+            $addOnEntity = \SV\StandardLib\Helper::findCached(AddOn::class, $addonId);
             if ($addOnEntity instanceof AddOn)
             {
                 // unlike \XF::isAddOnActive, the add-on must not be in a processing state
@@ -179,14 +186,15 @@ class Helper extends Repository
     }
 
     /**
-     * @param \DateInterval|array $interval
-     * @param int                 $maximumDateParts
-     * @param string              $phraseContext
+     * @param DateInterval|array $interval
+     * @param int                $maximumDateParts
+     * @param string             $phraseContext
+     * @param bool               $showSeconds
      * @return array
      */
     public function buildRelativeDateString($interval, int $maximumDateParts = 0, string $phraseContext = 'raw', bool $showSeconds = false): array
     {
-        if ($interval instanceof \DateInterval)
+        if ($interval instanceof DateInterval)
         {
             $interval = [
                 'y' => $interval->y,
@@ -217,7 +225,7 @@ class Helper extends Repository
         $dateArr = [];
         foreach ($formatMaps AS $format => $phrase)
         {
-            if ($maximumDateParts && \count($dateArr) >= $maximumDateParts)
+            if ($maximumDateParts && count($dateArr) >= $maximumDateParts)
             {
                 break;
             }
@@ -235,7 +243,7 @@ class Helper extends Repository
                     'count' => $value
                 ])->render($phraseContext);
             }
-            else if ($maximumDateParts > 0 && \count($dateArr) > 0)
+            else if ($maximumDateParts > 0 && count($dateArr) > 0)
             {
                 break;
             }
@@ -269,11 +277,11 @@ class Helper extends Repository
         $absCeil = function ($number) {
             if ($number < 0)
             {
-                return \floor($number);
+                return floor($number);
             }
             else
             {
-                return \ceil($number);
+                return ceil($number);
             }
         };
 
@@ -281,11 +289,11 @@ class Helper extends Repository
             if ($number < 0)
             {
                 // -0 -> 0
-                return \ceil($number) || 0;
+                return ceil($number) || 0;
             }
             else
             {
-                return \floor($number);
+                return floor($number);
             }
         };
 

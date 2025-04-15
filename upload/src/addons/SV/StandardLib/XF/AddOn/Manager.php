@@ -7,6 +7,7 @@ namespace SV\StandardLib\XF\AddOn;
 use SV\StandardLib\Helper;
 use function array_key_exists;
 use function array_merge;
+use function count;
 use function is_array;
 
 /**
@@ -26,7 +27,7 @@ class Manager extends XFCP_Manager
             {
                 continue;
             }
-            list ($version, $product) = $requirement;
+            [$version, $product] = $requirement;
 
             // only apply the version string constraint if it is a known add-on
             if (!array_key_exists($productKey, $addOns))

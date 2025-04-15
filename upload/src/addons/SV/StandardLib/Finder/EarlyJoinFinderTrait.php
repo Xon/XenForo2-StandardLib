@@ -12,8 +12,11 @@ use XF\Mvc\Entity\Finder;
 use XF\Mvc\Entity\FinderExpression;
 use XF\Mvc\Entity\Structure;
 use function implode, count;
+use function is_array;
 use function is_callable;
 use function is_float;
+use function is_int;
+use function property_exists;
 
 /**
  * @method int getEarlyJoinThreshold(?int $offset = null, ?int $limit = null, array $options = [])
@@ -88,7 +91,7 @@ trait EarlyJoinFinderTrait
         }
 
         $primaryKey = $this->structure->primaryKey;
-        $primaryKeys = \is_array($primaryKey) ? $primaryKey : [$primaryKey];
+        $primaryKeys = is_array($primaryKey) ? $primaryKey : [$primaryKey];
         $subQueryOptions = $options;
         $subQueryOptions['fetchOnly'] = $primaryKeys;
         $subQueryOptions['skipEarlyJoin'] = true;
@@ -103,7 +106,7 @@ trait EarlyJoinFinderTrait
         }
 
         // Use property_exists and not ?? as Finder does magic _get lookups which don't like it
-        $allJoins = \property_exists($this, 'allJoins') ? $this->allJoins : null;
+        $allJoins = property_exists($this, 'allJoins') ? $this->allJoins : null;
         try
         {
             // do this before the outer-joins
@@ -140,7 +143,7 @@ trait EarlyJoinFinderTrait
         $joins = [];
 
         $fetchOnly = $options['fetchOnly'] ?? null;
-        if (\is_array($fetchOnly))
+        if (is_array($fetchOnly))
         {
             if (!$fetchOnly)
             {
@@ -149,8 +152,8 @@ trait EarlyJoinFinderTrait
 
             foreach ($fetchOnly AS $key => $fetchValue)
             {
-                $fetchSql = $this->columnSqlName(\is_int($key) ? $fetchValue : $key);
-                $fetch[] = $fetchSql . (!\is_int($key) ? " AS '$fetchValue'" : '');
+                $fetchSql = $this->columnSqlName(is_int($key) ? $fetchValue : $key);
+                $fetch[] = $fetchSql . (!is_int($key) ? " AS '$fetchValue'" : '');
             }
         }
         else
@@ -186,7 +189,7 @@ trait EarlyJoinFinderTrait
             }
 
             $joins[] = "$joinType JOIN $table AS `$join[alias]`$joinHints ON ($join[condition])";
-            if ($join['fetch'] && !\is_array($fetchOnly))
+            if ($join['fetch'] && !is_array($fetchOnly))
             {
                 $fetch[] = "`$join[alias]`.*";
             }

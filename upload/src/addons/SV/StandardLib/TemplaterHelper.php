@@ -5,6 +5,8 @@
 
 namespace SV\StandardLib;
 
+use Closure;
+use LogicException;
 use SV\StandardLib\Helper as StandardLibHelper;
 use SV\StandardLib\XF\CssRenderer;
 use XF\App;
@@ -17,6 +19,7 @@ use XF\Phrase;
 use XF\PreEscaped;
 use XF\Style;
 use XF\Template\Templater as BaseTemplater;
+use function is_callable;
 use function json_decode;
 use function max;
 use function method_exists, is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
@@ -73,7 +76,7 @@ class TemplaterHelper
 
     public function __construct(BaseTemplater $templater)
     {
-        $this->hasFromCallable = \is_callable('\Closure::fromCallable');
+        $this->hasFromCallable = is_callable('\Closure::fromCallable');
         $this->templater = $templater;
         $this->templaterAccessClass = \XF::extendClass(TemplaterAccess::class);
         $this->app = $this->templaterAccessClass::app($templater);
@@ -128,7 +131,7 @@ class TemplaterHelper
     {
         if ($filter === null)
         {
-            throw new \LogicException('Require $filter to not be null');
+            throw new LogicException('Require $filter to not be null');
         }
 
         if (is_string($filter))
@@ -144,7 +147,7 @@ class TemplaterHelper
         }
 
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $filter = \Closure::fromCallable($filter);
+        $filter = Closure::fromCallable($filter);
 
         return $filter;
     }
@@ -585,6 +588,6 @@ class TemplaterHelper
 
     protected function repository(string $identifier): Repository
     {
-        return \SV\StandardLib\Helper::repository($identifier);
+        return Helper::repository($identifier);
     }
 }

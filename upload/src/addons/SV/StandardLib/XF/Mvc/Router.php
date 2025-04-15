@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib\XF\Mvc;
 
+use SV\StandardLib\Helper;
 use SV\StandardLib\Repository\LinkBuilder;
 use XF\Mvc\RouteBuiltLink;
 use function is_string;
@@ -15,8 +16,7 @@ class Router extends XFCP_Router
     {
         parent::__construct($linkFormatter, $routes);
 
-        /** @var LinkBuilder $repo */
-        $repo = \SV\StandardLib\Helper::repository(\SV\StandardLib\Repository\LinkBuilder::class);
+        $repo = Helper::repository(LinkBuilder::class);
         $repo->hookRouteBuilder($this);
     }
 

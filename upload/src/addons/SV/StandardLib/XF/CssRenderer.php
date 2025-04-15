@@ -4,6 +4,8 @@ namespace SV\StandardLib\XF;
 
 use function preg_match;
 use function preg_replace_callback;
+use function trigger_error;
+use function var_export;
 
 /**
  * @Extends \XF\CssRenderer

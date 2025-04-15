@@ -11,6 +11,7 @@ use XF\Db\AbstractAdapter;
 use function array_fill_keys;
 use function array_slice;
 use function count;
+use function explode;
 use function implode;
 use function is_array;
 use function is_string;
@@ -134,7 +135,7 @@ trait SqlJoinTrait
     {
         if (empty($this->rawJoins[$alias]) || empty($this->joins[$alias]))
         {
-            throw new \LogicException('Need to invoke sqlJoin() before sqlJoinConditions()');
+            throw new LogicException('Need to invoke sqlJoin() before sqlJoinConditions()');
         }
 
         $joinConditions = [];
@@ -215,7 +216,7 @@ trait SqlJoinTrait
      */
     public function resolveFieldToTableAndColumn($field, $markJoinFundamental = true)
     {
-        $parts = \explode('.', $field);
+        $parts = explode('.', $field);
         if (count($parts) === 2)
         {
             [$alias, $column] = $parts;
