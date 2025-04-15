@@ -20,14 +20,14 @@ use function is_float;
  * @method string columnSqlName(string $column, bool $markFundamental = true)
  * @method void whereImpossible()
  *
- * @property int aliasCounter
- * @property Finder parentFinder
+ * @property int $aliasCounter
+ * @property Finder $parentFinder
  *
- * @property array order
- * @property array defaultOrder
- * @property array joins
- * @property int limit
- * @property int offset
+ * @property array $order
+ * @property array $defaultOrder
+ * @property array $joins
+ * @property int $limit
+ * @property int $offset
  *
  * @property AbstractAdapter $db
  * @property Structure $structure

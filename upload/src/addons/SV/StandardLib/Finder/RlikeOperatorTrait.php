@@ -6,7 +6,7 @@ use XF\Db\AbstractAdapter;
 use XF\Mvc\Entity\FinderExpression;
 
 /**
- * @property AbstractAdapter db
+ * @property AbstractAdapter $db
  * @method FinderExpression expression(string $sqlExpression, string... $columns)
  */
 trait RlikeOperatorTrait

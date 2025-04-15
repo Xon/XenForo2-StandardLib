@@ -17,9 +17,9 @@ use function is_string;
 use function substr;
 
 /**
- * @property array joins
- * @property string[] indexHints
- * @property AbstractAdapter db
+ * @property array $joins
+ * @property string[] $indexHints
+ * @property AbstractAdapter $db
  *
  * @method string columnSqlName(string $column, bool $markFundamental = true)
  */

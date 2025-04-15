@@ -6,7 +6,7 @@ use XF\Mvc\Entity\Finder;
 use XF\Mvc\Entity\Structure;
 
 /**
- * @property Structure structure
+ * @property Structure $structure
  * @method Finder with(string|string[] $name, bool $mustExist = false)
  */
 trait ComplexJoinTrait
