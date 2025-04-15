@@ -222,7 +222,10 @@ trait SqlJoinTrait
             [$alias, $column] = $parts;
             if (isset($this->rawJoins[$alias][$column]))
             {
-                $this->joins[$alias]['fundamental'] = $markJoinFundamental;
+                if ($markJoinFundamental)
+                {
+                    $this->joins[$alias]['fundamental'] = true;
+                }
                 $this->joins[$alias]['reallyFundamental'] = true;
 
                 return [$alias, $column];
