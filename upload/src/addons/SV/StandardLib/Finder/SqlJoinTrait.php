@@ -8,6 +8,7 @@
 namespace SV\StandardLib\Finder;
 
 use XF\Db\AbstractAdapter;
+use LogicException;
 use function array_fill_keys;
 use function array_slice;
 use function call_user_func_array;
