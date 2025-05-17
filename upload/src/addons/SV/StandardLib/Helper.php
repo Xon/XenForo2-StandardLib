@@ -15,6 +15,7 @@ use function class_exists;
 use function count;
 use function str_replace;
 use function strpos;
+use function substr;
 
 class Helper
 {
@@ -157,6 +158,13 @@ class Helper
         if (\XF::$versionId < 2030000 && strpos($identifier, ':') === false)
         {
             $identifier = str_replace('\\Repository\\', ':', $identifier);
+        }
+
+        // XF bug: https://xenforo.com/community/threads/xf-repository-does-not-understand-class-aliases-breaking-the-invariant-that-a-repository-is-created-once.231024/
+        // Just append Repository, and the class loader works it out
+        if (\XF::$versionId >= 2030000 && \XF::$versionId < 2030770 && substr($identifier, -10) !== 'Repository')
+        {
+            $identifier .= 'Repository';
         }
 
         /** @var T $repo */
