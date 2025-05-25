@@ -92,12 +92,15 @@ class Delete extends AbstractPlugin
                         $reason = $this->filter('reason', 'str');
 
                         $deleter = Helper::service($deleterService, $entity);
+                        if (!is_callable([$deleter, 'setSendAlert']) || !is_callable([$deleter, 'delete']))
+                        {
+                            throw new LogicException('Deleter service must implement setSendAlert/delete methods');
+                        }
+
                         if ($includeAuthorAlert && $this->filter('author_alert', 'bool'))
                         {
-                            assert(method_exists($deleter, 'setSendAlert'));
                             $deleter->setSendAlert(true, $this->filter('author_alert_reason', 'str'));
                         }
-                        assert(method_exists($deleter, 'delete'));
                         $deleter->delete('hard', $reason);
 
                         $inlineModPlugin = Helper::plugin($this, InlineModPlugin::class);
@@ -112,13 +115,16 @@ class Delete extends AbstractPlugin
                         }
 
                         $deleter = Helper::service($deleterService, $entity);
+                        if (!is_callable([$deleter, 'setSendAlert']) || !is_callable([$deleter, 'unDelete']))
+                        {
+                            throw new LogicException('Deleter service must implement setSendAlert/unDelete methods');
+                        }
+
                         if ($includeAuthorAlert && $this->filter('author_alert', 'bool'))
                         {
-                            assert(method_exists($deleter, 'setSendAlert'));
                             $deleter->setSendAlert(true, $this->filter('author_alert_reason', 'str'));
                         }
 
-                        assert(method_exists($deleter, 'unDelete'));
                         $deleter->unDelete();
 
                         return $this->redirect($redirectLink . $linkHash);
@@ -135,12 +141,15 @@ class Delete extends AbstractPlugin
                 }
 
                 $deleter = Helper::service($deleterService, $entity);
+                if (!is_callable([$deleter, 'setSendAlert']) || !is_callable([$deleter, 'delete']))
+                {
+                    throw new LogicException('Deleter service must implement setSendAlert/delete methods');
+                }
+
                 if ($includeAuthorAlert && $this->filter('author_alert', 'bool'))
                 {
-                    assert(method_exists($deleter, 'setSendAlert'));
                     $deleter->setSendAlert(true, $this->filter('author_alert_reason', 'str'));
                 }
-                assert(method_exists($deleter, 'delete'));
                 $deleter->delete($type, $reason);
 
                 $inlineModPlugin = Helper::plugin($this, InlineModPlugin::class);

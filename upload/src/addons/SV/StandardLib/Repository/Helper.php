@@ -435,8 +435,15 @@ class Helper extends Repository
 
     protected function buildShimStubFile(string $srcClass, string $destClass): string
     {
-        assert($srcClass !== '' && $srcClass[0] === '\\');
-        assert($destClass !== '' && $destClass[0] === '\\');
+        if ($srcClass === '' || $srcClass[0] !== '\\')
+        {
+            throw new \LogicException('Expected $finalClass to not be empty and start with a \\');
+        }
+        if ($destClass === '' || $destClass[0] !== '\\')
+        {
+            throw new \LogicException('Expected $finalClass to not be empty and start with a \\');
+        }
+
         $nsEnd = strrpos($srcClass, '\\');
         $srcAlias = substr($srcClass, 1, $nsEnd) . 'XFCP_' . substr($srcClass, $nsEnd + 1);
 

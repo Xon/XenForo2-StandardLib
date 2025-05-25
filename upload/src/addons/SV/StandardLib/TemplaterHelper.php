@@ -69,7 +69,6 @@ class TemplaterHelper
             $helper = TemplaterAccess::getDefaultParam($templater, 'svTemplateHelper');
 
         }
-        assert($helper instanceof TemplaterHelper);
 
         return $helper;
     }
@@ -563,7 +562,6 @@ class TemplaterHelper
         if ($this->cssRenderer === null)
         {
             $renderer = Helper::newExtendedClass(\XF\CssRenderer::class, $this->app, $this->templater);
-            assert($renderer instanceof CssRenderer);
             $this->cssRenderer = $renderer;
         }
 
