@@ -172,15 +172,24 @@ trait EarlyJoinFinderTrait
                 continue;
             }
 
+            $isReallyFundamental = $join['reallyFundamental'] ?? false;
             $table = $join['table'];
             if ($join['hasTableExpr'] ?? false)
             {
                 // This is a table expression from SqlJoinTrait, and has already been used as a filter in the original expression
                 // but is not actually used in any other columns, so it can be discarded now
-                if (!($join['reallyFundamental'] ?? false))
+                if (!$isReallyFundamental)
                 {
                     continue;
                 }
+            }
+            else if (!$isFetch && !$isReallyFundamental)
+            {
+                // This join does not affect the result as it isn't fetched AND filtering has been done in the inner join
+                // This can match the following patterns:
+                // 1) `left join ... as table where table.id is not null`
+                // 2) `inner join ... as table`
+                continue;
             }
             else
             {
