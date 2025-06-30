@@ -406,7 +406,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
          */
         getPageNavWrappers: function(logNotFound)
         {
-            logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
+            logNotFound = typeof logNotFound === 'undefined' ? false : logNotFound;
             if (!this.options.pageNavWrapper)
             {
                 if (logNotFound)
@@ -443,7 +443,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 return null;
             }
 
-            var pageNavWrappers = this.getPageNavWrappers(false);
+            var pageNavWrappers = this.getPageNavWrappers();
             if (pageNavWrappers === null)
             {
                 return null;
