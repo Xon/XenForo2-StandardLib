@@ -56,7 +56,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             var existingPage = null,
                 pageNavWrappers = this.getPageNavWrappers();
-            if (pageNavWrappers !== null)
+            if (pageNavWrappers.length !== 0)
             {
                 var pageNavWrapper = pageNavWrappers[0];
                 var currentPageLink = pageNavWrapper.querySelector('.pageNav-page--current > a');
@@ -253,12 +253,6 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 this.xhrFilter = null;
 
                 var oldPageNavWrappers = this.getPageNavWrappers();
-                if (oldPageNavWrappers === null)
-                {
-                    return;
-                }
-
-
                 var newPageNavWrapper = html.querySelector(this.options.pageNavWrapper);
                 if (newPageNavWrapper === null)
                 {
@@ -336,7 +330,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         shimDynamicPageNav: function()
         {
             var pageNavWrappers = this.getPageNavWrappers();
-            if (pageNavWrappers === null)
+            if (pageNavWrappers.length === 0)
             {
                 return;
             }
@@ -400,36 +394,13 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         },
 
         /**
-         * @param {Boolean} logNotFound
-         *
-         * @returns {null|HTMLElement[]}
+         * @returns {HTMLElement[]}
          */
-        getPageNavWrappers: function(logNotFound)
+        getPageNavWrappers: function()
         {
-            logNotFound = typeof logNotFound === 'undefined' ? false : logNotFound;
-            if (!this.options.pageNavWrapper)
-            {
-                if (logNotFound)
-                {
-                    console.error('No pagination wrapper query expression defined');
-                }
+            var thisTarget = this.target || this.$target.get(0);
 
-                return null;
-            }
-
-            var thisTarget = this.target || this.$target.get(0),
-                pageNavWrappers = thisTarget.querySelectorAll(this.options.pageNavWrapper);
-            if (pageNavWrappers === null || pageNavWrappers.length === 0)
-            {
-                if (logNotFound)
-                {
-                    console.error('No old pagination wrapper available');
-                }
-
-                return null;
-            }
-
-            return pageNavWrappers;
+            return this.options.pageNavWrapper ? thisTarget.querySelectorAll(this.options.pageNavWrapper) :  [];
         },
 
         /**
@@ -444,9 +415,9 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             var pageNavWrappers = this.getPageNavWrappers();
-            if (pageNavWrappers === null)
+            if (pageNavWrappers.length === 0)
             {
-                return null;
+                return 1;
             }
 
             var lastPageSelected = parseInt(this.svLastPageSelected) || null;

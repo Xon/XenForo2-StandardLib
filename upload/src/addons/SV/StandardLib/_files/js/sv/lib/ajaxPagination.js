@@ -49,7 +49,7 @@ SV.$ = SV.$ || window.jQuery || null;
 
             var existingPage = null,
                 pageNavWrappers = this.getPageNavWrappers();
-            if (pageNavWrappers !== null)
+            if (pageNavWrappers.length !== 0)
             {
                 var pageNavWrapper = pageNavWrappers[0];
                 var currentPageLink = pageNavWrapper.querySelector('.pageNav-page--current > a')
@@ -57,6 +57,10 @@ SV.$ = SV.$ || window.jQuery || null;
                 {
                     existingPage = this.getPageFromAhref(currentPageLink);
                 }
+            }
+            else
+            {
+                console.error('No pagination wrapper query expression defined');
             }
             this.lastPageSelected = (typeof existingPage === 'number') ? existingPage : 1;
 
@@ -112,18 +116,13 @@ SV.$ = SV.$ || window.jQuery || null;
 
         _paginationAjaxResponse: function(result)
         {
-            var oldPageNavWrappers = this.getPageNavWrappers();
-            if (oldPageNavWrappers === null)
-            {
-                return;
-            }
-
             var oldContentWrapper = this.getContentWrapper();
             if (oldContentWrapper === null)
             {
                 return;
             }
 
+            var oldPageNavWrappers = this.getPageNavWrappers();
             result.html.content = '<div>' + result.html.content.trim() + '</div>';
             XF.setupHtmlInsert(result.html, (html) => {
                 if (typeof XF.createElementFromString === "undefined") { // XF 2.2
@@ -191,7 +190,7 @@ SV.$ = SV.$ || window.jQuery || null;
         shimDynamicPageNav: function()
         {
             var pageNavWrappers = this.getPageNavWrappers();
-            if (pageNavWrappers === null)
+            if (pageNavWrappers.length === 0)
             {
                 return;
             }
@@ -269,36 +268,13 @@ SV.$ = SV.$ || window.jQuery || null;
         },
 
         /**
-         * @param {Boolean} logNotFound
-         *
-         * @returns {null|HTMLElement[]}
+         * @returns {HTMLElement[]}
          */
-        getPageNavWrappers: function(logNotFound)
+        getPageNavWrappers: function()
         {
-            logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
-            if (!this.options.pageNavWrapper)
-            {
-                if (logNotFound)
-                {
-                    console.error('No pagination wrapper query expression defined');
-                }
+            var thisTarget = this.target || this.$target.get(0);
 
-                return null;
-            }
-
-            var thisTarget = this.target || this.$target.get(0),
-                pageNavWrappers = thisTarget.querySelectorAll(this.options.pageNavWrapper);
-            if (pageNavWrappers === null || pageNavWrappers.length === 0)
-            {
-                if (logNotFound)
-                {
-                    console.error('No old pagination wrapper available');
-                }
-
-                return null;
-            }
-
-            return pageNavWrappers;
+            return this.options.pageNavWrapper ? thisTarget.querySelectorAll(this.options.pageNavWrapper) :  [];
         },
 
         /**
@@ -334,10 +310,10 @@ SV.$ = SV.$ || window.jQuery || null;
                 return null;
             }
 
-            var pageNavWrappers = this.getPageNavWrappers(false);
-            if (pageNavWrappers === null)
+            var pageNavWrappers = this.getPageNavWrappers();
+            if (pageNavWrappers.length === 0)
             {
-                return null;
+                return 1;
             }
 
             var lastPageSelected = parseInt(this.lastPageSelected) || null;

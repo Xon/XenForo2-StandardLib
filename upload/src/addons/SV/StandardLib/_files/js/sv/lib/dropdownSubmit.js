@@ -104,18 +104,13 @@ SV.$ = SV.$ || window.jQuery || null;
         {
             this.xhr = null;
 
-            var oldPageNavWrappers = this.getPageNavWrappers(false);
-            if (oldPageNavWrappers === null)
-            {
-                return;
-            }
-
             var oldContentWrapper = this.getContentWrapper();
             if (oldContentWrapper === null)
             {
                 return;
             }
 
+            var oldPageNavWrappers = this.getPageNavWrappers();
             var tmpResult;
             if (typeof XF.createElementFromString === "undefined") // XF 2.2
             {
@@ -182,36 +177,13 @@ SV.$ = SV.$ || window.jQuery || null;
         },
 
         /**
-         * @param {Boolean} logNotFound
-         *
-         * @returns {null|HTMLElement[]}
+         * @returns {HTMLElement[]}
          */
-        getPageNavWrappers: function(logNotFound)
+        getPageNavWrappers: function()
         {
-            logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
-            if (!this.options.pageNavWrapper)
-            {
-                if (logNotFound)
-                {
-                    console.error('No pagination wrapper query expression defined');
-                }
+            var thisTarget = this.target || this.$target.get(0);
 
-                return null;
-            }
-
-            var thisTarget = this.target || this.$target.get(0),
-                pageNavWrappers = thisTarget.querySelectorAll(this.options.pageNavWrapper);
-            if (pageNavWrappers === null || pageNavWrappers.length === 0)
-            {
-                if (logNotFound)
-                {
-                    console.error('No old pagination wrapper available');
-                }
-
-                return null;
-            }
-
-            return pageNavWrappers;
+            return this.options.pageNavWrapper ? thisTarget.querySelectorAll(this.options.pageNavWrapper) :  [];
         },
 
         /**
