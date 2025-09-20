@@ -21,7 +21,7 @@ use function property_exists;
 /**
  * @method int getEarlyJoinThreshold(?int $offset = null, ?int $limit = null, array $options = [])
  * @method string columnSqlName(string $column, bool $markFundamental = true)
- * @method void whereImpossible()
+ * @method static whereImpossible()
  *
  * @property int $aliasCounter
  * @property Finder $parentFinder
