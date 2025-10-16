@@ -260,10 +260,10 @@ Support for date/time/timezone input, returned as a unix timestamp
 ```
 
 ```php
-$scheduledStartDate = $this->filter('scheduled_start_date', 'sv-datetime');
+$scheduledStartDate = $this->filter('scheduled_start_date', '?sv-datetime,empty-str-to-null');
 ```
 Compatibility note; `$useNativeTimeInputs` is forced enabled for XF2.3+.
-For php code, `sv-datetime` input abstracts the differences between native time inputs and older inputs.
+For php code, `sv-datetime` input abstracts the differences between native time inputs and older inputs. `?,...empty-str-to-null` allows it to reliably return null on ajax submit or html-form submit
 However, for javascript code referencing the individual fields this is a backwards compatibility breaking change.
 
 ## Helper code
