@@ -1,14 +1,26 @@
 <?php
+/**
+ * @noinspection PhpMultipleClassDeclarationsInspection
+ */
 
 namespace SV\StandardLib;
 
+use SV\StandardLib\XF\DevelopmentOutput\StyleProperty as ExtendedDevOutputStyleProperty;
+use SV\StandardLib\XF\Entity\StyleProperty as ExtendedStylePropertyEntity;
+use SV\StandardLib\XF\Template\TemplaterXF21Patch;
+use SV\StandardLib\XF\Template\XFCP_TemplaterXF21Patch;
 use XF\AddOn\AbstractSetup;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
 use XF\Db\Schema\Alter;
-use XF\Entity\Phrase;
+use XF\DevelopmentOutput\StyleProperty as DevOutputStyleProperty;
+use XF\Entity\ClassExtension as ClassExtensionEntity;
+use XF\Entity\Phrase as PhraseEntity;
+use XF\Entity\StyleProperty as StylePropertyEntity;
+use XF\Finder\Phrase as PhraseFinder;
 use XF\Repository\Option as OptionRepo;
+use XF\Template\Templater;
 
 class Setup extends AbstractSetup
 {
@@ -24,8 +36,8 @@ class Setup extends AbstractSetup
 
     public function uninstallStep1()// : void
     {
-        /** @var Phrase[] $phrases */
-        $phrases = Helper::finder(\XF\Finder\Phrase::class)
+        /** @var PhraseEntity[] $phrases */
+        $phrases = Helper::finder(PhraseFinder::class)
                          ->where('language_id', '=', 0)
                          ->where('addon_id', '=', 'SV/StandardLib')
                          ->where('title', 'like', 'time.%')
@@ -44,6 +56,8 @@ class Setup extends AbstractSetup
 
     public function upgrade2001230000Step1()//: void
     {
+        $this->syncClassExtensions();
+
         if (\XF::$versionId >= 2030000)
         {
             return;
@@ -57,24 +71,50 @@ class Setup extends AbstractSetup
     public function postInstall(array &$stateChanges)// : void
     {
         parent::postInstall($stateChanges);
-        Helper::repo()->rebuildAddOnVersionCache();
-        Helper::repo()->clearShimCache();
-        Helper::repository(OptionRepo::class)->rebuildOptionCache();
+        $this->doRebuilds();
     }
 
     public function postUpgrade($previousVersion, array &$stateChanges)// : void
     {
         parent::postUpgrade($previousVersion, $stateChanges);
-        Helper::repo()->rebuildAddOnVersionCache();
-        Helper::repo()->clearShimCache();
-        Helper::repository(OptionRepo::class)->rebuildOptionCache();
+        $this->doRebuilds();
     }
 
     public function postRebuild()// : void
     {
         parent::postRebuild();
+        $this->doRebuilds();
+    }
+
+    public function doRebuilds()// : void
+    {
         Helper::repo()->rebuildAddOnVersionCache();
         Helper::repo()->clearShimCache();
         Helper::repository(OptionRepo::class)->rebuildOptionCache();
+        $this->syncClassExtensions();
+    }
+
+    public function syncClassExtensions()//: void
+    {
+        $preXF23 = \XF::$versionId < 2030000;
+        $this->patchClassExtension(StylePropertyEntity::class,ExtendedStylePropertyEntity::class,  $preXF23);
+        $this->patchClassExtension(DevOutputStyleProperty::class,ExtendedDevOutputStyleProperty::class,  $preXF23);
+
+        $this->patchClassExtension(Templater::class,TemplaterXF21Patch::class,  \XF::$versionId < 2020000);
+    }
+
+    protected function patchClassExtension(string $fromClass, string $toClass, bool $value)//: void
+    {
+        $classExtension = Helper::findOne(ClassExtensionEntity::class, [
+            'from_class' => $fromClass,
+            'to_class' => $toClass,
+        ]);
+        if ($classExtension === null)
+        {
+            return;
+        }
+
+        $classExtension->active = $value;
+        $classExtension->saveIfChanged();
     }
 }

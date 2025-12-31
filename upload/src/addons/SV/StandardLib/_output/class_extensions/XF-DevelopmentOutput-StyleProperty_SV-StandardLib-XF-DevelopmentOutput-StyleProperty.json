@@ -2,5 +2,5 @@
     "from_class": "XF\\DevelopmentOutput\\StyleProperty",
     "to_class": "SV\\StandardLib\\XF\\DevelopmentOutput\\StyleProperty",
     "execute_order": 1,
-    "active": true
+    "active": false
 }

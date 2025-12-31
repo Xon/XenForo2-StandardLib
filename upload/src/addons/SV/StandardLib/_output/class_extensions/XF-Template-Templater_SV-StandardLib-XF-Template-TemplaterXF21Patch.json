@@ -2,5 +2,5 @@
     "from_class": "XF\\Template\\Templater",
     "to_class": "SV\\StandardLib\\XF\\Template\\TemplaterXF21Patch",
     "execute_order": 1,
-    "active": true
+    "active": false
 }
