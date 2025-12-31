@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Entity\\StyleProperty",
+    "to_class": "SV\\StandardLib\\XF\\Entity\\StyleProperty",
+    "execute_order": 1,
+    "active": true
+}

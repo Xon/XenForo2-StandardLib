@@ -25,9 +25,15 @@ namespace SV\StandardLib\XF
 	class XFCP_InputFilterer extends \XF\InputFilterer {}
 }
 
+namespace SV\StandardLib\XF\DevelopmentOutput
+{
+	class XFCP_StyleProperty extends \XF\DevelopmentOutput\StyleProperty {}
+}
+
 namespace SV\StandardLib\XF\Entity
 {
 	class XFCP_Option extends \XF\Entity\Option {}
+	class XFCP_StyleProperty extends \XF\Entity\StyleProperty {}
 }
 
 namespace SV\StandardLib\XF\Mvc
