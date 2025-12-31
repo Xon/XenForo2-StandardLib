@@ -1,0 +1,1 @@
+Different bundles implement different methods of search-as-you-type, which influences the js bundle size and has varying degree of fuzzy support

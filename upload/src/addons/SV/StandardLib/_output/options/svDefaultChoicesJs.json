@@ -1,0 +1,13 @@
+{
+    "edit_format": "radio",
+    "edit_format_params": "choices.search-prefix.js={{ phrase('svStandardLib_choices_search.prefix') }}\nchoices.search-kmp.js={{ phrase('svStandardLib_choices_search.kmp') }}\nchoices.search-basic.js={{ phrase('svStandardLib_choices_search.fusejs_basic') }}\nchoices.js={{ phrase('svStandardLib_choices_search.fusejs_full') }}",
+    "data_type": "string",
+    "sub_options": [],
+    "validation_class": "",
+    "validation_method": "",
+    "advanced": false,
+    "default_value": "choices.search-basic.js",
+    "relations": {
+        "discussionOptions": 700
+    }
+}

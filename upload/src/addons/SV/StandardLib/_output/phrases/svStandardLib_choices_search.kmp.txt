@@ -1,0 +1,1 @@
+<a href="https://en.wikipedia.org/wiki/Knuth-Morris-Pratt_algorithm">KMP</a> search

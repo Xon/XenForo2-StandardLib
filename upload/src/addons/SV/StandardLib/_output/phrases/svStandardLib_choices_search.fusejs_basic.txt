@@ -1,0 +1,1 @@
+<a href="https://www.fusejs.io/getting-started/different-builds.html">Fuse.js basic</a> search

@@ -11,6 +11,7 @@
 namespace XF;
 
 /**
+ * @property string|null $svDefaultChoicesJs Default Choices.js bundle
  * @property bool|null $svLogLessFunc Standard Lib: Log parse_less_func debug info
  */
 class Options
