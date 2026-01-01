@@ -1,4 +1,4 @@
-/*! choices.js v11.2.0 | © 2025 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
+/*! choices.js v11.2.0 | © 2026 Josh Johnson | https://github.com/jshjohnson/Choices#readme */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -3433,7 +3433,7 @@
             this.initialised = false;
             this._store = new Store(config);
             this._currentValue = '';
-            config.searchEnabled = (!isText && config.searchEnabled) || isSelectMultiple;
+            config.searchEnabled = !isText && config.searchEnabled;
             this._canSearch = config.searchEnabled;
             this._isScrollingOnIe = false;
             this._highlightPosition = 0;
@@ -5176,24 +5176,24 @@
             containerInner.wrap(passedElement.element);
             // Wrapper inner container with outer container
             containerOuter.wrap(containerInner.element);
-            if (this._isSelectOneElement) {
-                this.input.placeholder = this.config.searchPlaceholderValue || '';
-            }
-            else {
-                if (this._placeholderValue) {
-                    this.input.placeholder = this._placeholderValue;
-                }
-                this.input.setWidth();
-            }
             containerOuter.element.appendChild(containerInner.element);
             containerOuter.element.appendChild(dropdownElement);
             containerInner.element.appendChild(this.itemList.element);
             dropdownElement.appendChild(this.choiceList.element);
-            if (!this._isSelectOneElement) {
-                containerInner.element.appendChild(this.input.element);
+            if (this._isSelectOneElement) {
+                this.input.placeholder = this.config.searchPlaceholderValue || '';
+                if (this.config.searchEnabled) {
+                    dropdownElement.insertBefore(this.input.element, dropdownElement.firstChild);
+                }
             }
-            else if (this.config.searchEnabled) {
-                dropdownElement.insertBefore(this.input.element, dropdownElement.firstChild);
+            else {
+                if (!this._isSelectMultipleElement || this.config.searchEnabled) {
+                    containerInner.element.appendChild(this.input.element);
+                }
+                if (this._placeholderValue) {
+                    this.input.placeholder = this._placeholderValue;
+                }
+                this.input.setWidth();
             }
             this._highlightPosition = 0;
             this._isSearching = false;
