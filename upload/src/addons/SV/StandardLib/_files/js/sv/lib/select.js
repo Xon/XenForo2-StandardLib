@@ -1,12 +1,30 @@
+// noinspection ES6ConvertVarToLetConst
 var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
+// XF22 compat shim
+/** @type jQuery */
 SV.$ = SV.$ || window.jQuery || null;
 SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
 (function()
 {
     "use strict";
-    let $ = SV.$;
+    const $ = SV.$,
+        xf22 = typeof XF.on !== 'function',
+        trigger = xf22 ? function (target, event, data) {
+            $(target).trigger(event, data)
+        }: XF.trigger,
+        on = xf22 ? function (element, namespacedEvent, handler) {
+            $(element).on(namespacedEvent, handler);
+        } : XF.on;
+
+    /**
+     * @return {HTMLElement}
+     */
+    function getTarget(handler) {
+        // noinspection JSUnresolvedReference
+        return handler.target || handler.$target.get(0);
+    }
 
     /**
      * @param s string
@@ -103,7 +121,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         init: function()
         {
-            let theTarget = this.target || this.$target.get(0);
+            let theTarget = getTarget(this);
             this.form = theTarget.closest('form')
             this.initialValue = theTarget.value
             this.choices = new Choices(theTarget, this.getConfig());
@@ -124,7 +142,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         getConfig: function ()
         {
-            let field = this.target || this.$target.get(0),
+            let field = getTarget(this),
                 placeholderValue = this.options.placeholder || field.getAttribute('placeholder'),
                 placeholder = !!placeholderValue,
                 config = SV.extendObject({}, this.options, {
@@ -144,7 +162,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 this.options.maxItemCount = 1;
             }
             // support arbitrary choices.js config options as data-* attributes
-            const dataset = (this.target || this.$target.get(0)).dataset,
+            const dataset = (getTarget(this)).dataset,
                 defaultOptions = Choices.defaults.allOptions;
             Object.keys(defaultOptions).forEach((key) =>
             {
@@ -265,7 +283,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             appendClasses('containerOuter', ['inputGroup', 'svChoices--inputGroup']);
             appendClasses('containerInner', ['input']);
 
-            const dataset = (this.target || this.$target.get(0)).dataset;
+            const dataset = (getTarget(this)).dataset;
             Object.keys(defaultClassNames).forEach((key) =>
             {
                 const datasetKey = 'class' + ucfirst(key)
@@ -292,48 +310,20 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             let form = this.form
             let passedElement = this.choices.passedElement.element;
 
-            if (typeof XF.on !== "function") // XF 2.2
+            if (this.options.resetOnSubmit && form instanceof HTMLFormElement)
             {
-                if (this.options.resetOnSubmit)
-                {
-                    let $form = $(form)
-                    if ($form.length)
-                    {
-                        //$form.on('ajax-submit:complete', this.onFormReset.bind(this))
-                        $form.on('ajax-submit:response', this.afterFormSubmit.bind(this))
-                    }
-                }
-
-                let $target = $(passedElement);
-                $target.on('addItem', this.onAddItem.bind(this));
-                $target.on('removeItem', this.onRemoveItem.bind(this));
-                $target.on('choice', this.onChoice.bind(this));
-                $target.on('showDropdown', this.onShowDropdown.bind(this));
-                $target.on('hideDropdown', this.onHideDropdown.bind(this));
-                $target.on('control:enabled', this.onControlEnabled.bind(this));
-                $target.on('control:disabled', this.onControlDisabled.bind(this));
-                $target.on('refreshChoices', this.onRefreshChoices.bind(this));
+                //on(form, 'ajax-submit:complete', this.onFormReset.bind(this))
+                on(form, 'ajax-submit:response', this.afterFormSubmit.bind(this))
             }
-            else
-            {
-                if (this.options.resetOnSubmit)
-                {
-                    if (form instanceof HTMLFormElement)
-                    {
-                        //XF.on(form, 'ajax-submit:complete', this.onFormReset.bind(this))
-                        XF.on(form, 'ajax-submit:response', this.afterFormSubmit.bind(this))
-                    }
-                }
 
-                XF.on(passedElement, 'addItem', this.onAddItem.bind(this));
-                XF.on(passedElement, 'removeItem', this.onRemoveItem.bind(this));
-                XF.on(passedElement, 'choice', this.onChoice.bind(this));
-                XF.on(passedElement, 'showDropdown', this.onShowDropdown.bind(this));
-                XF.on(passedElement, 'hideDropdown', this.onHideDropdown.bind(this));
-                XF.on(passedElement, 'control:enabled', this.onControlEnabled.bind(this));
-                XF.on(passedElement, 'control:disabled', this.onControlDisabled.bind(this));
-                XF.on(passedElement, 'refreshChoices', this.onRefreshChoices.bind(this));
-            }
+            on(passedElement, 'addItem', this.onAddItem.bind(this));
+            on(passedElement, 'removeItem', this.onRemoveItem.bind(this));
+            on(passedElement, 'choice', this.onChoice.bind(this));
+            on(passedElement, 'showDropdown', this.onShowDropdown.bind(this));
+            on(passedElement, 'hideDropdown', this.onHideDropdown.bind(this));
+            on(passedElement, 'control:enabled', this.onControlEnabled.bind(this));
+            on(passedElement, 'control:disabled', this.onControlDisabled.bind(this));
+            on(passedElement, 'refreshChoices', this.onRefreshChoices.bind(this));
         },
 
         onAddItem: function (event)
@@ -488,7 +478,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         init ()
         {
-            let theTarget = this.target || this.$target.get(0)
+            let theTarget = getTarget(this)
             if (!theTarget.matches('select'))
             {
                 console.error('Must trigger on select')
@@ -504,25 +494,11 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 }
                 else
                 {
-                    if (typeof XF.on !== "function") // XF 2.2
-                    {
-                        listenTo.on('change', XF.proxy(this, 'loadChoices'));
-                    }
-                    else
-                    {
-                        XF.on(listenTo, 'change', this.loadChoices.bind(this));
-                    }
+                    on(listenTo, 'change', this.loadChoices.bind(this));
 
                     if (this.options.initUpdate)
                     {
-                        if (typeof XF.trigger === "function")
-                        {
-                            XF.trigger(listenTo, 'change');
-                        }
-                        else
-                        {
-                            listenTo.trigger('change');
-                        }
+                        trigger(listenTo, 'change');
                     }
                 }
             }
@@ -539,18 +515,11 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         {
             if (data.html)
             {
-                const select = this.target || this.$target.get(0)
+                const select = getTarget(this)
 
                 XF.setupHtmlInsert(data.html, html =>
                 {
-                    if (typeof XF.trigger !== 'function') // XF 2.2
-                    {
-                        $(select).trigger('refreshChoices', [html.get(0)])
-                    }
-                    else
-                    {
-                        XF.trigger(select, XF.customEvent('refreshChoices', {html}))
-                    }
+                    trigger(select, xf22 ? [html.get(0)] : XF.customEvent('refreshChoices', {html}))
                 })
             }
         }

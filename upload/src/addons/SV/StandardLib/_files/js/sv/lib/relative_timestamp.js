@@ -1,12 +1,27 @@
 // noinspection ES6ConvertVarToLetConst
+
 var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
+// XF22 compat shim
+/** @type jQuery */
 SV.$ = SV.$ || window.jQuery || null;
 
 (function()
 {
     "use strict";
-    var $ = SV.$;
+    const $ = SV.$,
+        xf22 = typeof XF.on !== 'function',
+        trigger = xf22 ? function (target, event, data) {
+            $(target).trigger(event, data)
+        }: XF.trigger;
+
+    /**
+     * @return {HTMLElement}
+     */
+    function getTarget(handler) {
+        // noinspection JSUnresolvedReference
+        return handler.target || handler.$target.get(0);
+    }
 
     if (typeof moment === 'function')
     {
@@ -21,6 +36,7 @@ SV.$ = SV.$ || window.jQuery || null;
              * http://www.php.net/manual/en/function.date.php
              * http://momentjs.com/docs/#/displaying/format/
              */
+            // noinspection JSUnusedGlobalSymbols
             let formatMap = {
                     d: 'DD',
                     D: 'ddd',
@@ -141,7 +157,7 @@ SV.$ = SV.$ || window.jQuery || null;
             }
 
             // noinspection JSUnresolvedReference
-            this.field = this.target || this.$target.get(0);
+            this.field = getTarget(this);
 
             const now = Math.floor(Date.now() / 1000) * 1000,
                 end = this.options.timestamp * 1000;
@@ -374,11 +390,7 @@ SV.$ = SV.$ || window.jQuery || null;
                 return;
             }
 
-            if (typeof XF.trigger === "function") {
-                XF.trigger(eventTarget, eventName);
-            } else {
-                $(eventTarget).trigger(eventName);
-            }
+            trigger(eventTarget, eventName);
         }
     });
 

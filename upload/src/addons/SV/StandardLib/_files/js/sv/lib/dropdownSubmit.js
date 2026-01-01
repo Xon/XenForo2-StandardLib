@@ -1,11 +1,27 @@
+// noinspection ES6ConvertVarToLetConst,JSUnusedLocalSymbols
+
 var SV = window.SV || {};
+// XF22 compat shim
+/** @type jQuery */
 SV.$ = SV.$ || window.jQuery || null;
 
 ;((window, document) =>
 {
     "use strict";
+    const $ = SV.$,
+        xf22 = typeof XF.on !== 'function',
+        on = xf22 ? function (element, namespacedEvent, handler) {
+            $(element).on(namespacedEvent, handler);
+        } : XF.on;
 
-    var $ = SV.$;
+    /**
+     * @return {HTMLElement}
+     */
+    function getTarget(handler) {
+        // noinspection JSUnresolvedReference
+        return handler.target || handler.$target.get(0);
+    }
+
     SV.DropdownSubmit = XF.Element.newHandler({
         options: {
             pageNavWrapper: '.block-outer--page-nav-wrapper',
@@ -22,7 +38,7 @@ SV.$ = SV.$ || window.jQuery || null;
 
         init: function()
         {
-            var thisTarget = this.target || this.$target.get(0);
+            var thisTarget = getTarget(this);
             this.inOverlay = thisTarget.closest('.overlay-container') !== null;
 
             if (!this.options.contentWrapper)
@@ -50,14 +66,7 @@ SV.$ = SV.$ || window.jQuery || null;
             this.perPageDropdown = thisTarget.querySelector(this.options.perPageDropdown);
             if (this.perPageDropdown !== null)
             {
-                if (typeof XF.on !== "function") // XF 2.2
-                {
-                    $(this.perPageDropdown).on('change', this.perPageChange.bind(this));
-                }
-                else
-                {
-                    XF.on(this.perPageDropdown, 'change', this.perPageChange.bind(this));
-                }
+                on(this.perPageDropdown, 'change', this.perPageChange.bind(this));
             }
         },
 
@@ -112,7 +121,7 @@ SV.$ = SV.$ || window.jQuery || null;
 
             var oldPageNavWrappers = this.getPageNavWrappers();
             var tmpResult;
-            if (typeof XF.createElementFromString === "undefined") // XF 2.2
+            if (xf22)
             {
                 tmpResult = $.parseHTML('<div>' + result.html.content + '</div>');
                 tmpResult = tmpResult[0];
@@ -181,13 +190,13 @@ SV.$ = SV.$ || window.jQuery || null;
          */
         getPageNavWrappers: function()
         {
-            var thisTarget = this.target || this.$target.get(0);
+            var thisTarget = getTarget(this);
 
             return this.options.pageNavWrapper ? thisTarget.querySelectorAll(this.options.pageNavWrapper) :  [];
         },
 
         /**
-         * @param {Boolean} logNotFound
+         * @param {Boolean=} logNotFound
          *
          * @returns {null|HTMLElement}
          */
@@ -195,7 +204,7 @@ SV.$ = SV.$ || window.jQuery || null;
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
 
-            var thisTarget = this.target || this.$target.get(0),
+            var thisTarget = getTarget(this),
                 contentWrapper = thisTarget.querySelector((this.options.contentWrapper));
             if (contentWrapper === null)
             {

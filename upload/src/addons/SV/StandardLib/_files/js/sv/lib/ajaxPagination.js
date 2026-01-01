@@ -1,10 +1,24 @@
+// noinspection ES6ConvertVarToLetConst,JSUnusedLocalSymbols
+
 var SV = window.SV || {};
 SV.$ = SV.$ || window.jQuery || null;
 
 !function(window, document)
 {
     "use strict";
-    var $ = SV.$;
+    const $ = SV.$,
+        xf22 = typeof XF.on !== 'function',
+        on = xf22 ? function (element, namespacedEvent, handler) {
+            $(element).on(namespacedEvent, handler);
+        } : XF.on;
+
+    /**
+     * @return {HTMLElement}
+     */
+    function getTarget(handler) {
+        // noinspection JSUnresolvedReference
+        return handler.target || handler.$target.get(0);
+    }
 
     SV.AjaxPagination = XF.Element.newHandler({
         options: {
@@ -22,7 +36,7 @@ SV.$ = SV.$ || window.jQuery || null;
 
         init: function()
         {
-            var thisTarget = this.target || this.$target.get(0);
+            var thisTarget = getTarget(this);
             this.inOverlay = thisTarget.closest('.overlay-container') !== null;
             if (!this.options.contentWrapper)
             {
@@ -69,14 +83,7 @@ SV.$ = SV.$ || window.jQuery || null;
             this.perPageDropdown = thisTarget.querySelector(this.options.perPageDropdown)
             if (this.perPageDropdown !== null)
             {
-                if (typeof XF.on !== "function") // XF 2.2
-                {
-                    $(this.perPageDropdown).on('change', this.perPageChange.bind(this));
-                }
-                else
-                {
-                    XF.on(this.perPageDropdown, 'change', this.perPageChange.bind(this));
-                }
+                on(this.perPageDropdown, 'change', this.perPageChange.bind(this));
             }
         },
 
@@ -125,7 +132,7 @@ SV.$ = SV.$ || window.jQuery || null;
             var oldPageNavWrappers = this.getPageNavWrappers();
             result.html.content = '<div>' + result.html.content.trim() + '</div>';
             XF.setupHtmlInsert(result.html, (html) => {
-                if (typeof XF.createElementFromString === "undefined") { // XF 2.2
+                if (xf22) {
                     html = html.get(0);
                 }
 
@@ -195,20 +202,11 @@ SV.$ = SV.$ || window.jQuery || null;
                 return;
             }
 
-            if (typeof XF.on === "function") // XF 2.2
-            {
-                for (const pageNavWrapper of pageNavWrappers) {
-                    for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href]')) {
-                        XF.on(pageNavLink, 'click', this.ajaxLoadNewPage.bind(this))
-                    }
-                    XF.activate(pageNavWrapper);
+            for (const pageNavWrapper of pageNavWrappers) {
+                for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href]')) {
+                    on(pageNavLink, 'click', this.ajaxLoadNewPage.bind(this))
                 }
-            }
-            else // XF 2.2
-            {
-                var $wrappers = $(pageNavWrappers);
-                $wrappers.find('.pageNav a[href]').on('click', this.ajaxLoadNewPage.bind(this));
-                XF.activate($wrappers);
+                XF.activate(pageNavWrapper);
             }
         },
 
@@ -272,20 +270,20 @@ SV.$ = SV.$ || window.jQuery || null;
          */
         getPageNavWrappers: function()
         {
-            var thisTarget = this.target || this.$target.get(0);
+            var thisTarget = getTarget(this);
 
             return this.options.pageNavWrapper ? thisTarget.querySelectorAll(this.options.pageNavWrapper) :  [];
         },
 
         /**
-         * @param {Boolean} logNotFound
+         * @param {Boolean=} logNotFound
          *
          * @returns {null|{length}|*|jQuery|HTMLElement}
          */
         getContentWrapper: function(logNotFound)
         {
             logNotFound = typeof logNotFound === 'undefined' ? true : logNotFound;
-            var thisTarget = this.target || this.$target.get(0),
+            var thisTarget = getTarget(this),
                 contentWrapper = thisTarget.querySelector(this.options.contentWrapper)
             if (contentWrapper === null)
             {

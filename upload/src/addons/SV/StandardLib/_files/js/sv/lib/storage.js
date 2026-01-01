@@ -1,8 +1,18 @@
+// noinspection ES6ConvertVarToLetConst
+
 var SV = window.SV || {};
 
 ;((window, document) =>
 {
     "use strict";
+
+    /**
+     * @return {HTMLElement}
+     */
+    function getTarget(handler) {
+        // noinspection JSUnresolvedReference
+        return handler.target || handler.$target.get(0);
+    }
 
     SV.ToggleStorage = XF.extend(XF.ToggleStorage, {
         options: {
@@ -30,7 +40,7 @@ var SV = window.SV || {};
             options.defaultValue = !!options.defaultValue;
 
             // noinspection EqualityComparisonWithCoercionJS
-            var thisTarget = this.target || this.$target.get(0),
+            var thisTarget = getTarget(this),
                 activeClass = thisTarget.classList.contains(options.activeClass);
             if (activeClass === options.defaultValue) {
                 this.storage.remove(
@@ -43,7 +53,7 @@ var SV = window.SV || {};
         updateStorage: function()
         {
             var options = this.options;
-            var thisTarget = this.target || this.$target.get(0),
+            var thisTarget = getTarget(this),
                 activeClass = thisTarget.classList.contains(options.activeClass);
             if (activeClass === options.defaultValue) {
                 this.storage.remove(

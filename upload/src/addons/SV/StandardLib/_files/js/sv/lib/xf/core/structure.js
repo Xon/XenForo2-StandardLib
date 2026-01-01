@@ -1,15 +1,22 @@
-// noinspection JSUnusedLocalSymbols
+// noinspection ES6ConvertVarToLetConst
+
 var SV = window.SV || {};
 SV.StandardLib = SV.StandardLib || {};
 SV.StandardLib.XF = SV.StandardLib.XF || {};
 SV.StandardLib.XF.Tabs = SV.StandardLib.XF.Tabs || {};
-SV.$ = SV.$ || window.jQuery || null;
 SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
 ;((window, document) =>
 {
     "use strict";
-    var $ = SV.$;
+
+    /**
+     * @return {HTMLElement}
+     */
+    function getTarget(handler) {
+        // noinspection JSUnresolvedReference
+        return handler.target || handler.$target.get(0);
+    }
 
     SV.StandardLib.XF.Tabs.BaseOpts = {
         svStoreSelectedTabInputName: null
@@ -35,7 +42,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
          */
         _getHiddenInput: function ()
         {
-            var thisTarget = this.target || this.$target.get(0),
+            var thisTarget = getTarget(this),
                 form = thisTarget.closest('form'),
                 escapedInputName = XF.htmlspecialchars(this.options.svStoreSelectedTabInputName.toString()),
                 finalInputSelector = '[name="' + escapedInputName + '"]',
@@ -43,22 +50,10 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
             if (hiddenInput === null)
             {
-                if (typeof XF.createElement === "function")
-                {
-                    hiddenInput = XF.createElement('input', {
-                        type: 'hidden',
-                        name: escapedInputName,
-                        value: ''
-                    })
-                }
-                else // jQuery - XF 2.2
-                {
-                    hiddenInput = $('<input />', {
-                        type: 'hidden',
-                        name: escapedInputName,
-                        value: ''
-                    }).get(0)
-                }
+                hiddenInput = document.createElement('input')
+                hiddenInput.type = 'hidden';
+                hiddenInput.name =  escapedInputName;
+                hiddenInput.value = '';
 
                 form.append(hiddenInput)
             }
