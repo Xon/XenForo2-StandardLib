@@ -15,30 +15,53 @@ class AddOn extends XFCP_AddOn
     /**
      * @param Upload[] $uploads
      * @return InstallBatchCreatorService
-     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function getBatchCreatorService(array $uploads)
     {
-        /** @var ExtendedInstallBatchCreatorService $creator */
-        $creator = $this->service(InstallBatchCreatorService::class, $this->getAddOnManager());
+        if (count($uploads) === 1)
+        {
+            $upload = reset($uploads);
+            $fileName = $upload->getFileName();
+            if (preg_match('/^SV-StandardLib.*.zip$/i', $fileName))
+            {
+                return parent::getBatchCreatorService($uploads);
+            }
+        }
 
+        try
+        {
+            return $this->getSvBatchCreatorService($uploads);
+        }
+        catch (\Throwable $e)
+        {
+            \XF::logException($e);
+
+            return parent::getBatchCreatorService($uploads);
+        }
+    }
+
+    protected function getSvBatchCreatorService(array $uploads): InstallBatchCreatorService
+    {
         /** @var ExtendedAddOnManager $addOnManager */
         $addOnManager = $this->app->addOnManager();
         $addOnManager->skipAddOnRequirements = true;
         try
         {
-            foreach ($uploads AS $upload)
+            /** @var ExtendedInstallBatchCreatorService $creator */
+            $creator = $this->service(InstallBatchCreatorService::class, $this->getAddOnManager());
+
+            foreach ($uploads as $upload)
             {
                 $creator->addUpload($upload);
             }
+
+            $creator->validateAllAddons();
+
+            return $creator;
         }
         finally
         {
             $addOnManager->skipAddOnRequirements = false;
         }
-
-        $creator->validateAllAddons();
-
-        return $creator;
     }
 }
