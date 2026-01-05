@@ -68,5 +68,4 @@ if (\XF::$versionId < 2030000)
 else
 {
     class StyleProperty extends XFCP_StyleProperty {}
-    return;
 }
