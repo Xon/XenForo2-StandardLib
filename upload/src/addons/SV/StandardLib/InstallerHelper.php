@@ -5,6 +5,8 @@ namespace SV\StandardLib;
 use LogicException;
 use SV\StandardLib\Db\AlterColumnUnwrapper;
 use SV\StandardLib\Db\AlterTableUnwrapper;
+use SV\StandardLib\Repository\AddOnRepository;
+use SV\StandardLib\Repository\Helper as HelperRepo;
 use XF\AddOn\AddOn;
 use XF\Admin\App;
 use XF\Db\AbstractAdapter;
@@ -25,19 +27,13 @@ use XFES\Service\Configurer;
 use XFES\Service\Optimizer;
 use function array_keys;
 use function count;
-use function explode;
 use function file_exists;
 use function in_array;
 use function is_array;
-use function phpversion;
 use function preg_replace;
 use function str_replace;
 use function strlen;
-use function strpos;
-use function strtolower;
 use function unserialize;
-use function version_compare;
-use function sprintf;
 
 /**
  * @version 1.10.0
@@ -606,88 +602,14 @@ trait InstallerHelper
      */
     protected function checkSoftRequires(array &$errors, array &$warnings): void
     {
-        $json = $this->addOn->getJson();
-        if (empty($json['require-soft']))
+        $requirements = $json['require-soft'] ?? null;
+        if (is_array($requirements) && count($requirements) !== 0)
         {
-            return;
-        }
-
-        $addOns = \XF::app()->container('addon.cache');
-        foreach ((array)$json['require-soft'] as $productKey => $requirement)
-        {
-            if (!is_array($requirement))
-            {
-                continue;
-            }
-            [$version, $product] = $requirement;
-            $errorType = count($requirement) >= 3 ? $requirement[2] : null;
-
-            // advisory
-            if ($errorType === null)
-            {
-                continue;
-            }
-
-            $enabled = false;
-            $versionValid = false;
-
-            if (strpos($productKey, 'php-ext') === 0)
-            {
-                $parts = explode('/', $productKey, 2);
-                if (isset($parts[1]))
-                {
-                    $enabled = phpversion($parts[1]) !== false;
-                    $versionValid = ($version === '*') || (version_compare(phpversion($parts[1]), $version, 'ge'));
-                }
-            }
-            else if (strpos($productKey, 'php') === 0)
-            {
-                $enabled = true;
-                $versionValid = version_compare(phpversion(), $version, 'ge');
-            }
-            else if (strpos($productKey, 'mysql') === 0)
-            {
-                $mySqlVersion = \XF::db()->getServerVersion();
-                if ($mySqlVersion)
-                {
-                    $enabled = true;
-                    $versionValid = version_compare(strtolower($mySqlVersion), $version, 'ge');
-                }
-            }
-            else
-            {
-                $enabled = isset($addOns[$productKey]);
-                $versionValid = Helper::isAddOnActive($productKey, $version);
-            }
-
-            if (!$enabled)
-            {
-                continue;
-            }
-
-            if (!$versionValid)
-            {
-                $reason = count($requirement) >= 4 ? (' ' . $requirement[3]) : '';
-
-                if ($errorType)
-                {
-                    $errors[] = new PreEscaped(sprintf(
-                        '%s requires %s.%s',
-                        $json['title'],
-                        $product,
-                        $reason
-                    ));
-                }
-                else
-                {
-                    $warnings[] = new PreEscaped(sprintf(
-                        '%s recommends %s.%s',
-                        $json['title'],
-                        $product,
-                        $reason
-                    ));
-                }
-            }
+            $title = $this->addOn->title ?? $this->addOn->addon_id;
+            $existingAddOnVersionString = HelperRepo::get()->getAddonVersions();
+            $existingAddOnVersionIds = \XF::app()->container('addon.cache');
+            $addOnManager = AddOnRepository::get();
+            $addOnManager->checkAddOnRequirements($requirements, $title, $errors, $warnings, true, true, $existingAddOnVersionString, $existingAddOnVersionIds);
         }
     }
 

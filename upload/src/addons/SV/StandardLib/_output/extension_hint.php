@@ -16,6 +16,7 @@ namespace SV\StandardLib\XF\AddOn
 
 namespace SV\StandardLib\XF\Admin\Controller
 {
+	class XFCP_AddOn extends \XF\Admin\Controller\AddOn {}
 	class XFCP_Template extends \XF\Admin\Controller\Template {}
 }
 
@@ -45,6 +46,11 @@ namespace SV\StandardLib\XF\Pub\Controller
 {
 	class XFCP_Forum extends \XF\Pub\Controller\Forum {}
 	class XFCP_Watched extends \XF\Pub\Controller\Watched {}
+}
+
+namespace SV\StandardLib\XF\Service\AddOnArchive
+{
+	class XFCP_InstallBatchCreator extends \XF\Service\AddOnArchive\InstallBatchCreator {}
 }
 
 namespace SV\StandardLib\XF\Template

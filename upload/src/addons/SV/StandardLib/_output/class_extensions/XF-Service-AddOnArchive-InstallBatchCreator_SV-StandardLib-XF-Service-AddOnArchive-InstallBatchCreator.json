@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Service\\AddOnArchive\\InstallBatchCreator",
+    "to_class": "SV\\StandardLib\\XF\\Service\\AddOnArchive\\InstallBatchCreator",
+    "execute_order": 1,
+    "active": true
+}

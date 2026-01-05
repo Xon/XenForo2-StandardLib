@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Admin\\Controller\\AddOn",
+    "to_class": "SV\\StandardLib\\XF\\Admin\\Controller\\AddOn",
+    "execute_order": 1,
+    "active": true
+}

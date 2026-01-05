@@ -138,7 +138,7 @@ class Helper extends Repository
     }
 
     /** @noinspection PhpUnusedParameterInspection */
-    protected function getAddonVersions(): array
+    public function getAddonVersions(): array
     {
         /** @var callable(Container, string): array $func */
         $func = \XF::app()->fromRegistry('addon.versionCache', function (Container $c, string $key) {
@@ -175,7 +175,7 @@ class Helper extends Repository
     }
 
     /** @noinspection PhpUnnecessaryLocalVariableInspection */
-    protected function sanitizeVersionString(string $version): string
+    public function sanitizeVersionString(string $version): string
     {
         $version = preg_replace('/\s+/u', ' ', mb_strtolower($version));
         $version = trim($version);

@@ -2,9 +2,8 @@
 
 namespace SV\StandardLib\XF\AddOn;
 
-
-
 use SV\StandardLib\Helper;
+use XF\PreEscaped;
 use function array_key_exists;
 use function array_merge;
 use function count;
@@ -15,9 +14,16 @@ use function is_array;
  */
 class Manager extends XFCP_Manager
 {
+    public $skipAddOnRequirements = false;
+
     /** @noinspection PhpMissingReturnTypeInspection */
     public function checkAddOnRequirements(array $requirements, $title, &$errors = [])
     {
+        if ($this->skipAddOnRequirements)
+        {
+            return true;
+        }
+
         $errors = [];
         $addOns = \XF::app()->container('addon.cache');
 
