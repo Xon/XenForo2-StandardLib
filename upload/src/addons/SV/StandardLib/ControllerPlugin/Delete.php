@@ -9,11 +9,9 @@ use XF\ControllerPlugin\InlineMod as InlineModPlugin;
 use XF\Entity\Phrase;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Reply\AbstractReply;
-use function assert;
 use function count;
 use function intval;
 use function is_callable;
-use function method_exists;
 use function reset;
 
 /**

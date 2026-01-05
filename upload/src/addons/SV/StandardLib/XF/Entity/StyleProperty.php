@@ -2,7 +2,6 @@
 
 namespace SV\StandardLib\XF\Entity;
 
-use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Structure;
 
 if (\XF::$versionId < 2030000)
@@ -31,6 +30,7 @@ if (\XF::$versionId < 2030000)
         /**
          * @param Structure $structure
          * @return Structure
+         * @noinspection PhpMissingReturnTypeInspection
          */
         public static function getStructure(Structure $structure)
         {

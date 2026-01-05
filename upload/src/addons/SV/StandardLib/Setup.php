@@ -8,7 +8,6 @@ namespace SV\StandardLib;
 use SV\StandardLib\XF\DevelopmentOutput\StyleProperty as ExtendedDevOutputStyleProperty;
 use SV\StandardLib\XF\Entity\StyleProperty as ExtendedStylePropertyEntity;
 use SV\StandardLib\XF\Template\TemplaterXF21Patch;
-use SV\StandardLib\XF\Template\XFCP_TemplaterXF21Patch;
 use XF\AddOn\AbstractSetup;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;

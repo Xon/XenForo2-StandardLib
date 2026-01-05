@@ -12,7 +12,6 @@ use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Repository;
 use XF\Util\File as FileUtil;
 use function abs;
-use function assert;
 use function ceil;
 use function class_alias;
 use function count;
@@ -64,7 +63,7 @@ class Helper extends Repository
 
         if (is_string($targetVersion))
         {
-            $addOnEntity = \SV\StandardLib\Helper::findCached(AddOn::class, $addonId);
+            $addOnEntity = HelperUtil::findCached(AddOn::class, $addonId);
             if ($addOnEntity instanceof AddOn)
             {
                 // unlike \XF::isAddOnActive, the add-on must not be in a processing state
@@ -377,7 +376,7 @@ class Helper extends Repository
         if ($entity->isValidColumn($backupColumn) || $entity->isValidGetter($backupColumn))
         {
             /** @var UserEntity|null $user */
-            $user = \SV\StandardLib\Helper::find(UserEntity::class, $entity->get($backupColumn));
+            $user = HelperUtil::find(UserEntity::class, $entity->get($backupColumn));
 
             return $user;
         }

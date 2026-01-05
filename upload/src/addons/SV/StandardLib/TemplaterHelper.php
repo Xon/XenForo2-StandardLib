@@ -22,7 +22,7 @@ use XF\Template\Templater as BaseTemplater;
 use function is_callable;
 use function json_decode;
 use function max;
-use function method_exists, is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, assert, trigger_error, trim, implode;
+use function method_exists, is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, trigger_error, trim, implode;
 
 class TemplaterHelper
 {
@@ -404,6 +404,7 @@ class TemplaterHelper
      * @param string        $phraseName
      * @param array         $params
      * @return string|PreEscaped
+     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function fnPhraseDynamic(BaseTemplater $templater, bool &$escape, string $phraseName, array $params = [])
     {
@@ -486,17 +487,16 @@ class TemplaterHelper
 
     /**
      * @param BaseTemplater $templater
-     * @param bool $escape
-     * @param int $nowTimestamp
-     * @param int $otherTimestamp
-     * @param int $maximumDateParts
-     * @param bool $countUp
+     * @param bool   $escape
+     * @param int    $nowTimestamp
+     * @param int    $otherTimestamp
+     * @param int    $maximumDateParts
+     * @param bool   $countUp
      * @param string $class
      * @param string $triggerEvent
      * @param string $triggerEventOnSelector
+     * @param bool   $showSeconds
      * @return string|PreEscaped
-     * @throws \Exception
-     * @noinspection PhpReturnDocTypeMismatchInspection
      */
     public function fnRelativeTimestamp(
         BaseTemplater $templater, bool &$escape, int $nowTimestamp, int $otherTimestamp,
