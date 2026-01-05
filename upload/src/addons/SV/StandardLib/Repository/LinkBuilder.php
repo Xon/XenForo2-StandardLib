@@ -3,11 +3,17 @@
 namespace SV\StandardLib\Repository;
 
 use Closure;
+use SV\StandardLib\Helper as HelperUtil;
 use XF\Mvc\Entity\Repository;
 use XF\Mvc\Router;
 
 class LinkBuilder extends Repository
 {
+    public static function get(): self
+    {
+        return HelperUtil::repository(self::class);
+    }
+
     /**
      * @param Router $router
      * @return void

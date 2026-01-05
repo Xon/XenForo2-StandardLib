@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib\Repository;
 
+use SV\StandardLib\Helper as HelperUtil;
 use SV\StandardLib\Permissions\PermissionCache;
 use XF\Entity\PermissionCacheContent;
 use XF\Entity\PermissionCombination;
@@ -13,6 +14,11 @@ use function implode;
 
 class Permissions extends Repository
 {
+    public static function get(): self
+    {
+        return HelperUtil::repository(self::class);
+    }
+
     /**
      * @param array<int> $permissionCombinationIds
      * @return void

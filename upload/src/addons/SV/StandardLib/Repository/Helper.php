@@ -4,6 +4,7 @@ namespace SV\StandardLib\Repository;
 
 use DateInterval;
 use SV\InstallerAppHelper\InstallAppBootstrap;
+use SV\StandardLib\Helper as HelperUtil;
 use XF\Container;
 use XF\Entity\AddOn;
 use XF\Entity\User as UserEntity;
@@ -31,6 +32,11 @@ use function version_compare;
 
 class Helper extends Repository
 {
+    public static function get(): self
+    {
+        return HelperUtil::repository(self::class);
+    }
+
     /**
      * @param string          $addonId
      * @param string|int|null $targetVersion
