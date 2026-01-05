@@ -16,7 +16,7 @@
 	{
 		color: @xf-textColorMuted;
 		background-color: @xf-pageBg;
-		cursor: not-allowed;
+		cursor: not-allowed !important;
 		-webkit-user-select: none;
 		user-select: none;
 	}
@@ -26,7 +26,10 @@
 	}
 	& [hidden]
 	{
-		display: none !important;
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		opacity: 0;
 	}
 }
 
