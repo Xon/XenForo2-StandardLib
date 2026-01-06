@@ -14,6 +14,11 @@ namespace SV\StandardLib\XF\AddOn
 	class XFCP_Manager extends \XF\AddOn\Manager {}
 }
 
+namespace SV\StandardLib\XF\AddOn\DataType
+{
+	class XFCP_StyleProperty extends \XF\AddOn\DataType\StyleProperty {}
+}
+
 namespace SV\StandardLib\XF\Admin\Controller
 {
 	class XFCP_AddOn extends \XF\Admin\Controller\AddOn {}

@@ -5,10 +5,12 @@
 
 namespace SV\StandardLib;
 
+use SV\StandardLib\XF\AddOn\DataType\StyleProperty as ExtendedStylePropertyDataType;
 use SV\StandardLib\XF\DevelopmentOutput\StyleProperty as ExtendedDevOutputStyleProperty;
 use SV\StandardLib\XF\Entity\StyleProperty as ExtendedStylePropertyEntity;
 use SV\StandardLib\XF\Template\TemplaterXF21Patch;
 use XF\AddOn\AbstractSetup;
+use XF\AddOn\DataType\StyleProperty as StylePropertyDataType;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
@@ -96,6 +98,7 @@ class Setup extends AbstractSetup
     public function syncClassExtensions()//: void
     {
         $preXF23 = \XF::$versionId < 2030000;
+        $this->patchClassExtension(StylePropertyDataType::class, ExtendedStylePropertyDataType::class,  $preXF23);
         $this->patchClassExtension(StylePropertyEntity::class,ExtendedStylePropertyEntity::class,  $preXF23);
         $this->patchClassExtension(DevOutputStyleProperty::class,ExtendedDevOutputStyleProperty::class,  $preXF23);
 
