@@ -519,7 +519,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
                 XF.setupHtmlInsert(data.html, html =>
                 {
-                    trigger(select, xf22 ? [html.get(0)] : XF.customEvent('refreshChoices', {html}))
+                    trigger(select, 'refreshChoices', xf22 ? [html.get(0)] : {html})
                 })
             }
         }
