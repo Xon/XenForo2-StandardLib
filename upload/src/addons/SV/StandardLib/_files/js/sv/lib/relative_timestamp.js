@@ -301,7 +301,7 @@ SV.$ = SV.$ || window.jQuery || null;
             }
 
             let value = parseInt(momentObj[methodName]()),
-                phrase = 'svStandardLib_time.' + type + (value > 1 ? 's' : '');
+                phrase = 'time.' + type + (value > 1 ? 's' : '');
 
             // skip zero items
             if (!value)
