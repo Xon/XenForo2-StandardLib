@@ -19,6 +19,7 @@ use XF\Phrase;
 use XF\PreEscaped;
 use XF\Style;
 use XF\Template\Templater as BaseTemplater;
+use function array_sum;
 use function is_callable;
 use function json_decode;
 use function max;
@@ -211,7 +212,12 @@ class TemplaterHelper
     {
         $this->addFilter('replacevalue', 'filterReplaceValue');
         $this->addFilter('addvalue', 'filterAddValue');
-        $this->addFunction('array_diff', 'fnArrayDiff');
+        if (\XF::$versionId < 2030870)
+        {
+            $this->addFunction('array_diff', 'fnArrayDiff');
+            $this->addFunction('array_reverse', 'fnArrayReverse');
+            $this->addFunction('array_sum', 'fnArraySum');
+        }
         if (\XF::$versionId < 2020000)
         {
             $this->addFunction('phrase_dynamic', 'fnPhraseDynamic');
@@ -220,13 +226,13 @@ class TemplaterHelper
         {
             $this->addFunction('property_variation', 'fnPropertyVariation');
         }
-        $this->addFunction('array_reverse', 'fnArrayReverse');
-        $this->addFunction('sv_array_reverse', \XF::$debugMode ? 'fnArrayReverseOld' : 'fnArrayReverse');
         $this->addFunction('sv_relative_timestamp', 'fnRelativeTimestamp');
         $this->addFunction('parse_less_func', 'fnParseLessFunc');
         $this->addFunction('abs', 'fnAbs');
         $this->addFunction('is_toggle_set', 'fnIsToggleSet');
         $this->addFunction('is_addon_active', 'fnIsAddonActive');
+        // legacy
+        $this->addFunction('sv_array_reverse', \XF::$debugMode ? 'fnArrayReverseOld' : 'fnArrayReverse');
     }
 
     /**
@@ -483,6 +489,22 @@ class TemplaterHelper
         }
 
         return $array ?? [];
+    }
+
+    /**
+     * @param BaseTemplater                 $templater
+     * @param bool                          $escape
+     * @param AbstractCollection|array|null $array
+     * @return int|float
+     */
+    public function fnArraySum(BaseTemplater $templater, bool &$escape, $array)
+    {
+        if ($array instanceof AbstractCollection)
+        {
+            $array->toArray();
+        }
+
+        return is_array($array) ? array_sum($array) : 0;
     }
 
     /**
