@@ -7,6 +7,7 @@ namespace SV\StandardLib;
 
 use SV\StandardLib\XF\AddOn\DataType\StyleProperty as ExtendedStylePropertyDataType;
 use SV\StandardLib\XF\DevelopmentOutput\StyleProperty as ExtendedDevOutputStyleProperty;
+use SV\StandardLib\XF\Entity\Option as ExtendedOptionEntity;
 use SV\StandardLib\XF\Entity\StyleProperty as ExtendedStylePropertyEntity;
 use SV\StandardLib\XF\Template\TemplaterXF21Patch;
 use XF\AddOn\AbstractSetup;
@@ -17,6 +18,7 @@ use XF\AddOn\StepRunnerUpgradeTrait;
 use XF\Db\Schema\Alter;
 use XF\DevelopmentOutput\StyleProperty as DevOutputStyleProperty;
 use XF\Entity\ClassExtension as ClassExtensionEntity;
+use XF\Entity\Option as OptionEntity;
 use XF\Entity\Phrase as PhraseEntity;
 use XF\Entity\StyleProperty as StylePropertyEntity;
 use XF\Finder\Phrase as PhraseFinder;
@@ -97,6 +99,9 @@ class Setup extends AbstractSetup
 
     public function syncClassExtensions()//: void
     {
+        // only enable for pre XF2.3.8
+        $this->patchClassExtension(OptionEntity::class, ExtendedOptionEntity::class, \XF::$versionId < 2030870);
+
         $preXF23 = \XF::$versionId < 2030000;
         $this->patchClassExtension(StylePropertyDataType::class, ExtendedStylePropertyDataType::class,  $preXF23);
         $this->patchClassExtension(StylePropertyEntity::class,ExtendedStylePropertyEntity::class,  $preXF23);
