@@ -184,8 +184,11 @@ class Helper extends Repository
             return $version;
         }
         $version = preg_replace('/^(?:v|version)\s*/u', '', $version);
-        $version = str_replace('patch level', 'pl', $version);
-        $version = str_replace('release candidate', 'rc', $version);
+        $version = strtr($version, [
+            'patch level' => 'pl',
+            'release candidate' => 'rc',
+            'preview' => 'rc',
+        ]);
 
         return $version;
     }
