@@ -2,5 +2,5 @@
     "from_class": "XF\\AddOn\\DataType\\StyleProperty",
     "to_class": "SV\\StandardLib\\XF\\AddOn\\DataType\\StyleProperty",
     "execute_order": 1,
-    "active": true
+    "active": false
 }

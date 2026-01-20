@@ -2,5 +2,5 @@
     "from_class": "XF\\Entity\\Option",
     "to_class": "SV\\StandardLib\\XF\\Entity\\Option",
     "execute_order": 1,
-    "active": true
+    "active": false
 }
