@@ -19,7 +19,7 @@ class Option extends XFCP_Option
             /** @noinspection PhpWrongStringConcatenationInspection */
             return strval(floatval($this->option_value_)) + 0;
         }
-        else if ($this->data_type === 'bool')
+        else if ($this->data_type === 'boolean')
         {
             return (bool)$this->option_value_;
         }
@@ -35,7 +35,7 @@ class Option extends XFCP_Option
         {
             return (int)$this->default_value_;
         }
-        else if ($this->data_type === 'bool')
+        else if ($this->data_type === 'boolean')
         {
             return (bool)$this->default_value_;
         }
