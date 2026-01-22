@@ -33,7 +33,8 @@ class Option extends XFCP_Option
         // int/bool types are not cast as expected, which is then cached into \XF::options()
         if ($this->isDataTypeNumeric())
         {
-            return (int)$this->default_value_;
+            /** @noinspection PhpWrongStringConcatenationInspection */
+            return strval(floatval($this->option_value_)) + 0;
         }
         else if ($this->data_type === 'boolean')
         {
