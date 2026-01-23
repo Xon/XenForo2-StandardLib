@@ -216,6 +216,15 @@ Replaces a value `$elementValue` in an array/collection with `$newElementValue`.
 $array|replacevalue($elementValue, $newElementValue)
 ```
 
+### Template Function: array_first
+Reverse an array/collection. See [`array_first`](https://www.php.net/manual/en/function.array-first.php) for details.
+
+### Template Function: array_last
+Reverse an array/collection. See [`array_last`](https://www.php.net/manual/en/function.array-last.php) for details.
+
+### Template Function: array_sum
+Reverse an array/collection. See [`array_sum`](https://www.php.net/manual/en/function.array-sum.php) for details.
+
 ### Template Function: array_reverse
 Reverse an array/collection. See [`array_reverse`](https://www.php.net/manual/en/function.array-reverse.php) for details.
 
