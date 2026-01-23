@@ -212,7 +212,12 @@ class TemplaterHelper
     {
         $this->addFilter('replacevalue', 'filterReplaceValue');
         $this->addFilter('addvalue', 'filterAddValue');
-        if (\XF::$versionId < 2030870)
+        if (true)
+        {
+            $this->addFunction('array_first', 'fnArrayFirst');
+            $this->addFunction('array_last', 'fnArrayLast');
+        }
+        if (\XF::$versionId < 2030800)
         {
             $this->addFunction('array_diff', 'fnArrayDiff');
             $this->addFunction('array_reverse', 'fnArrayReverse');
@@ -417,6 +422,42 @@ class TemplaterHelper
         $phrase = $this->templater->getLanguage()->phrase($phraseName, $params);
 
         return $phrase->render();
+    }
+
+    public function fnArrayFirst(BaseTemplater $templater, bool &$escape, $array)
+    {
+        $array = $array instanceof AbstractCollection ? $array->toArray() : $array;
+
+        if (!is_array($array))
+        {
+            $array = [];
+        }
+
+        // `reset` returns false on empty, but php `array_first` returns null
+        if (count($array) === 0)
+        {
+            return null;
+        }
+
+        return reset($array);
+    }
+
+    public function fnArrayLast(BaseTemplater $templater, bool &$escape, $array)
+    {
+        $array = $array instanceof AbstractCollection ? $array->toArray() : $array;
+
+        if (!is_array($array))
+        {
+            $array = [];
+        }
+
+        // `end` returns false on empty, but php `array_first` returns null
+        if (count($array) === 0)
+        {
+            return null;
+        }
+
+        return end($array);
     }
 
     /**
