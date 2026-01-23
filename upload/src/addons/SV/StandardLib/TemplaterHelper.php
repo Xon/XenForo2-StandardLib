@@ -428,25 +428,16 @@ class TemplaterHelper
      */
     public function fnArrayDiff(BaseTemplater $templater, bool &$escape, ?array $array1 = null, ...$arrays): array
     {
-        array_unshift($arrays, $array1);
-        foreach($arrays as &$array)
+        $arrays = func_get_args();
+        unset($arrays[0]);
+        unset($arrays[1]);
+
+        foreach ($arrays AS &$arr)
         {
-            if ($array === null)
-            {
-                $array = [];
-            }
-            else if ($array instanceof AbstractCollection)
-            {
-                $array = $array->toArray();
-            }
+            $arr = $arr instanceof AbstractCollection ? $arr->toArray() : $arr;
         }
 
-        if (count($arrays) <= 1)
-        {
-            return $array1;
-        }
-
-        return array_diff(...$arrays);
+        return call_user_func_array('array_diff', $arrays);
     }
 
     /**
@@ -479,16 +470,14 @@ class TemplaterHelper
      */
     public function fnArrayReverse(BaseTemplater $templater, bool &$escape, $array, bool $preserveKeys = true)
     {
-        if ($array instanceof AbstractCollection)
+        $array = $array instanceof AbstractCollection ? $array->toArray() : $array;
+
+        if (!is_array($array))
         {
-            return $array->reverse($preserveKeys);
-        }
-        else if (is_array($array))
-        {
-            return array_reverse($array, $preserveKeys);
+            $array = [];
         }
 
-        return $array ?? [];
+        return array_reverse($array, $preserveKeys);
     }
 
     /**
@@ -499,12 +488,14 @@ class TemplaterHelper
      */
     public function fnArraySum(BaseTemplater $templater, bool &$escape, $array)
     {
-        if ($array instanceof AbstractCollection)
+        $array = $array instanceof AbstractCollection ? $array->toArray() : $array;
+
+        if (!is_array($array))
         {
-            $array->toArray();
+            $array = [];
         }
 
-        return is_array($array) ? array_sum($array) : 0;
+        return array_sum($array);
     }
 
     /**
