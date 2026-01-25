@@ -217,10 +217,10 @@ $array|replacevalue($elementValue, $newElementValue)
 ```
 
 ### Template Function: array_first
-Reverse an array/collection. See [`array_first`](https://www.php.net/manual/en/function.array-first.php) for details.
+Gets the first value from an array/collection. See [`array_first`](https://www.php.net/manual/en/function.array-first.php) for details.
 
 ### Template Function: array_last
-Reverse an array/collection. See [`array_last`](https://www.php.net/manual/en/function.array-last.php) for details.
+Gets the last value from an array/collection. See [`array_last`](https://www.php.net/manual/en/function.array-last.php) for details.
 
 ### Template Function: array_sum
 Reverse an array/collection. See [`array_sum`](https://www.php.net/manual/en/function.array-sum.php) for details.
