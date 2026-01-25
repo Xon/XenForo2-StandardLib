@@ -212,7 +212,7 @@ class TemplaterHelper
     {
         $this->addFilter('replacevalue', 'filterReplaceValue');
         $this->addFilter('addvalue', 'filterAddValue');
-        if (true)
+        if (\XF::$versionId < 2030900)
         {
             $this->addFunction('array_first', 'fnArrayFirst');
             $this->addFunction('array_last', 'fnArrayLast');
