@@ -19,11 +19,23 @@ use XF\Phrase;
 use XF\PreEscaped;
 use XF\Style;
 use XF\Template\Templater as BaseTemplater;
+use function abs;
+use function array_reverse;
 use function array_sum;
+use function call_user_func_array;
+use function count;
+use function end;
+use function func_get_args;
+use function implode;
+use function is_array;
 use function is_callable;
+use function is_string;
 use function json_decode;
 use function max;
-use function method_exists, is_string, is_array, count, array_diff, array_reverse, array_unshift, abs, trigger_error, trim, implode;
+use function method_exists;
+use function reset;
+use function trigger_error;
+use function trim;
 
 class TemplaterHelper
 {
