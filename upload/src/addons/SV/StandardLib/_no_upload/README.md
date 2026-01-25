@@ -222,6 +222,9 @@ Gets the first value from an array/collection. See [`array_first`](https://www.p
 ### Template Function: array_last
 Gets the last value from an array/collection. See [`array_last`](https://www.php.net/manual/en/function.array-last.php) for details.
 
+### Template Function: array_is_list
+Check if an array/collection is a list. See [`array_is_list`](https://www.php.net/manual/en/function.array-is-list.php) for details.
+
 ### Template Function: array_sum
 Reverse an array/collection. See [`array_sum`](https://www.php.net/manual/en/function.array-sum.php) for details.
 

@@ -216,6 +216,7 @@ class TemplaterHelper
         {
             $this->addFunction('array_first', 'fnArrayFirst');
             $this->addFunction('array_last', 'fnArrayLast');
+            $this->addFunction('array_is_list', 'fnArrayIsList');
         }
         if (\XF::$versionId < 2030800)
         {
@@ -459,6 +460,29 @@ class TemplaterHelper
 
         return end($array);
     }
+
+    public function fnArrayIsList(BaseTemplater $templater, bool &$escape, $array)
+    {
+        $array = $array instanceof AbstractCollection ? $array->toArray() : $array;
+
+        if (!is_array($array))
+        {
+            $array = [];
+        }
+
+        $i = 0;
+        foreach ($array as $k => $v)
+        {
+            if ($k !== $i++)
+            {
+                return false;
+            }
+        }
+
+        return true;
+//        return array_is_list($array);
+    }
+
 
     /**
      * @param BaseTemplater $templater
