@@ -12,7 +12,6 @@ use XF\Mvc\Entity\Entity;
 use XF\Mvc\Reply\AbstractReply;
 use function count;
 use function get_class;
-use function intval;
 use function is_callable;
 use function reset;
 
@@ -61,11 +60,11 @@ class Delete extends AbstractPlugin
         if ($this->isPost())
         {
             $id = $entity->getIdentifierValues();
-            if (!$id || count($id) !== 1)
+            if ($id === null || count($id) !== 1)
             {
                 throw new InvalidArgumentException('Entity does not have an ID or does not have a simple key');
             }
-            $entityId = intval(reset($id));
+            $entityId = (int)reset($id);
 
             if ($entity->{$stateKey} === 'deleted')
             {
