@@ -47,7 +47,12 @@ class InputFilterer extends XFCP_InputFilterer
                     $tz = $value['tz'];
 
                     $timeParts = explode(':', $timeValue, 3);
-                    if (count($timeParts) !== 3)
+                    if (count($timeParts) === 2)
+                    {
+                        // safari doesn't support seconds for input[type=time]
+                        $timeParts[] = 0;
+                    }
+                    else if (count($timeParts) === 3)
                     {
                         return 0;
                     }
