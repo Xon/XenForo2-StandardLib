@@ -18,6 +18,32 @@ use function is_string;
 class InputFilterer extends XFCP_InputFilterer
 {
     /**
+     * @param string|int|null $int
+     * @param int|null        $min
+     * @param int|null        $max
+     * @return int
+     */
+    protected function svIntSanitizer($int, ?int $min, ?int $max): int
+    {
+        if (!is_numeric($int))
+        {
+            return $min;
+        }
+
+        $int = (int)$int;
+        if ($min !== null && $int < $min)
+        {
+            $int = $min;
+        }
+        else if ($max !== null && $int > $max)
+        {
+            $int = $max;
+        }
+
+        return $int;
+    }
+
+    /**
      * @param mixed  $value
      * @param string $type
      * @param array  $options
@@ -88,31 +114,12 @@ class InputFilterer extends XFCP_InputFilterer
                 }
                 [$year, $month, $day] = $ymdParts;
 
-                $intSanitizer = function ($int, ?int $min, ?int $max): int {
-                    if (!is_numeric($int))
-                    {
-                        return $min;
-                    }
-
-                    $int = (int)$int;
-                    if ($min !== null && $int < $min)
-                    {
-                        $int = $min;
-                    }
-                    else if ($max !== null && $int > $max)
-                    {
-                        $int = $max;
-                    }
-
-                    return $int;
-                };
-
-                $year = $intSanitizer($year, 1970, null);
-                $month = $intSanitizer($month, 1, 12);
-                $day = $intSanitizer($day, 1, 31);
-                $hh = $intSanitizer($hh, 0, 24);
-                $mm = $intSanitizer($mm, 0, 60);
-                $ss = $intSanitizer($ss, 0, 60);
+                $year = $this->svIntSanitizer($year, 1970, null);
+                $month = $this->svIntSanitizer($month, 1, 12);
+                $day = $this->svIntSanitizer($day, 1, 31);
+                $hh = $this->svIntSanitizer($hh, 0, 24);
+                $mm = $this->svIntSanitizer($mm, 0, 60);
+                $ss = $this->svIntSanitizer($ss, 0, 60);
 
                 if (is_string($tz))
                 {
