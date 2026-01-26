@@ -66,11 +66,12 @@ class InputFilterer extends XFCP_InputFilterer
                     return 0;
                 }
 
+                $tz = $value['tz'] ?? '';
+
                 if (array_key_exists('date', $value) && array_key_exists('time', $value))
                 {
                     $dateParts = $value['date'];
                     $timeValue = $value['time'];
-                    $tz = $value['tz'];
 
                     $timeParts = explode(':', $timeValue, 3);
                     if (count($timeParts) === 2)
@@ -88,14 +89,13 @@ class InputFilterer extends XFCP_InputFilterer
                          && array_key_exists('hh', $value)
                          && array_key_exists('mm', $value)
                          && array_key_exists('ss', $value)
-                         && array_key_exists('tz', $value))
+                )
                 {
                     // old XF2.2 version, shim to new version
                     $dateParts = $value['ymd'];
                     $hh = $value['hh'];
                     $mm = $value['mm'];
                     $ss = $value['ss'];
-                    $tz = $value['tz'];
                 }
                 else
                 {
