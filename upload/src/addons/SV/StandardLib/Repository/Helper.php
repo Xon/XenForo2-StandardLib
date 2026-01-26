@@ -3,6 +3,7 @@
 namespace SV\StandardLib\Repository;
 
 use DateInterval;
+use LogicException;
 use SV\InstallerAppHelper\InstallAppBootstrap;
 use SV\StandardLib\Helper as HelperUtil;
 use XF\Container;
@@ -22,7 +23,6 @@ use function is_string;
 use function mb_strtolower;
 use function md5;
 use function preg_replace;
-use function str_replace;
 use function strpos;
 use function strrpos;
 use function substr;
@@ -53,6 +53,7 @@ class Helper extends Repository
         if ($targetVersion === null || $targetVersion === '*')
         {
             $addOns = \XF::app()->container('addon.cache');
+
             return isset($addOns[$addonId]);
         }
 
@@ -100,9 +101,9 @@ class Helper extends Repository
     /**
      * XF2.1 support
      *
-     * @param string $addOnId
-     * @param int|null    $versionId
-     * @param string $operator
+     * @param string   $addOnId
+     * @param int|null $versionId
+     * @param string   $operator
      * @return bool|int
      */
     protected function isAddOnActiveForXF21(string $addOnId, ?int $versionId = null, string $operator = '>=')
@@ -158,6 +159,7 @@ class Helper extends Repository
         ');
         \XF::app()->registry()->set('addon.versionCache', $data);
         $this->markAsCriticalAddon();
+
         return $data;
     }
 
@@ -185,9 +187,9 @@ class Helper extends Repository
         }
         $version = preg_replace('/^(?:v|version)\s*/u', '', $version);
         $version = strtr($version, [
-            'patch level' => 'pl',
+            'patch level'       => 'pl',
             'release candidate' => 'rc',
-            'preview' => 'rc',
+            'preview'           => 'rc',
         ]);
 
         return $version;
@@ -205,12 +207,12 @@ class Helper extends Repository
         if ($interval instanceof DateInterval)
         {
             $interval = [
-                'y' => $interval->y,
-                'm' => $interval->m,
-                'd' => $interval->d,
-                'h' => $interval->h,
-                'i' => $interval->i,
-                's' => $interval->s,
+                'y'      => $interval->y,
+                'm'      => $interval->m,
+                'd'      => $interval->d,
+                'h'      => $interval->h,
+                'i'      => $interval->i,
+                's'      => $interval->s,
                 'invert' => $interval->invert,
             ];
         }
@@ -231,7 +233,7 @@ class Helper extends Repository
         }
 
         $dateArr = [];
-        foreach ($formatMaps AS $format => $phrase)
+        foreach ($formatMaps as $format => $phrase)
         {
             if ($maximumDateParts && count($dateArr) >= $maximumDateParts)
             {
@@ -242,13 +244,13 @@ class Helper extends Repository
             if ($value === 1)
             {
                 $dateArr[] = \XF::phrase('time.' . $phrase, [
-                    'count' => $value
+                    'count' => $value,
                 ])->render($phraseContext);
             }
             else if ($value > 1)
             {
                 $dateArr[] = \XF::phrase('time.' . $phrase . 's', [
-                    'count' => $value
+                    'count' => $value,
                 ])->render($phraseContext);
             }
             else if ($maximumDateParts > 0 && count($dateArr) > 0)
@@ -388,7 +390,7 @@ class Helper extends Repository
     }
 
     /**
-     * @param string $destClass
+     * @param string       $destClass
      * @param class-string $srcClass
      * @return void
      */
@@ -403,13 +405,13 @@ class Helper extends Repository
 
         if ($destClass[0] !== '\\')
         {
-            $destClass = '\\'.$destClass;
+            $destClass = '\\' . $destClass;
         }
         if ($srcClass[0] !== '\\')
         {
-            $srcClass = '\\'.$srcClass;
+            $srcClass = '\\' . $srcClass;
         }
-        $file = '/svShim/'.md5($destClass.'-'.$srcClass).'.php';
+        $file = '/svShim/' . md5($destClass . '-' . $srcClass) . '.php';
         $stubFile = FileUtil::getCodeCachePath() . $file;
 
         // include returns false if the file doesn't exist, so don't bother with file_exists/is_readable checks
@@ -429,7 +431,7 @@ class Helper extends Repository
 
         $php = $this->buildShimStubFile($srcClass, $destClass);
 
-        FileUtil::writeToAbstractedPath('code-cache:/'.$file, $php);
+        FileUtil::writeToAbstractedPath('code-cache:/' . $file, $php);
 
         try
         {
@@ -445,11 +447,11 @@ class Helper extends Repository
     {
         if ($srcClass === '' || $srcClass[0] !== '\\')
         {
-            throw new \LogicException('Expected $finalClass to not be empty and start with a \\');
+            throw new LogicException('Expected $finalClass to not be empty and start with a \\');
         }
         if ($destClass === '' || $destClass[0] !== '\\')
         {
-            throw new \LogicException('Expected $finalClass to not be empty and start with a \\');
+            throw new LogicException('Expected $finalClass to not be empty and start with a \\');
         }
 
         $nsEnd = strrpos($srcClass, '\\');
@@ -458,7 +460,7 @@ class Helper extends Repository
         $nsEnd = strrpos($destClass, '\\');
         $namespace = substr($destClass, 1, $nsEnd - 1);
         $class = substr($destClass, $nsEnd + 1);
-        $destAlias = $namespace. '\\XFCP_' . $class;
+        $destAlias = $namespace . '\\XFCP_' . $class;
 
         return <<<EOL
 <?php

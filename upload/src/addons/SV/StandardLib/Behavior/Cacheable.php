@@ -13,8 +13,8 @@ class Cacheable extends Behavior
     protected function getDefaultConfig(): array
     {
         return [
-            'repository' => $this->entity->structure()->shortName,
-            'rebuildCacheFuncName' => 'rebuildCache',
+            'repository'            => $this->entity->structure()->shortName,
+            'rebuildCacheFuncName'  => 'rebuildCache',
             'shouldRebuildCallable' => null,
         ];
     }
@@ -60,7 +60,7 @@ class Cacheable extends Behavior
         }
         else if (\XF::$developmentMode || \XF::$debugMode)
         {
-            $e = new LogicException('Expected '.$class.'::'.$func.' method to exist');
+            $e = new LogicException('Expected ' . $class . '::' . $func . ' method to exist');
             if (\XF::$developmentMode)
             {
                 throw $e;

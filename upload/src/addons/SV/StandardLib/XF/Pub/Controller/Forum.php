@@ -9,20 +9,19 @@ use XF\Mvc\Reply\AbstractReply;
 use XF\Mvc\Reply\View;
 
 /**
- * @Extends \XF\Pub\Controller\Forum
+ * @extends \XF\Pub\Controller\Forum
  */
 class Forum extends XFCP_Forum
 {
     /**
      * @param ParameterBag $params
-     *
      * @return AbstractReply
      */
     public function actionForum(ParameterBag $params)
     {
         $reply = parent::actionForum($params);
 
-        if ($reply instanceof View && ($forum  = $reply->getParam('forum')))
+        if ($reply instanceof View && ($forum = $reply->getParam('forum')))
         {
             $this->getSvFilterPlugin()->injectIntoReply($reply, 'forums', $forum);
         }

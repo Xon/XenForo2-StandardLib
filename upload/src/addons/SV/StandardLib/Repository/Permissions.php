@@ -57,8 +57,8 @@ class Permissions extends Repository
     }
 
     /**
-     * @param string $contentType
-     * @param string $permissionGroup
+     * @param string           $contentType
+     * @param string           $permissionGroup
      * @param array<int,int[]> $permissionMap format; $permissionMap[$permissionCombinationId][$id] = true;
      * @return void
      */
@@ -118,7 +118,7 @@ class Permissions extends Repository
     }
 
     /**
-     * @deprecated Replacement is getPerContentPermissions
+     * @deprecated   Replacement is getPerContentPermissions
      * @noinspection PhpUnusedParameterInspection
      */
     public function getContentPermissions(string $contentType, string $NotUseArg, ?User $user = null): array

@@ -8,7 +8,7 @@ use XF\Mvc\RouteBuiltLink;
 use function is_string;
 
 /**
- * @Extends \XF\Mvc\Router
+ * @extends \XF\Mvc\Router
  */
 class Router extends XFCP_Router
 {
@@ -42,7 +42,7 @@ class Router extends XFCP_Router
                 {
                     break;
                 }
-                elseif (is_string($output) || $output instanceof RouteBuiltLink)
+                else if (is_string($output) || $output instanceof RouteBuiltLink)
                 {
                     return $output;
                 }

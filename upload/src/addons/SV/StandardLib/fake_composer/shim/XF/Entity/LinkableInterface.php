@@ -6,13 +6,14 @@
  * @noinspection PhpIllegalPsrClassPathInspection
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
+
 namespace XF\Entity;
 
 interface LinkableInterface
 {
     /**
-     * @param bool  $canonical
-     * @param array $extraParams
+     * @param bool        $canonical
+     * @param array       $extraParams
      * @param string|null $hash
      * @return string
      */

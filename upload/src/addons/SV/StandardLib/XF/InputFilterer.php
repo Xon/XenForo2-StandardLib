@@ -83,14 +83,13 @@ class InputFilterer extends XFCP_InputFilterer
                 }
                 [$year, $month, $day] = $ymdParts;
 
-                $intSanitizer = function ($int, ?int $min, ?int$max): int
-                {
+                $intSanitizer = function ($int, ?int $min, ?int $max): int {
                     if (!is_numeric($int))
                     {
                         return $min;
                     }
 
-                    $int = (int) $int;
+                    $int = (int)$int;
                     if ($min !== null && $int < $min)
                     {
                         $int = $min;

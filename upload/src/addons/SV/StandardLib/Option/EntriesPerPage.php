@@ -13,7 +13,7 @@ abstract class EntriesPerPage extends AbstractOption
     public static function renderOption(Option $option, array $htmlParams): string
     {
         $choices = [];
-        foreach ($option->option_value AS $perPage)
+        foreach ($option->option_value as $perPage)
         {
             $choices[] = [
                 'value' => $perPage,
@@ -25,8 +25,8 @@ abstract class EntriesPerPage extends AbstractOption
             $option,
             $htmlParams,
             [
-                'choices' => $choices,
-                'nextCounter' => count($choices)
+                'choices'     => $choices,
+                'nextCounter' => count($choices),
             ]
         );
     }
@@ -35,7 +35,7 @@ abstract class EntriesPerPage extends AbstractOption
     {
         $output = [];
 
-        foreach ($value AS $perPage)
+        foreach ($value as $perPage)
         {
             $value = is_int($perPage) ? $perPage : (int)$perPage['value'];
             if ($value === 0)

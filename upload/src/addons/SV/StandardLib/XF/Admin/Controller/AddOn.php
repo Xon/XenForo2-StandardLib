@@ -3,9 +3,12 @@
 namespace SV\StandardLib\XF\Admin\Controller;
 
 use SV\StandardLib\XF\AddOn\Manager as ExtendedAddOnManager;
+use SV\StandardLib\XF\Service\AddOnArchive\InstallBatchCreator as ExtendedInstallBatchCreatorService;
 use XF\Http\Upload;
 use XF\Service\AddOnArchive\InstallBatchCreator as InstallBatchCreatorService;
-use SV\StandardLib\XF\Service\AddOnArchive\InstallBatchCreator as ExtendedInstallBatchCreatorService;
+use function count;
+use function preg_match;
+use function reset;
 
 /**
  * @extends \XF\Admin\Controller\AddOn
@@ -15,6 +18,7 @@ class AddOn extends XFCP_AddOn
     /**
      * @param Upload[] $uploads
      * @return InstallBatchCreatorService
+     * @noinspection PhpMissingReturnTypeInspection
      */
     protected function getBatchCreatorService(array $uploads)
     {

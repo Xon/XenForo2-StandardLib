@@ -30,5 +30,5 @@ if (\XF::$versionId < 2020000)
 }
 else
 {
-    class TemplaterXF21Patch extends XFCP_TemplaterXF21Patch {}
+    class TemplaterXF21Patch extends XFCP_TemplaterXF21Patch { }
 }

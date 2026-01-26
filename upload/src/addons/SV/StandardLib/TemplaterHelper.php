@@ -51,7 +51,7 @@ class TemplaterHelper
     protected $cssRenderer = null;
 
     /**
-     * @param Container $container
+     * @param Container     $container
      * @param BaseTemplater $templater
      * @return void
      */
@@ -80,7 +80,6 @@ class TemplaterHelper
         {
             self::templaterSetup(\XF::app()->container(), $templater);
             $helper = TemplaterAccess::getDefaultParam($templater, 'svTemplateHelper');
-
         }
 
         return $helper;
@@ -122,7 +121,7 @@ class TemplaterHelper
      * @param string $function
      * @return callable|callable-string|null
      */
-    public function function(string $function)
+    public function function (string $function)
     {
         $functions = $this->functions();
 
@@ -165,9 +164,9 @@ class TemplaterHelper
     }
 
     /**
-     * @param string $name
+     * @param string                   $name
      * @param callable|callable-string $filter
-     * @param bool   $replace
+     * @param bool                     $replace
      * @return void
      */
     protected function addFilter(string $name, $filter, bool $replace = false)
@@ -181,9 +180,9 @@ class TemplaterHelper
     }
 
     /**
-     * @param string $name
+     * @param string                   $name
      * @param callable|callable-string $filter
-     * @param bool   $replace
+     * @param bool                     $replace
      * @return void
      */
     protected function addFunction(string $name, $filter, bool $replace = false)
@@ -305,18 +304,19 @@ class TemplaterHelper
         {
             return $default;
         }
-        if (($setDate+$expiryOffset) <= \XF::$time)
+        if (($setDate + $expiryOffset) <= \XF::$time)
         {
             return $default;
         }
 
         return (bool)($valueBag[2] ?? $default);
     }
+
     /**
-     * @param BaseTemplater             $templater
-     * @param array|AbstractCollection  $value
-     * @param bool                      $escape
-     * @param mixed                     $toAdd
+     * @param BaseTemplater            $templater
+     * @param array|AbstractCollection $value
+     * @param bool                     $escape
+     * @param mixed                    $toAdd
      * @return array|AbstractCollection
      */
     public function filterAddValue(BaseTemplater $templater, $value, bool &$escape, $toAdd)
@@ -349,11 +349,11 @@ class TemplaterHelper
     }
 
     /**
-     * @param BaseTemplater   $templater
-     * @param array|AbstractCollection  $value
-     * @param bool            $escape
-     * @param int|string      $toReplace
-     * @param int|string|null $replaceWith
+     * @param BaseTemplater            $templater
+     * @param array|AbstractCollection $value
+     * @param bool                     $escape
+     * @param int|string               $toReplace
+     * @param int|string|null          $replaceWith
      * @return array|AbstractCollection
      */
     public function filterReplaceValue(BaseTemplater $templater, $value, bool &$escape, $toReplace, $replaceWith): array
@@ -473,7 +473,7 @@ class TemplaterHelper
         return end($array);
     }
 
-    public function fnArrayIsList(BaseTemplater $templater, bool &$escape, $array)
+    public function fnArrayIsList(BaseTemplater $templater, bool &$escape, $array): bool
     {
         $array = $array instanceof AbstractCollection ? $array->toArray() : $array;
 
@@ -497,9 +497,9 @@ class TemplaterHelper
 
 
     /**
-     * @param BaseTemplater $templater
-     * @param bool          $escape
-     * @param ?array        $array1
+     * @param BaseTemplater                   $templater
+     * @param bool                            $escape
+     * @param ?array                          $array1
      * @param array<array|AbstractCollection> $arrays
      * @return array
      */
@@ -509,7 +509,7 @@ class TemplaterHelper
         unset($arrays[0]);
         unset($arrays[1]);
 
-        foreach ($arrays AS &$arr)
+        foreach ($arrays as &$arr)
         {
             $arr = $arr instanceof AbstractCollection ? $arr->toArray() : $arr;
         }
@@ -518,11 +518,10 @@ class TemplaterHelper
     }
 
     /**
-     * @param BaseTemplater $templater
-     * @param bool $escape
+     * @param BaseTemplater            $templater
+     * @param bool                     $escape
      * @param AbstractCollection|array $array
-     * @param bool $preserveKeys
-     *
+     * @param bool                     $preserveKeys
      * @return array|AbstractCollection
      * @deprecated
      */
@@ -538,11 +537,10 @@ class TemplaterHelper
     }
 
     /**
-     * @param BaseTemplater $templater
-     * @param bool $escape
+     * @param BaseTemplater                 $templater
+     * @param bool                          $escape
      * @param AbstractCollection|array|null $array
-     * @param bool $preserveKeys
-     *
+     * @param bool                          $preserveKeys
      * @return array|AbstractCollection
      */
     public function fnArrayReverse(BaseTemplater $templater, bool &$escape, $array, bool $preserveKeys = true)
@@ -577,22 +575,22 @@ class TemplaterHelper
 
     /**
      * @param BaseTemplater $templater
-     * @param bool   $escape
-     * @param int    $nowTimestamp
-     * @param int    $otherTimestamp
-     * @param int    $maximumDateParts
-     * @param bool   $countUp
-     * @param string $class
-     * @param string $triggerEvent
-     * @param string $triggerEventOnSelector
-     * @param bool   $showSeconds
+     * @param bool          $escape
+     * @param int           $nowTimestamp
+     * @param int           $otherTimestamp
+     * @param int           $maximumDateParts
+     * @param bool          $countUp
+     * @param string        $class
+     * @param string        $triggerEvent
+     * @param string        $triggerEventOnSelector
+     * @param bool          $showSeconds
      * @return string|PreEscaped
      */
     public function fnRelativeTimestamp(
         BaseTemplater $templater, bool &$escape, int $nowTimestamp, int $otherTimestamp,
-        int $maximumDateParts = 0, bool $countUp = false, string $class = '', string $triggerEvent = '',
-        string $triggerEventOnSelector = '',
-        bool $showSeconds = false
+        int           $maximumDateParts = 0, bool $countUp = false, string $class = '', string $triggerEvent = '',
+        string        $triggerEventOnSelector = '',
+        bool          $showSeconds = false
     )
     {
         $escape = false;
@@ -620,14 +618,14 @@ class TemplaterHelper
         }
 
         return $this->templater->renderMacro('public:svStandardLib_helper_macros', 'relative_timestamp', [
-            'class' => $class,
-            'countUp' => $countUp,
-            'triggerEvent' => $triggerEvent,
+            'class'                  => $class,
+            'countUp'                => $countUp,
+            'triggerEvent'           => $triggerEvent,
             'triggerEventOnSelector' => $triggerEventOnSelector,
-            'timeStr' => $timeStr,
-            'otherTimestamp' => $otherTimestamp,
-            'maximumDateParts' => $maximumDateParts,
-            'showSeconds' => $showSeconds,
+            'timeStr'                => $timeStr,
+            'otherTimestamp'         => $otherTimestamp,
+            'maximumDateParts'       => $maximumDateParts,
+            'showSeconds'            => $showSeconds,
         ]);
     }
 

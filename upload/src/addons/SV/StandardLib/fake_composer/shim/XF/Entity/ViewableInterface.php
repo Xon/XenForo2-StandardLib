@@ -6,9 +6,10 @@
  * @noinspection PhpIllegalPsrClassPathInspection
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
+
 namespace XF\Entity;
 
 interface ViewableInterface
 {
-	public function canView();
+    public function canView();
 }

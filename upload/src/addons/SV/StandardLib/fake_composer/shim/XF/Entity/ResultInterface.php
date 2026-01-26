@@ -6,6 +6,7 @@
  * @noinspection PhpIllegalPsrClassPathInspection
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
+
 namespace XF\Entity;
 
 interface ResultInterface extends \XF\Api\Result\ResultInterface

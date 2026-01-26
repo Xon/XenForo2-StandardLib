@@ -3,14 +3,13 @@
 namespace SV\StandardLib\XF\AddOn;
 
 use SV\StandardLib\Helper;
-use XF\PreEscaped;
 use function array_key_exists;
 use function array_merge;
 use function count;
 use function is_array;
 
 /**
- * @Extends \XF\AddOn\Manager
+ * @extends \XF\AddOn\Manager
  */
 class Manager extends XFCP_Manager
 {

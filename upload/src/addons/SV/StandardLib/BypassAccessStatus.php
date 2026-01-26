@@ -17,7 +17,7 @@ class BypassAccessStatus
      * @param mixed  $context
      * @return Closure
      */
-    public function getPrivate(object $obj, string $attribute, $context = null) : Closure
+    public function getPrivate(object $obj, string $attribute, $context = null): Closure
     {
         $getter = function () use ($attribute) { return $this->$attribute; };
         if (!$context)
@@ -34,7 +34,7 @@ class BypassAccessStatus
      * @param mixed  $context
      * @return Closure
      */
-    public function setPrivate(object $obj, string $attribute, $context = null) : Closure
+    public function setPrivate(object $obj, string $attribute, $context = null): Closure
     {
         $setter = function ($value) use ($attribute) { $this->$attribute = $value; };
         if (!$context)
@@ -47,10 +47,10 @@ class BypassAccessStatus
 
     /**
      * @param string|object $obj
-     * @param string $attribute
+     * @param string        $attribute
      * @return Closure
      */
-    public function getStaticPrivate($obj, string $attribute) : Closure
+    public function getStaticPrivate($obj, string $attribute): Closure
     {
         $getter = function () use ($attribute) {
             return static::$$attribute;
@@ -61,10 +61,10 @@ class BypassAccessStatus
 
     /**
      * @param string|object $obj
-     * @param string $attribute
+     * @param string        $attribute
      * @return Closure
      */
-    public function setStaticPrivate($obj, string $attribute) : Closure
+    public function setStaticPrivate($obj, string $attribute): Closure
     {
         $setter = function ($value) use ($attribute) {
             static::$$attribute = $value;

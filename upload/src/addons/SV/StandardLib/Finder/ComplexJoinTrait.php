@@ -14,14 +14,14 @@ trait ComplexJoinTrait
     /** @var int */
     public $complexJoinCounter = 0;
     /** @var null|Structure */
-    public $originalStructure  = null;
+    public $originalStructure = null;
 
     /**
      * @param array $condition - this is an XF Entity relationship condition
      * @param bool  $mustExist
      * @return string
      */
-    public function complexJoin(array $condition, bool $mustExist = false) : string
+    public function complexJoin(array $condition, bool $mustExist = false): string
     {
         $alias = 'complex_join_' . $this->complexJoinCounter++;
 

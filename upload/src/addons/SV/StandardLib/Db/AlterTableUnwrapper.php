@@ -2,8 +2,8 @@
 
 namespace SV\StandardLib\Db;
 
-use XF\Db\Schema\Column as DbColumnSchema;
 use XF\Db\Schema\Alter as DbAlterSchema;
+use XF\Db\Schema\Column as DbColumnSchema;
 use XF\Db\Schema\Index as DbIndexSchema;
 
 /**
@@ -13,7 +13,6 @@ abstract class AlterTableUnwrapper extends DbAlterSchema
 {
     /**
      * @param DbAlterSchema $table
-     *
      * @return DbColumnSchema[]
      */
     public static function getChangeColumns(DbAlterSchema $table): array
@@ -22,25 +21,21 @@ abstract class AlterTableUnwrapper extends DbAlterSchema
     }
 
     /**
-     * @since 1.10.0
-     *
      * @param DbAlterSchema $table
-     *
      * @return DbIndexSchema[]
+     * @since 1.10.0
      */
-    public static function getAddIndexes(DbAlterSchema $table) : array
+    public static function getAddIndexes(DbAlterSchema $table): array
     {
         return $table->addIndexes;
     }
 
     /**
-     * @since 1.10.0
-     *
      * @param DbAlterSchema $table
-     *
      * @return DbColumnSchema[]
+     * @since 1.10.0
      */
-    public static function getAddColumns(DbAlterSchema $table) : array
+    public static function getAddColumns(DbAlterSchema $table): array
     {
         return $table->addColumns;
     }

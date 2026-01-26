@@ -5,7 +5,7 @@ namespace SV\StandardLib\XF\AddOn;
 use SV\StandardLib\Helper;
 
 /**
- * @Extends \XF\AddOn\DataManager
+ * @extends \XF\AddOn\DataManager
  */
 class DataManager extends XFCP_DataManager
 {
@@ -13,6 +13,7 @@ class DataManager extends XFCP_DataManager
     public function rebuildActiveAddOnCache()
     {
         Helper::repo()->rebuildAddOnVersionCache();
+
         return parent::rebuildActiveAddOnCache();
     }
 }

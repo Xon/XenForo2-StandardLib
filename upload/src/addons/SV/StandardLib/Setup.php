@@ -103,18 +103,18 @@ class Setup extends AbstractSetup
         $this->patchClassExtension(OptionEntity::class, ExtendedOptionEntity::class, \XF::$versionId < 2030870);
 
         $preXF23 = \XF::$versionId < 2030000;
-        $this->patchClassExtension(StylePropertyDataType::class, ExtendedStylePropertyDataType::class,  $preXF23);
-        $this->patchClassExtension(StylePropertyEntity::class,ExtendedStylePropertyEntity::class,  $preXF23);
-        $this->patchClassExtension(DevOutputStyleProperty::class,ExtendedDevOutputStyleProperty::class,  $preXF23);
+        $this->patchClassExtension(StylePropertyDataType::class, ExtendedStylePropertyDataType::class, $preXF23);
+        $this->patchClassExtension(StylePropertyEntity::class, ExtendedStylePropertyEntity::class, $preXF23);
+        $this->patchClassExtension(DevOutputStyleProperty::class, ExtendedDevOutputStyleProperty::class, $preXF23);
 
-        $this->patchClassExtension(Templater::class,TemplaterXF21Patch::class,  \XF::$versionId < 2020000);
+        $this->patchClassExtension(Templater::class, TemplaterXF21Patch::class, \XF::$versionId < 2020000);
     }
 
     protected function patchClassExtension(string $fromClass, string $toClass, bool $value)//: void
     {
         $classExtension = Helper::findOne(ClassExtensionEntity::class, [
             'from_class' => $fromClass,
-            'to_class' => $toClass,
+            'to_class'   => $toClass,
         ]);
         if ($classExtension === null)
         {

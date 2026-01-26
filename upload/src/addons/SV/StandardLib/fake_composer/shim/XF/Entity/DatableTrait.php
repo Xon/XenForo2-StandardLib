@@ -6,6 +6,7 @@
  * @noinspection PhpIllegalPsrClassPathInspection
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
+
 namespace XF\Entity;
 
 trait DatableTrait
@@ -13,6 +14,7 @@ trait DatableTrait
     public function getContentDate(): int
     {
         $column = $this->getContentDateColumn();
+
         return $this->{$column};
     }
 }

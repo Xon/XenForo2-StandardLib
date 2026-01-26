@@ -4,14 +4,14 @@ namespace SV\StandardLib\XF\Admin\Controller;
 
 use SV\StandardLib\Helper;
 use XF\Diff;
+use XF\Entity\Template as TemplateEntity;
 use XF\Entity\TemplateModification;
 use XF\Mvc\Entity\ArrayCollection;
 use XF\Mvc\Entity\Finder;
 use XF\Mvc\ParameterBag;
-use XF\Mvc\Reply\View as ViewReply;
-use XF\Entity\Template as TemplateEntity;
-use XF\Repository\TemplateModification as TemplateModificationRepo;
 use XF\Mvc\Reply\Exception as ExceptionReply;
+use XF\Mvc\Reply\View as ViewReply;
+use XF\Repository\TemplateModification as TemplateModificationRepo;
 use XF\Template\Compiler\Exception as TemplateCompilerException;
 use function array_map;
 use function in_array;
@@ -43,12 +43,10 @@ class Template extends XFCP_Template
 
     /**
      * @param ParameterBag $parameterBag
-     *
      * @return ViewReply
-     *
      * @throws ExceptionReply
      */
-    public function actionViewModifications(ParameterBag $parameterBag) : ViewReply
+    public function actionViewModifications(ParameterBag $parameterBag): ViewReply
     {
         /** @noinspection PhpUndefinedFieldInspection */
         $masterTemplate = $this->assertTemplateExists($parameterBag->template_id);
@@ -71,8 +69,7 @@ class Template extends XFCP_Template
 
         /** @var TemplateModification[]|ArrayCollection $modifications */
         $modifications = $this->getTemplateModificationFinderForSvStandardLib($template->type, $template->title)->fetch();
-        $filtered = $modifications->filter(function (TemplateModification $mod) use ($activeModIds)
-        {
+        $filtered = $modifications->filter(function (TemplateModification $mod) use ($activeModIds) {
             if ($activeModIds === null)
             {
                 return $mod->enabled;
@@ -89,29 +86,29 @@ class Template extends XFCP_Template
             $statuses
         );
 
-        $statuses = array_map(function ($status)
-        {
+        $statuses = array_map(function ($status) {
             if (is_numeric($status))
             {
                 return \XF::phrase('svStandardLib_match_count_x', [
-                    'count' => \XF::app()->language()->numberFormat($status)
+                    'count' => \XF::app()->language()->numberFormat($status),
                 ]);
             }
+
             return $status;
         }, $statuses);
 
         $viewParams = [
-            'style' => $style,
+            'style'    => $style,
             'template' => $template,
 
-            'mods' => $modifications->toArray(),
+            'mods'       => $modifications->toArray(),
             'activeMods' => $filtered,
 
-            'templateStr' => $templateStr,
+            'templateStr'  => $templateStr,
             'activeModIds' => $activeModIds,
-            'status' => $statuses,
-            '_xfWithData' => $this->filter('_xfWithData', 'bool'),
-            'tab' => $this->filter('tab', 'str', 'diffs')
+            'status'       => $statuses,
+            '_xfWithData'  => $this->filter('_xfWithData', 'bool'),
+            'tab'          => $this->filter('tab', 'str', 'diffs'),
         ];
 
         switch ($viewParams['tab'])
@@ -160,6 +157,6 @@ class Template extends XFCP_Template
                      ->where('type', $type)
                      ->where('template', $template)
                      ->whereAddOnActive()
-                     ->order(\XF::$versionId >= 2010872  ? ['execution_order', 'modification_key'] : ['execution_order']);
+                     ->order(\XF::$versionId >= 2010872 ? ['execution_order', 'modification_key'] : ['execution_order']);
     }
 }

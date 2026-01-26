@@ -2,13 +2,23 @@
 
 namespace SV\StandardLib\Repository;
 
-use SV\StandardLib\Helper;
+use SV\StandardLib\Helper as HelperUtil;
 use SV\StandardLib\Repository\Helper as HelperRepo;
 use XF\AddOn\AddOn;
 use XF\Mvc\Entity\ArrayCollection;
 use XF\Mvc\Entity\Repository;
-use SV\StandardLib\Helper as HelperUtil;
 use XF\PreEscaped;
+use function array_fill_keys;
+use function array_keys;
+use function array_reverse;
+use function count;
+use function explode;
+use function is_array;
+use function is_numeric;
+use function phpversion;
+use function strpos;
+use function strtolower;
+use function version_compare;
 
 class AddOnRepository extends Repository
 {
@@ -67,7 +77,7 @@ class AddOnRepository extends Repository
 
             $installList[$addOnId] = [
                 'config' => (new ArrayCollection($config))->sortByList($this->keyOrder)->toArray(),
-                'addon' => $addOnJson,
+                'addon'  => $addOnJson,
             ];
             if (count($config) !== 0)
             {

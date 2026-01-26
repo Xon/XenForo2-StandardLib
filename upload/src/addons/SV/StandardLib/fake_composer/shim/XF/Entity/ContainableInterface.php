@@ -6,6 +6,7 @@
  * @noinspection PhpIllegalPsrClassPathInspection
  * @noinspection PhpMultipleClassDeclarationsInspection
  */
+
 namespace XF\Entity;
 
 /**
@@ -22,9 +23,9 @@ interface ContainableInterface
      * The ID of the container.
      */
     public function getContentContainerId(): int;
-    
+
     /**
-	 * The content type of the container.
-	 */
-	public function getContentContainerType(): string;
+     * The content type of the container.
+     */
+    public function getContentContainerType(): string;
 }

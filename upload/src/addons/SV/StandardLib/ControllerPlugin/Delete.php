@@ -2,6 +2,7 @@
 
 namespace SV\StandardLib\ControllerPlugin;
 
+use InvalidArgumentException;
 use LogicException;
 use SV\StandardLib\Helper;
 use XF\ControllerPlugin\AbstractPlugin;
@@ -10,51 +11,46 @@ use XF\Entity\Phrase;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Reply\AbstractReply;
 use function count;
+use function get_class;
 use function intval;
 use function is_callable;
 use function reset;
 
-/**
- * Class Delete
- *
- * @package SV\StandardLib\ControllerPlugin
- */
 class Delete extends AbstractPlugin
 {
     /**
-     * @param Entity $entity
-     * @param string $stateKey
-     * @param string $deleterService
-     * @param string $contentType
-     * @param string $deleteLink
-     * @param string $editLink
-     * @param string $redirectLink
+     * @param Entity        $entity
+     * @param string        $stateKey
+     * @param string        $deleterService
+     * @param string        $contentType
+     * @param string        $deleteLink
+     * @param string        $editLink
+     * @param string        $redirectLink
      * @param Phrase|string $title
-     * @param bool $canHardDelete
-     * @param bool $includeAuthorAlert
-     * @param string|null $templateName
-     * @param array $params
-     *
+     * @param bool          $canHardDelete
+     * @param bool          $includeAuthorAlert
+     * @param string|null   $templateName
+     * @param array         $params
      * @return AbstractReply
      */
     public function actionDeleteWithState(
-        Entity $entity,
-        string $stateKey,
-        string $deleterService,
-        string $contentType,
-        string $deleteLink,
-        string $editLink,
-        string $redirectLink,
-               $title,
-        bool $canHardDelete = false,
-        bool $includeAuthorAlert = true,
+        Entity  $entity,
+        string  $stateKey,
+        string  $deleterService,
+        string  $contentType,
+        string  $deleteLink,
+        string  $editLink,
+        string  $redirectLink,
+                $title,
+        bool    $canHardDelete = false,
+        bool    $includeAuthorAlert = true,
         ?string $templateName = null,
-        array $params = []
+        array   $params = []
     ): AbstractReply
     {
         if (!is_callable([$entity, 'canDelete']) || !is_callable([$entity, 'canUndelete']))
         {
-            throw new LogicException('Either canDelete or canUndelete is not callable on ' . \get_class($entity));
+            throw new LogicException('Either canDelete or canUndelete is not callable on ' . get_class($entity));
         }
 
         if (!$entity->canDelete('soft', $error))
@@ -67,7 +63,7 @@ class Delete extends AbstractPlugin
             $id = $entity->getIdentifierValues();
             if (!$id || count($id) !== 1)
             {
-                throw new \InvalidArgumentException('Entity does not have an ID or does not have a simple key');
+                throw new InvalidArgumentException('Entity does not have an ID or does not have a simple key');
             }
             $entityId = intval(reset($id));
 
@@ -166,8 +162,9 @@ class Delete extends AbstractPlugin
                           'editLink'           => $editLink,
                           'deleteLink'         => $deleteLink,
                           'canHardDelete'      => $canHardDelete,
-                          'includeAuthorAlert' => $includeAuthorAlert
+                          'includeAuthorAlert' => $includeAuthorAlert,
                       ] + $params;
+
         return $this->view('SV\StandardLib:Delete\State', $templateName, $viewParams);
     }
 }

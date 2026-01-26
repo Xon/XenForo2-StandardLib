@@ -26,8 +26,8 @@ class Templater extends XFCP_Templater
             ],
             'sv/lib/xf/core/structure.js' => [
                 ['dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
-            ]
-        ]
+            ],
+        ],
     ];
 
     /**
@@ -39,12 +39,12 @@ class Templater extends XFCP_Templater
     protected static $choicesClassOverrides = [
         'data-class-container-outer' => 'containerOuter',
         'data-class-container-inner' => 'containerInner',
-        'data-class-list' => 'list',
-        'data-class-list-items' => 'listItems',
-        'data-class-item' => 'item',
+        'data-class-list'            => 'list',
+        'data-class-list-items'      => 'listItems',
+        'data-class-item'            => 'item',
         'data-class-item-selectable' => 'itemSelectable',
-        'data-class-input' => 'input',
-        'data-class-input-cloned' => 'inputCloned',
+        'data-class-input'           => 'input',
+        'data-class-input-cloned'    => 'inputCloned',
     ];
 
     public function includeJs(array $options)

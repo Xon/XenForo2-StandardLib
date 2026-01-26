@@ -7,8 +7,8 @@
 
 namespace SV\StandardLib\Finder;
 
-use XF\Db\AbstractAdapter;
 use LogicException;
+use XF\Db\AbstractAdapter;
 use function array_fill_keys;
 use function array_slice;
 use function call_user_func_array;
@@ -22,10 +22,9 @@ use function is_string;
 use function substr;
 
 /**
- * @property array $joins
- * @property string[] $indexHints
+ * @property array           $joins
+ * @property string[]        $indexHints
  * @property AbstractAdapter $db
- *
  * @method string columnSqlName(string $column, bool $markFundamental = true)
  */
 trait SqlJoinTrait
@@ -50,7 +49,7 @@ trait SqlJoinTrait
 
             $this->allJoins = $this->joins;
             $complexJoins = [];
-            foreach($this->rawJoins as $alias => $columns)
+            foreach ($this->rawJoins as $alias => $columns)
             {
                 $join = $this->joins[$alias] ?? [];
                 if ($join['hasTableExpr'] ?? false)
@@ -69,7 +68,7 @@ trait SqlJoinTrait
                     unset($this->joins[$alias]);
                 }
             }
-            $this->indexHints[] = "\n". implode('', $complexJoins);
+            $this->indexHints[] = "\n" . implode('', $complexJoins);
         }
         try
         {
@@ -109,27 +108,27 @@ trait SqlJoinTrait
         $this->hasTableExpr = $this->hasTableExpr || $hasTableExpr;
 
         $this->joins[$alias] = [
-            'rawJoin'        => true,
+            'rawJoin'           => true,
             // arbitrary table expressions need to be rewritten into index hints cos XF quotes the table name
-            'hasTableExpr'   => $hasTableExpr,
+            'hasTableExpr'      => $hasTableExpr,
             // the $this->join entry must match the following structure, with 'fetch' being false so getHydrationMap doesn't try to parse this
-            'table'          => $rawJoinTable,
-            'alias'          => $alias,
-            'condition'      => '',
-            'fetch'          => false,
-            'fundamental'    => false,
-            'exists'         => $mustExist,
+            'table'             => $rawJoinTable,
+            'alias'             => $alias,
+            'condition'         => '',
+            'fetch'             => false,
+            'fundamental'       => false,
+            'exists'            => $mustExist,
             'reallyFundamental' => false,
-            'indexHints'     => [], // XF2.2.12+
+            'indexHints'        => [], // XF2.2.12+
 
             // these are the attributes stored in the joins array, used by getHydrationMap() but not getQuery()
-            'structure'      => null,
-            'parentAlias'    => null,
-            'proxy'          => null,
-            'parentRelation' => null,
-            'relation'       => null,
-            'relationValue'  => null,
-            'entity'         => null,
+            'structure'         => null,
+            'parentAlias'       => null,
+            'proxy'             => null,
+            'parentRelation'    => null,
+            'relation'          => null,
+            'relationValue'     => null,
+            'entity'            => null,
         ];
 
         return $this;
@@ -144,7 +143,7 @@ trait SqlJoinTrait
 
         $joinConditions = [];
 
-        foreach ($conditions AS $condition)
+        foreach ($conditions as $condition)
         {
             if (is_string($condition))
             {
@@ -157,7 +156,7 @@ trait SqlJoinTrait
                 if (count($condition) > 3)
                 {
                     $readValue = [];
-                    foreach (array_slice($condition, 2) AS $v)
+                    foreach (array_slice($condition, 2) as $v)
                     {
                         if ($v && $v[0] === '$')
                         {
@@ -214,8 +213,7 @@ trait SqlJoinTrait
 
     /**
      * @param string $field
-     * @param bool $markJoinFundamental
-     *
+     * @param bool   $markJoinFundamental
      * @return array
      */
     public function resolveFieldToTableAndColumn($field, $markJoinFundamental = true)

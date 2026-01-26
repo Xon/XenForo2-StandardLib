@@ -6,16 +6,11 @@ use XF\ControllerPlugin\AbstractPlugin;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Reply\View;
 
-/**
- * Class Filter
- *
- * @package SV\StandardLib\ControllerPlugin
- */
 class Filter extends AbstractPlugin
 {
     /**
-     * @param View $reply
-     * @param string $route
+     * @param View        $reply
+     * @param string      $route
      * @param Entity|null $container
      * @return void
      */

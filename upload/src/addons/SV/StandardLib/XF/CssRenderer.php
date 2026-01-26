@@ -8,7 +8,7 @@ use function trigger_error;
 use function var_export;
 
 /**
- * @Extends \XF\CssRenderer
+ * @extends \XF\CssRenderer
  */
 class CssRenderer extends XFCP_CssRenderer
 {
@@ -20,6 +20,7 @@ class CssRenderer extends XFCP_CssRenderer
         if ($this->svSimpleLessParser !== null)
         {
             $this->svSimpleLessParser->Reset();
+
             return $this->svSimpleLessParser;
         }
 
@@ -33,7 +34,7 @@ class CssRenderer extends XFCP_CssRenderer
              */
             $plugins = [
                 new \XF\Less\RtlVisitorPre(),
-                new \XF\Less\RtlVisitor($isRtl)
+                new \XF\Less\RtlVisitor($isRtl),
             ];
         }
         else
@@ -50,10 +51,10 @@ class CssRenderer extends XFCP_CssRenderer
         }
 
         $this->svSimpleLessParser = new \Less_Parser([
-            'strictMath' => true,
+            'strictMath'      => true,
             'import_callback' => [$this, 'handleLessImport'],
-            'compress' => false,
-            'plugins' => $plugins,
+            'compress'        => false,
+            'plugins'         => $plugins,
         ]);
 
         return $this->svSimpleLessParser;
@@ -76,6 +77,7 @@ class CssRenderer extends XFCP_CssRenderer
         try
         {
             $parser = $this->getSimpleLessParser();
+
             return $func($parser);
         }
         finally
@@ -92,9 +94,8 @@ class CssRenderer extends XFCP_CssRenderer
     {
         $value = preg_replace_callback(
             '/var\(--xf-([^)]+)\)/i',
-            function (array $match): string
-            {
-                $prop = $this->style->getProperty($match[1],  null);
+            function (array $match): string {
+                $prop = $this->style->getProperty($match[1], null);
                 if ($prop === null)
                 {
                     return $match[0];
@@ -118,7 +119,7 @@ class CssRenderer extends XFCP_CssRenderer
      */
     public function parseLessColorFuncValue(string $value, $forceDebug = false)
     {
-        return $this->withSimpleLessParser(function(\Less_Parser $parser) use ($value, $forceDebug) {
+        return $this->withSimpleLessParser(function (\Less_Parser $parser) use ($value, $forceDebug) {
             $value = '@someVar: ' . $value . '; #test { color: @someVar; }';
             $value = $this->prepareLessForRendering($value);
             $value = $this->svProcessLessVariablesToRaw($value);

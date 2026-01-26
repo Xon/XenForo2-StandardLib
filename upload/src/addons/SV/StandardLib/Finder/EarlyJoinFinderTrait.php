@@ -7,11 +7,13 @@
 
 namespace SV\StandardLib\Finder;
 
+use InvalidArgumentException;
 use XF\Db\AbstractAdapter;
 use XF\Mvc\Entity\Finder;
 use XF\Mvc\Entity\FinderExpression;
 use XF\Mvc\Entity\Structure;
-use function implode, count;
+use function count;
+use function implode;
 use function is_array;
 use function is_callable;
 use function is_float;
@@ -22,18 +24,15 @@ use function property_exists;
  * @method int getEarlyJoinThreshold(?int $offset = null, ?int $limit = null, array $options = [])
  * @method string columnSqlName(string $column, bool $markFundamental = true)
  * @method static whereImpossible()
- *
- * @property int $aliasCounter
- * @property Finder $parentFinder
- *
- * @property array $order
- * @property array $defaultOrder
- * @property array $joins
- * @property int $limit
- * @property int $offset
- *
+ * @property int             $aliasCounter
+ * @property Finder          $parentFinder
+ * @property array           $order
+ * @property array           $defaultOrder
+ * @property array           $joins
+ * @property int             $limit
+ * @property int             $offset
  * @property AbstractAdapter $db
- * @property Structure $structure
+ * @property Structure       $structure
  */
 trait EarlyJoinFinderTrait
 {
@@ -41,7 +40,6 @@ trait EarlyJoinFinderTrait
 
     /**
      * @param array $options
-     *
      * @return string
      */
     public function getQuery(array $options = [])
@@ -85,7 +83,7 @@ trait EarlyJoinFinderTrait
         if ($this->parentFinder ||
             $threshold < 0 ||
             !$limit ||
-            $threshold && (($offset / $limit) < $threshold) )
+            $threshold && (($offset / $limit) < $threshold))
         {
             return parent::getQuery($options);
         }
@@ -97,7 +95,7 @@ trait EarlyJoinFinderTrait
         $subQueryOptions['skipEarlyJoin'] = true;
 
         $oldJoins = $this->joins;
-        foreach($this->joins as $key => $join)
+        foreach ($this->joins as $key => $join)
         {
             if (!$join['fundamental'])
             {
@@ -120,7 +118,7 @@ trait EarlyJoinFinderTrait
         $defaultOrderSql = [];
         if (!$this->order && $this->defaultOrder)
         {
-            foreach ($this->defaultOrder AS $defaultOrder)
+            foreach ($this->defaultOrder as $defaultOrder)
             {
                 $defaultOrderCol = $defaultOrder[0];
 
@@ -147,10 +145,10 @@ trait EarlyJoinFinderTrait
         {
             if (!$fetchOnly)
             {
-                throw new \InvalidArgumentException('Must specify one or more specific columns to fetch');
+                throw new InvalidArgumentException('Must specify one or more specific columns to fetch');
             }
 
-            foreach ($fetchOnly AS $key => $fetchValue)
+            foreach ($fetchOnly as $key => $fetchValue)
             {
                 $fetchSql = $this->columnSqlName(is_int($key) ? $fetchValue : $key);
                 $fetch[] = $fetchSql . (!is_int($key) ? " AS '$fetchValue'" : '');
@@ -162,7 +160,7 @@ trait EarlyJoinFinderTrait
         }
 
         $srcJoins = $allJoins ?? $this->joins;
-        foreach ($srcJoins AS $join)
+        foreach ($srcJoins as $join)
         {
             $isInnerJoin = $join['exists'];
             $isFetch = $join['fetch'];
@@ -193,7 +191,7 @@ trait EarlyJoinFinderTrait
             }
             else
             {
-                $table = '`'.$table.'`';
+                $table = '`' . $table . '`';
             }
 
             $joinType = $isInnerJoin ? 'INNER' : 'LEFT';
@@ -223,7 +221,7 @@ trait EarlyJoinFinderTrait
 
         $innerTable = 'earlyJoinQuery_' . $this->aliasCounter++;
         $primaryJoin = [];
-        foreach($primaryKeys as $primaryKey)
+        foreach ($primaryKeys as $primaryKey)
         {
             $primaryJoin[] = "(`$coreTable`.`$primaryKey` = `$innerTable`.`$primaryKey`)";
         }

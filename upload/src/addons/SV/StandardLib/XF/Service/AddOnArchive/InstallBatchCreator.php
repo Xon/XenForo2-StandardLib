@@ -3,10 +3,16 @@
 namespace SV\StandardLib\XF\Service\AddOnArchive;
 
 
+use LogicException;
 use SV\StandardLib\BypassAccessStatus;
 use SV\StandardLib\Repository\AddOnRepository;
 use SV\StandardLib\Repository\Helper as HelperRepo;
-use SV\StandardLib\XF\AddOn\Manager as ExtendedAddOnManager;
+use ZipArchive;
+use function array_key_exists;
+use function count;
+use function implode;
+use function is_array;
+use function json_decode;
 
 /**
  * @extends \XF\Service\AddOnArchive\InstallBatchCreator
@@ -57,13 +63,13 @@ class InstallBatchCreator extends XFCP_InstallBatchCreator
 
     protected function getJsonForAddon(string $addOnId, string $tempFile): ?array
     {
-        $zip = new \ZipArchive();
+        $zip = new ZipArchive();
         $openResult = $zip->open($tempFile);
         if ($openResult !== true)
         {
             if (\XF::$developmentMode)
             {
-                throw new \LogicException("File could not be opened as a zip ($openResult)");
+                throw new LogicException("File could not be opened as a zip ($openResult)");
             }
 
             return null;

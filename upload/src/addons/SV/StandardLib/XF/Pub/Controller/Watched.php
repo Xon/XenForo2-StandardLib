@@ -7,7 +7,7 @@ use SV\StandardLib\Helper;
 use XF\Mvc\Reply\View;
 
 /**
- * @Extends \XF\Pub\Controller\Watched
+ * @extends \XF\Pub\Controller\Watched
  */
 class Watched extends XFCP_Watched
 {

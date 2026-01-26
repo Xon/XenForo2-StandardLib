@@ -51,8 +51,9 @@ class Helper
     /**
      * Note; `new`/`T::__construct` is executed in the context of T
      * @template T
+     *
      * @param class-string<T> $classname
-     * @param        ...$args
+     * @param                 ...$args
      * @return T
      */
     public static function newExtendedClass(string $classname, ...$args)
@@ -91,9 +92,10 @@ class Helper
             {
                 return null;
             }
+
             return \XF::em()->getEntityStructure($entityName);
         }
-        catch(\Throwable $e)
+        catch (\Throwable $e)
         {
             return null;
         }
@@ -114,15 +116,16 @@ class Helper
 
         /** @var T $e */
         $e = \XF::em()->create($identifier);
+
         return $e;
     }
 
     /**
      * @template T of Entity
      * @param class-string<T> $identifier
-     * @param array $values Values for the columns in the entity, in source encoded form
-     * @param array $relations
-     * @param int $options Bit field of the \XF\Mvc\Entity\Manager::INSTANTIATE_* options
+     * @param array           $values  Values for the columns in the entity, in source encoded form
+     * @param array           $relations
+     * @param int             $options Bit field of the \XF\Mvc\Entity\Manager::INSTANTIATE_* options
      * @return T
      */
     public static function instantiateEntity(string $identifier, array $values = [], array $relations = [], int $options = 0)
@@ -135,6 +138,7 @@ class Helper
 
         /** @var T $e */
         $e = \XF::em()->instantiateEntity($identifier, $values, $relations, $options);
+
         return $e;
     }
 
@@ -255,7 +259,7 @@ class Helper
 
     /**
      * @template T of Entity
-     * @param class-string<T> $identifier
+     * @param class-string<T>              $identifier
      * @param int|string|array<int|string> $id
      * @return T|null
      */
@@ -293,13 +297,14 @@ class Helper
     /**
      * @template T of AbstractPlugin
      * @param Controller|AbstractPlugin $controller
-     * @param class-string<T> $class
+     * @param class-string<T>           $class
      * @return T
      */
     public static function plugin($controller, string $class)
     {
         /** @var AbstractPlugin $plugin */
         $plugin = $controller->plugin($class);
+
         return $plugin;
     }
 }

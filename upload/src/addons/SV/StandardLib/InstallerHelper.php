@@ -28,6 +28,7 @@ use XFES\Service\Optimizer;
 use function array_keys;
 use function count;
 use function file_exists;
+use function get_class;
 use function in_array;
 use function is_array;
 use function preg_replace;
@@ -37,9 +38,7 @@ use function unserialize;
 
 /**
  * @version 1.10.0
- *
- * @property AddOn addOn
- *
+ * @property AddOn $addOn
  * @method AbstractAdapter db()
  * @method SchemaManager schemaManager()
  */
@@ -100,7 +99,7 @@ trait InstallerHelper
      */
     protected function applyGlobalPermissionByGroup(string $groupId, string $permissionId, array $userGroups): void
     {
-        foreach($userGroups as $userGroupId)
+        foreach ($userGroups as $userGroupId)
         {
             $this->applyGlobalPermissionForGroup($groupId, $permissionId, $userGroupId);
         }
@@ -124,9 +123,8 @@ trait InstallerHelper
     /**
      * @param string $applyGroupId
      * @param string $applyPermissionId
-     * @param int $applyValue
-     * @param int $userGroupId
-     *
+     * @param int    $applyValue
+     * @param int    $userGroupId
      * @throws \XF\Db\Exception
      */
     public function applyGlobalPermissionIntForGroup(string $applyGroupId, string $applyPermissionId, int $applyValue, int $userGroupId): void
@@ -147,7 +145,7 @@ trait InstallerHelper
         }
 
         $registrationDefaults = $option->option_value;
-        foreach ($newRegistrationDefaults AS $optionName => $optionDefault)
+        foreach ($newRegistrationDefaults as $optionName => $optionDefault)
         {
             if (!isset($registrationDefaults[$optionName]))
             {
@@ -164,7 +162,6 @@ trait InstallerHelper
      * @param string $oldPermissionId
      * @param string $newGroupId
      * @param string $newPermissionId
-     *
      * @throws \XF\Db\Exception
      */
     protected function renamePermission(string $oldGroupId, string $oldPermissionId, string $newGroupId, string $newPermissionId): void
@@ -226,7 +223,7 @@ trait InstallerHelper
     {
         $db = $this->db();
 
-        foreach ($map AS $from => $to)
+        foreach ($map as $from => $to)
         {
             $mySqlRegex = '^' . str_replace('*', '[a-zA-Z0-9_]+', $from) . '$';
             $phpRegex = '/^' . str_replace('*', '([a-zA-Z0-9_]+)', $from) . '$/';
@@ -243,7 +240,7 @@ trait InstallerHelper
             {
                 /** @var PhraseEntity[] $phrases */
                 $phrases = Helper::findByIds(PhraseEntity::class, array_keys($results));
-                foreach ($results AS $phraseId => $oldTitle)
+                foreach ($results as $phraseId => $oldTitle)
                 {
                     if (isset($phrases[$phraseId]))
                     {
@@ -304,7 +301,7 @@ trait InstallerHelper
     protected function deletePhrases(array $map): void
     {
         $titles = [];
-        foreach($map as $titlePattern)
+        foreach ($map as $titlePattern)
         {
             $titles[] = ['title', 'LIKE', $titlePattern];
         }
@@ -362,7 +359,7 @@ trait InstallerHelper
      * @param string[]          $oldNames
      * @return DbColumnSchema
      */
-    protected function addOrChangeColumn(AbstractDdl $table, string $name, ?string $type = null, $length = null, array $oldNames = []) : DbColumnSchema
+    protected function addOrChangeColumn(AbstractDdl $table, string $name, ?string $type = null, $length = null, array $oldNames = []): DbColumnSchema
     {
         if ($table instanceof Create)
         {
@@ -380,7 +377,7 @@ trait InstallerHelper
             // check for pending renames
             $hasOldNames = (bool)$oldNames;
             $changeColumns = AlterTableUnwrapper::getChangeColumns($table);
-            foreach($changeColumns as $changeColumn)
+            foreach ($changeColumns as $changeColumn)
             {
 
                 $newName = AlterColumnUnwrapper::getRename($changeColumn);
@@ -405,7 +402,7 @@ trait InstallerHelper
                 }
             }
             // check for renames to be done
-            foreach($oldNames as $oldName)
+            foreach ($oldNames as $oldName)
             {
                 if ($table->getColumnDefinition($oldName))
                 {
@@ -417,16 +414,14 @@ trait InstallerHelper
             return $table->addColumn($name, $type, $length);
         }
 
-        throw new LogicException('Unknown schema DDL type ' . \get_class($table));
+        throw new LogicException('Unknown schema DDL type ' . get_class($table));
     }
 
     /**
-     * @since 1.10.0
-     *
      * @param Alter $alter
      * @param Alter $table
-     *
      * @return void
+     * @since 1.10.0
      */
     protected function reverseTableAlter(Alter $alter, Alter $table): void
     {
@@ -434,17 +429,17 @@ trait InstallerHelper
         $addColumns = AlterTableUnwrapper::getAddColumns($alter);
         $changeColumns = AlterTableUnwrapper::getChangeColumns($alter);
 
-        foreach ($addIndexes AS $addIndex)
+        foreach ($addIndexes as $addIndex)
         {
             $table->dropIndexes($addIndex->getIndexName());
         }
 
-        foreach ($addColumns AS $addColumn)
+        foreach ($addColumns as $addColumn)
         {
             $table->dropColumns($addColumn->getName());
         }
 
-        foreach ($changeColumns AS $changeColumn)
+        foreach ($changeColumns as $changeColumn)
         {
             if (!$changeColumn->isRename())
             {
@@ -462,20 +457,17 @@ trait InstallerHelper
     }
 
     /**
-     * @since 1.10.0
-     *
      * @param array<string, callable|callable-string> $tables
-     *
      * @return array<string, Alter>
+     * @since 1.10.0
      */
-    protected function getReversedAlterTables(array $tables) : array
+    protected function getReversedAlterTables(array $tables): array
     {
         $sm = $this->schemaManager();
 
-        foreach ($tables AS $tableName => $toApply)
+        foreach ($tables as $tableName => $toApply)
         {
-            $tables[$tableName] = function (Alter $table) use ($sm, $tableName, $toApply)
-            {
+            $tables[$tableName] = function (Alter $table) use ($sm, $tableName, $toApply) {
                 $alter = $sm->newAlter($tableName);
                 $toApply($alter);
 
@@ -500,7 +492,7 @@ trait InstallerHelper
         }
     }
 
-    protected function isCliRecommendedCheck(int $minAddonVersion, int $maxThreads, int $maxPosts, int $maxUsers) : bool
+    protected function isCliRecommendedCheck(int $minAddonVersion, int $maxThreads, int $maxPosts, int $maxUsers): bool
     {
         $totals = \XF::db()->fetchOne("
 			SELECT data_value
@@ -546,7 +538,7 @@ trait InstallerHelper
         return false;
     }
 
-    public function isCliRecommended(array &$warnings, int $minAddonVersion = 0, int $maxThreads = 0, int $maxPosts = 500000, int $maxUsers = 50000) : bool
+    public function isCliRecommended(array &$warnings, int $minAddonVersion = 0, int $maxThreads = 0, int $maxPosts = 500000, int $maxUsers = 50000): bool
     {
         if (\XF::app() instanceof App && $this->isCliRecommendedCheck($minAddonVersion, $maxThreads, $maxPosts, $maxUsers))
         {
@@ -578,21 +570,19 @@ trait InstallerHelper
 
     /**
      * Supports a 'require-soft' section with near identical structure to 'require'
-     *
      * An example;
-    "require-soft" :{
-    "SV/Threadmarks": [
-    2000370,
-    "Threadmarks v2.0.3+",
-    false,
-    "Please provide feedback if you are unable to upgrade."
-    ]
-    },
+     * "require-soft" :{
+     * "SV/Threadmarks": [
+     * 2000370,
+     * "Threadmarks v2.0.3+",
+     * false,
+     * "Please provide feedback if you are unable to upgrade."
+     * ]
+     * },
      * The 3rd array argument has 3 supported values, null/true/false
      *   null/no exists - this is advisory for "Extra Cli Tools" when determining bulk install order, and isn't actually checked
      *   false - if the item exists and is below the minimum version, log as a warning
      *   true - if the item exists and is below the minimum version, log as an error
-     *
      * The 4th array argument is extra help text intended to offer a more detailed explanation why
      * this version is required. For instance, if you're checking for PHP 7.2.0+, you can explain
      * that you plan to bump the minimum version going forward.
@@ -615,7 +605,8 @@ trait InstallerHelper
 
     protected function checkElasticSearchOptimizableState(): void
     {
-        if (!Helper::isAddOnActive('XFES')) {
+        if (!Helper::isAddOnActive('XFES'))
+        {
             return;
         }
 
@@ -644,7 +635,9 @@ trait InstallerHelper
                     }
                 }
             }
-            catch (Exception $e) {}
+            catch (Exception $e)
+            {
+            }
         }
 
         if ($isOptimizable)
@@ -657,7 +650,6 @@ trait InstallerHelper
      * Determine whether a permission is currently in use by another add-on.  Installers can use this to determine
      * whether a permission that was formerly associated with a different add-on should receive default settings or
      * should be left alone.
-     *
      * For example, if SV/FooBar is split into two add-ons, SV/Foo and SV/Bar, the two new add-ons will need to avoid
      * overwriting permissions that have already been configured as part of SV/FooBar.
      *
