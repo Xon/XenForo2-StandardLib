@@ -121,7 +121,7 @@ class InputFilterer extends XFCP_InputFilterer
                 $mm = $this->svIntSanitizer($mm, 0, 60);
                 $ss = $this->svIntSanitizer($ss, 0, 60);
 
-                if (is_string($tz))
+                if (is_string($tz) && $tz !== '')
                 {
                     /** @var TimeZoneData $tzData */
                     $tzData = \XF::app()->data('XF:TimeZone');
