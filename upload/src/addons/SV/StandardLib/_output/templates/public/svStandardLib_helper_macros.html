@@ -90,7 +90,7 @@
 						  arg-type="time"
 						  arg-readOnly="{{ $readOnly }}"
 						  arg-value="{$selectedTime}"
-						  arg-attrsHtml="{{ $allInputAttrsHtml . ' ' . $timeInputAttrsHtml .' ' . 'step="1"' }}" />
+						  arg-attrsHtml="{{ $allInputAttrsHtml . ' ' . $timeInputAttrsHtml .' ' . ($showSeconds ? 'step="1"' : '') }}" />
 			<xf:else />
 
 				<xf:set var="$selectedYMD" value="{{ $dateTimeArr.ymd ?: ($timestamp ? date($timestamp, 'picker') : '') }}" />
