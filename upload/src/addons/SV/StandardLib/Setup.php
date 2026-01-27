@@ -24,6 +24,7 @@ use XF\Entity\StyleProperty as StylePropertyEntity;
 use XF\Finder\Phrase as PhraseFinder;
 use XF\Repository\Option as OptionRepo;
 use XF\Template\Templater;
+use XF\Util\File as FileUtil;
 
 class Setup extends AbstractSetup
 {
@@ -55,6 +56,11 @@ class Setup extends AbstractSetup
     public function uninstallStep2()// : void
     {
         Helper::repo()->resetAddOnVersionCache();
+    }
+
+    public function uninstallStep3()// : void
+    {
+        FileUtil::deleteAbstractedDirectory('code-cache://svShim');
     }
 
     public function upgrade2001230000Step1()//: void
