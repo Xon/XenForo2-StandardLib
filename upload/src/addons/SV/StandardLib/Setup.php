@@ -5,6 +5,7 @@
 
 namespace SV\StandardLib;
 
+use SV\StandardLib\Job\RebuildOptionCacheJob;
 use SV\StandardLib\XF\AddOn\DataType\StyleProperty as ExtendedStylePropertyDataType;
 use SV\StandardLib\XF\DevelopmentOutput\StyleProperty as ExtendedDevOutputStyleProperty;
 use SV\StandardLib\XF\Entity\Option as ExtendedOptionEntity;
@@ -99,8 +100,13 @@ class Setup extends AbstractSetup
     {
         Helper::repo()->rebuildAddOnVersionCache();
         Helper::repo()->clearShimCache();
-        Helper::repository(OptionRepo::class)->rebuildOptionCache();
         $this->syncClassExtensions();
+
+        if (\XF::$versionId < 2030871)
+        {
+            // Execute option rebuilt in a background task as that runs after this add-on has finished being a zombie with is_processing logic
+            RebuildOptionCacheJob::enqueue();
+        }
     }
 
     public function syncClassExtensions()//: void
