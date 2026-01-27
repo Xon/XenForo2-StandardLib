@@ -21,10 +21,11 @@ use XF\Style;
 use XF\Template\Templater as BaseTemplater;
 use function abs;
 use function array_reverse;
+use function array_slice;
 use function array_sum;
 use function call_user_func_array;
 use function count;
-use function end;
+use function current;
 use function func_get_args;
 use function implode;
 use function is_array;
@@ -33,7 +34,6 @@ use function is_string;
 use function json_decode;
 use function max;
 use function method_exists;
-use function reset;
 use function trigger_error;
 use function trim;
 
@@ -446,13 +446,14 @@ class TemplaterHelper
             $array = [];
         }
 
-        // `reset` returns false on empty, but php `array_first` returns null
-        if (count($array) === 0)
+        //return array_first($array);
+
+        foreach ($array as $value)
         {
-            return null;
+            return $value;
         }
 
-        return reset($array);
+        return null;
     }
 
     public function fnArrayLast(BaseTemplater $templater, bool &$escape, $array)
@@ -464,13 +465,14 @@ class TemplaterHelper
             $array = [];
         }
 
-        // `end` returns false on empty, but php `array_first` returns null
+        //return array_last($array);
+
         if (count($array) === 0)
         {
             return null;
         }
 
-        return end($array);
+        return current(array_slice($array, -1));
     }
 
     public function fnArrayIsList(BaseTemplater $templater, bool &$escape, $array): bool
@@ -482,6 +484,8 @@ class TemplaterHelper
             $array = [];
         }
 
+        //return array_is_list($array);
+
         $i = 0;
         foreach ($array as $k => $v)
         {
@@ -492,7 +496,6 @@ class TemplaterHelper
         }
 
         return true;
-//        return array_is_list($array);
     }
 
 
