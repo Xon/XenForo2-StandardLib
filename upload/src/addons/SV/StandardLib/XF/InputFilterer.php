@@ -79,7 +79,7 @@ class InputFilterer extends XFCP_InputFilterer
                         // safari doesn't support seconds for input[type=time]
                         $timeParts[] = 0;
                     }
-                    else if (count($timeParts) === 3)
+                    else if (count($timeParts) !== 3)
                     {
                         return 0;
                     }
