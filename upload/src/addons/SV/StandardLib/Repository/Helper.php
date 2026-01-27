@@ -475,7 +475,23 @@ EOL;
     {
         try
         {
-            FileUtil::deleteAbstractedDirectory('code-cache://svShim');
+            $fs = \XF::app()->fs();
+            $files = $fs->listContents('code-cache://svShim', false);
+            foreach($files as $file)
+            {
+                if (($file['type'] ?? '') !== 'file')
+                {
+                    continue;
+                }
+                $filename = $file['path'] ?? '';
+                if ($filename === '')
+                {
+                    continue;
+                }
+                $filename = 'code-cache://' .$filename;
+
+                $fs->delete($filename);
+            }
         }
         catch (\Throwable $e)
         {
