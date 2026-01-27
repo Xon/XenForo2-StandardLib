@@ -64,7 +64,7 @@
 
 	<xf:set var="$selectedTz" value="{{ $dateTimeArr.tz ?: $xf.visitor.timezone }}" />
 
-	<div class="inputGroup-container inputGroup-containerSvStandardLibDateTime">
+	<div class="inputGroup-container inputGroup-containerSvStandardLibDateTime" data-timestamp="{$timestamp|for_attr}">
 		<div class="inputGroup">
 			<xf:if is="$useNativeTimeInputs">
 				<xf:set var="$selectedDate" value="{{ $dateTimeArr.ymd ?: ($timestamp ? date($timestamp, 'Y-m-d') : '') }}" />
