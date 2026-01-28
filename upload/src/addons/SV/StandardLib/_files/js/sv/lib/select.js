@@ -301,19 +301,22 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
 
         initEvents: function ()
         {
-            if (!this.choices)
+            if (!this.choices || !this.choices.passedElement)
             {
-                console.error('Choices not setup.')
+                console.error('Choices not setup')
                 return;
             }
 
-            let form = this.form
-            let passedElement = this.choices.passedElement.element;
+            const passedElement = this.choices.passedElement.element;
+            if (!passedElement) {
+                console.error('Choices not setup')
+                return;
+            }
 
-            if (this.options.resetOnSubmit && form instanceof HTMLFormElement)
+            if (this.options.resetOnSubmit && this.form)
             {
-                //on(form, 'ajax-submit:complete', this.onFormReset.bind(this))
-                on(form, 'ajax-submit:response', this.afterFormSubmit.bind(this))
+                //on(this.form, 'ajax-submit:complete', this.onFormReset.bind(this))
+                on(this.form, 'ajax-submit:response', this.afterFormSubmit.bind(this))
             }
 
             on(passedElement, 'addItem', this.onAddItem.bind(this));
@@ -330,7 +333,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         {
             if (this.choices === null)
             {
-                console.error('Choices not setup.')
+                console.error('Choices not setup')
                 return;
             }
 
@@ -379,7 +382,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         {
             if (!this.choices)
             {
-                console.error('Choices not setup.')
+                console.error('Choices not setup')
                 return
             }
 
@@ -390,7 +393,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         {
             if (!this.choices)
             {
-                console.error('Choices not setup.')
+                console.error('Choices not setup')
                 return
             }
 
@@ -401,7 +404,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         {
             if (!this.choices)
             {
-                console.error('Choices not setup.')
+                console.error('Choices not setup')
                 return
             }
 
