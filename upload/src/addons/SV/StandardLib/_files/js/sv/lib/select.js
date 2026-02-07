@@ -11,7 +11,19 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
     "use strict";
     const $ = SV.$,
         xf22 = typeof XF.on !== 'function',
-        trigger = xf22 ? function (target, event, data) {
+        toBoolean = xf22 ? function (value) {
+            switch (value) {
+                case 'true':
+                case 'yes':
+                case 'on':
+                case '1':
+                case 1:
+                    return true;
+                default:
+                    return false;
+            }
+        } : XF.toBoolean,
+    trigger = xf22 ? function (target, event, data) {
             $(target).trigger(event, data)
         }: XF.trigger,
         on = xf22 ? function (element, namespacedEvent, handler) {
@@ -192,7 +204,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                         }
                         break;
                     case 'boolean':
-                        v = XF.toBoolean(v);
+                        v = toBoolean(v);
                         break;
                     default:
                         return;
