@@ -28,6 +28,7 @@
 		  arg-controlOptions="!"
 		  arg-choices="!"
 		  arg-selectedChoices="!"
+		  arg-search="{{ true }}"
 		  arg-class="{{ [] }}"
 		  >
 	<div class="choices inputGroup svChoices--inputGroup {$class.containerOuter}" data-type="select-multiple" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false">
@@ -42,10 +43,12 @@
 					}}</div>
 				</xf:trim></xf:foreach>
 			</xf:trim></div>
+			<xf:if is="$search">
 			<input type="search" class="choices__input {$class.input} choices__input--cloned {$class.inputCloned} u-JsOnly" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list" {{$selectedChoices ? 'style="min-width: '.($placeholder ? 1 + strlen(trim($placeholder)) : '1').'ch; width: 1ch;"' : '' }} {{ 
 				$placeholder 
 				? 'placeholder="' . $placeholder . '" aria-label="' . $placeholder . '"' 
 				: '' }}>
+			</xf:if>
 		</div>
 	</div>
 </xf:macro>

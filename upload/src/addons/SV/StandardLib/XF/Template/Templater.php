@@ -165,6 +165,7 @@ class Templater extends XFCP_Templater
             'choices'         => $choices,
             'selectedChoices' => $selectedChoices,
             'class'           => $class,
+            'search'          => (bool)($controlOptions['data-search-enabled'] ?? true),
         ], $this->defaultParams);
     }
 
