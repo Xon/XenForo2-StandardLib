@@ -43,6 +43,12 @@
 	margin: 0;
 	padding-left: 0;
 	list-style: none;
+	&:empty::before
+	{
+		content: '';
+		display: block;
+		height: 1lh;
+	}
 	&--single
 	{
 		display: inline-block;
