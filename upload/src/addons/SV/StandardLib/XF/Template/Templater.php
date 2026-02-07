@@ -96,17 +96,18 @@ class Templater extends XFCP_Templater
             return parent::formSelect($controlOptions, $choices);
         }
 
-        $class = $controlOptions['class'] ?? '';
-        if (stripos($class, 'u-noJsOnly') === false)
-        {
-            $controlOptions['class'] = $class . ' u-noJsOnly';
-        }
-
         if ($controlOptions['skip-rendering'] ?? false)
         {
             unset($controlOptions['skip-rendering']);
 
             return parent::formSelect($controlOptions, $choices);
+        }
+
+        $classList = explode(' ', $controlOptions['class'] ?? '');
+        if (count($classList) !== 0)
+        {
+            $classList = array_filter($classList, function (string $s): bool { return $s !== 'u-noJsOnly'; });
+            $controlOptions['class'] = implode(' ', $classList);
         }
 
         $name = $controlOptions['name'];
@@ -154,6 +155,9 @@ class Templater extends XFCP_Templater
         $class = $this->copyChoicesClassOverridesFromDataAttributes($controlOptions);
 
         $selectHtml = parent::formSelect($controlOptions, $choices);
+
+        // patch hidden attribute (which doesn't take a value)
+        $selectHtml = preg_replace('#<select #', '$0hidden ', $selectHtml, 1);
 
         return $this->callMacro('', 'public:svStandardLib_macros::choices_static_render', [
             'name'            => $name,
