@@ -43,8 +43,8 @@ class TemplaterHelper
     protected $templater;
     /** @var App */
     protected $app;
-    /** @var bool */
-    protected $hasFromCallable;
+    /** @deprecated */
+    protected $hasFromCallable = true;
     /** @var class-string<TemplaterAccess>|TemplaterAccess */
     protected $templaterAccessClass;
     /** @var CssRenderer|null */
@@ -87,7 +87,6 @@ class TemplaterHelper
 
     public function __construct(BaseTemplater $templater)
     {
-        $this->hasFromCallable = is_callable('\Closure::fromCallable');
         $this->templater = $templater;
         $this->templaterAccessClass = \XF::extendClass(TemplaterAccess::class);
         $this->app = $this->templaterAccessClass::app($templater);
