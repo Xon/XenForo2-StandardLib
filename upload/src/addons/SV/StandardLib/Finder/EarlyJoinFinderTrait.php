@@ -53,12 +53,8 @@ trait EarlyJoinFinderTrait
             return parent::getQuery($options);
         }
 
-        $offset = $options['offset'] ?? null;
-        if ($offset === null)
-        {
-            $offset = $this->offset;
-        }
-
+        // do not truncate to an int in this step, that is done after the float check
+        $offset = $options['offset'] ?? $this->offset;
         // offset is computed as page*page-size, which can be user-controlled which can make it appear as a float
         // Do not trigger a possible type error because of the url; /forums/1/page-9223372036854775807
         // Support 32bit builds where floats only have 23 bits of precision which is less than PHP_INT_MAX
@@ -69,15 +65,9 @@ trait EarlyJoinFinderTrait
             return parent::getQuery($options);
         }
 
-        $limit = $options['limit'] ?? null;
-        if ($limit === null)
-        {
-            $limit = $this->limit;
-        }
-
         // sanity check on types
         $offset = (int)$offset;
-        $limit = (int)$limit;
+        $limit = (int)($options['limit'] ?? $this->limit);
 
         if ($this->parentFinder !== null || $limit === 0 || !is_callable([$this, 'getEarlyJoinThreshold']))
         {
