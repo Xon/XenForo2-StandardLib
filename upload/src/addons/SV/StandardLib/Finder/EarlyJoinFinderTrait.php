@@ -78,11 +78,14 @@ trait EarlyJoinFinderTrait
         $offset = (int)$offset;
         $limit = (int)$limit;
 
+        if ($this->parentFinder !== null || $limit === 0)
+        {
+            return parent::getQuery($options);
+        }
+
         $threshold = is_callable([$this, 'getEarlyJoinThreshold']) ? $this->getEarlyJoinThreshold($offset, $limit, $options) : -1;
 
-        if ($this->parentFinder ||
-            $threshold < 0 ||
-            !$limit ||
+        if ($threshold < 0 ||
             $threshold && (($offset / $limit) < $threshold))
         {
             return parent::getQuery($options);
