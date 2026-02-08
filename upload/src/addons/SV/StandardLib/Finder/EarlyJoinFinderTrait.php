@@ -44,10 +44,11 @@ trait EarlyJoinFinderTrait
      */
     public function getQuery(array $options = [])
     {
-        $skipEarlyJoin = $options['skipEarlyJoin'] ?? false;
+        $skipEarlyJoin = $options['skipEarlyJoin'] ?? $options['forDeferred'] ?? false;
+        $onlyIds = $options['onlyIds'] ?? false;
         $countOnly = $options['countOnly'] ?? false;
 
-        if ($skipEarlyJoin || $countOnly)
+        if ($skipEarlyJoin || $onlyIds || $countOnly)
         {
             return parent::getQuery($options);
         }
