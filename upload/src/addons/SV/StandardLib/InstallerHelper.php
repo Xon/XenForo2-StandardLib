@@ -229,6 +229,7 @@ trait InstallerHelper
             $phpRegex = '/^' . str_replace('*', '([a-zA-Z0-9_]+)', $from) . '$/';
             $replacePhrase = str_replace('*', '$1', $to);
 
+            // customizations are not owned by the add-on
             $results = $db->fetchPairs("
 				SELECT phrase_id, title
 				FROM xf_phrase
@@ -238,44 +239,50 @@ trait InstallerHelper
 
             if ($results)
             {
-                /** @var PhraseEntity[] $phrases */
-                $phrases = Helper::findByIds(PhraseEntity::class, array_keys($results));
+                $phrases = Helper::findByIds(PhraseEntity::class, array_keys($results))
+                                 ->toArray();
                 foreach ($results as $phraseId => $oldTitle)
                 {
-                    if (isset($phrases[$phraseId]))
+                    /** @var PhraseEntity $phrase */
+                    $phrase = $phrases[$phraseId] ?? null;
+                    if ($phrase !== null)
                     {
                         $newTitle = preg_replace($phpRegex, $replacePhrase, $oldTitle);
-                        $phrase = $phrases[$phraseId];
 
                         $db->beginTransaction();
 
-                        /** @var PhraseEntity $newPhrase */
-                        $newPhrase = $replace
-                            ? Helper::finder(PhraseFinder::class)
-                                    ->where('title', '=', $newTitle)
-                                    ->fetchOne()
-                            : null;
+                        // phrases exist per language, so ensure the correct existing phrase is replaced
+                        $existingPhrase = Helper::finder(PhraseFinder::class)
+                                           ->where('title', '=', $newTitle)
+                                           ->where('language_id', '=', $phrase->language_id)
+                                           ->fetchOne();
 
-                        if ($newPhrase)
+                        if ($existingPhrase !== null)
                         {
+                            if (!$replace)
+                            {
+                                $db->rollback();
+                                continue;
+                            }
+
                             // already exists, replace the value and delete
-                            $newPhrase->set('title', $phrase->phrase_text, ['forceSet' => true]);
-                            $newPhrase->set('global_cache', false, ['forceSet' => true]);
+                            $existingPhrase->phrase_text = $phrase->phrase_text;
+                            $existingPhrase->global_cache = false;
                             if ($deOwn)
                             {
-                                $newPhrase->addon_id = '';
+                                $existingPhrase->addon_id = '';
                             }
-                            if ($newPhrase->hasBehavior('XF:DevOutputWritable'))
+                            if ($existingPhrase->hasBehavior('XF:DevOutputWritable'))
                             {
-                                $newPhrase->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
+                                $existingPhrase->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
                             }
-                            $newPhrase->save(false);
+                            $existingPhrase->save(false);
                             $phrase->delete(false);
                         }
                         else
                         {
-                            $phrase->set('title', $newTitle, ['forceSet' => true]);
-                            $phrase->set('global_cache', false, ['forceSet' => true]);
+                            $phrase->title = $newTitle;
+                            $phrase->global_cache = false;
                             if ($deOwn)
                             {
                                 $phrase->addon_id = '';
