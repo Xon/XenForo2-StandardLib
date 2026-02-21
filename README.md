@@ -103,8 +103,8 @@ namespace SV\ElasticSearchEssentials\XF\Repository;
 \SV\StandardLib\Helper::repo()->aliasClass(
     'SV\ElasticSearchEssentials\XF\Repository\Search',
     \XF::$versionId < 2020000
-        ? 'SV\ElasticSearchEssentials\XF\Repository\XF2\Search'
-        : 'SV\ElasticSearchEssentials\XF\Repository\XF22\Search'
+        ? \SV\ElasticSearchEssentials\XF\Repository\XF2\Search::class
+        : \SV\ElasticSearchEssentials\XF\Repository\XF22\Search::class
 );
 ```
 
