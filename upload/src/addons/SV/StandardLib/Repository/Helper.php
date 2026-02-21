@@ -404,14 +404,6 @@ class Helper extends Repository
         {
             throw new LogicException('Expected $srcClass to not be empty');
         }
-
-        if (\XF::$versionId < 2021300)
-        {
-            $this->aliasClassSimple($destClass, $srcClass);
-
-            return;
-        }
-
         if ($destClass[0] !== '\\')
         {
             $destClass = '\\' . $destClass;
@@ -420,6 +412,38 @@ class Helper extends Repository
         {
             $srcClass = '\\' . $srcClass;
         }
+
+        if (\XF::$versionId < 2021300)
+        {
+            $this->aliasClassSimple($destClass, $srcClass);
+
+            return;
+        }
+
+        $this->aliasClassStubFile($destClass, $srcClass);
+    }
+
+    /**
+     * @param class-string $destClass
+     * @param class-string $srcClass
+     * @return array{0: string, 1: string, 2: string, 3: string}
+     */
+    protected function getClassAliases(string $destClass, string $srcClass): array
+    {
+        $nsEnd = strrpos($srcClass, '\\');
+        $srcXFCP = '\\' . substr($srcClass, 1, $nsEnd) . 'XFCP_' . substr($srcClass, $nsEnd + 1);
+
+        $nsEnd = strrpos($destClass, '\\');
+        $namespace = substr($destClass, 1, $nsEnd - 1);
+        $class = substr($destClass, $nsEnd + 1);
+        $destXFCP = '\\' . $namespace . '\\XFCP_' . $class;
+
+        return [$destXFCP, $srcXFCP, $namespace, $class];
+    }
+
+
+    public function aliasClassStubFile(string $destClass, string $srcClass): void
+    {
         $file = '/svShim/' . md5($destClass . '-' . $srcClass) . '.php';
         $stubFile = FileUtil::getCodeCachePath() . $file;
 
@@ -454,19 +478,13 @@ class Helper extends Repository
 
     protected function buildShimStubFile(string $srcClass, string $destClass): string
     {
-        $nsEnd = strrpos($srcClass, '\\');
-        $srcAlias = substr($srcClass, 1, $nsEnd) . 'XFCP_' . substr($srcClass, $nsEnd + 1);
-
-        $nsEnd = strrpos($destClass, '\\');
-        $namespace = substr($destClass, 1, $nsEnd - 1);
-        $class = substr($destClass, $nsEnd + 1);
-        $destAlias = $namespace . '\\XFCP_' . $class;
+        [$destXFCP, $srcXFCP, $namespace, $class] = $this->getClassAliases($destClass, $srcClass);
 
         return <<<EOL
 <?php
 namespace $namespace;
 class $class extends $srcClass {}
-class_alias('$destAlias', '$srcAlias', false);
+class_alias('$destXFCP', '$srcXFCP', false);
 return true;
 EOL;
     }
@@ -520,25 +538,8 @@ EOL;
     {
         class_alias($srcClass, $destClass);
 
-        $nsEnd = strrpos($srcClass, '\\');
-        if ($nsEnd !== false)
-        {
-            $srcAlias = substr($srcClass, 0, $nsEnd) . '\\XFCP_' . substr($srcClass, $nsEnd + 1);
-        }
-        else
-        {
-            $srcAlias = "XFCP_$srcClass";
-        }
-        $nsEnd = strrpos($destClass, '\\');
-        if ($nsEnd !== false)
-        {
-            $destAlias = substr($destClass, 0, $nsEnd) . '\\XFCP_' . substr($destClass, $nsEnd + 1);
-        }
-        else
-        {
-            $destAlias = "XFCP_$destClass";
-        }
+        [$destXFCP, $srcXFCP] = $this->getClassAliases($destClass, $srcClass);
 
-        class_alias($destAlias, $srcAlias, false);
+        class_alias($destXFCP, $srcXFCP, false);
     }
 }
