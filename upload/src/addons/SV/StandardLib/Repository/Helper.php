@@ -390,7 +390,7 @@ class Helper extends Repository
     }
 
     /**
-     * @param string       $destClass
+     * @param class-string $destClass
      * @param class-string $srcClass
      * @return void
      */
