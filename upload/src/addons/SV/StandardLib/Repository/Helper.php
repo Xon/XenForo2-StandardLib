@@ -396,6 +396,15 @@ class Helper extends Repository
      */
     public function aliasClass(string $destClass, string $srcClass): void
     {
+        if ($destClass === '')
+        {
+            throw new LogicException('Expected $destClass to not be empty');
+        }
+        if ($srcClass === '')
+        {
+            throw new LogicException('Expected $srcClass to not be empty');
+        }
+
         if (\XF::$versionId < 2021300)
         {
             $this->aliasClassSimple($destClass, $srcClass);
@@ -445,15 +454,6 @@ class Helper extends Repository
 
     protected function buildShimStubFile(string $srcClass, string $destClass): string
     {
-        if ($srcClass === '' || $srcClass[0] !== '\\')
-        {
-            throw new LogicException('Expected $finalClass to not be empty and start with a \\');
-        }
-        if ($destClass === '' || $destClass[0] !== '\\')
-        {
-            throw new LogicException('Expected $finalClass to not be empty and start with a \\');
-        }
-
         $nsEnd = strrpos($srcClass, '\\');
         $srcAlias = substr($srcClass, 1, $nsEnd) . 'XFCP_' . substr($srcClass, $nsEnd + 1);
 
