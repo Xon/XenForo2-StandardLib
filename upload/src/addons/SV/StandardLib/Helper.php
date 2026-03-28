@@ -48,6 +48,13 @@ class Helper
         return self::repo()->hasDesiredAddOnVersion($addonId, $targetVersion, $operator);
     }
 
+    public static function isFeatureFlagEnabled(string $addonId, string $flagName): bool
+    {
+        $featureFlags = \XF::config('svFeatureFlags');
+
+        return (bool)($featureFlags[$addonId][$flagName] ?? false);
+    }
+
     /**
      * Note; `new`/`T::__construct` is executed in the context of T
      * @template T
