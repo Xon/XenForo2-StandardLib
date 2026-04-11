@@ -34,6 +34,11 @@ class Setup extends AbstractSetup
     use StepRunnerUpgradeTrait;
     use StepRunnerUninstallTrait;
 
+    protected function installStep1()//:void
+    {
+        $this->applySchemaChanges();
+    }
+
     protected function upgrade1110001Step1()// : void
     {
         $this->renameOption('svAdvancedBbCodeLogLessFunc', 'svLogLessFunc', true);
@@ -67,15 +72,11 @@ class Setup extends AbstractSetup
     public function upgrade2001230000Step1()//: void
     {
         $this->syncClassExtensions();
+    }
 
-        if (\XF::$versionId >= 2030000)
-        {
-            return;
-        }
-        // XF2.1/XF2.2 compat
-        $this->alterTable('xf_style_property', function (Alter $table) {
-            $this->addOrChangeColumn($table, 'has_variations', 'tinyint')->setDefault(0)->after('value_parameters');
-        });
+    public function upgrade2001230000Step2()//: void
+    {
+        $this->applySchemaChanges();
     }
 
     public function postInstall(array &$stateChanges)// : void
@@ -106,6 +107,17 @@ class Setup extends AbstractSetup
         {
             // Execute option rebuilt in a background task as that runs after this add-on has finished being a zombie with is_processing logic
             RebuildOptionCacheJob::enqueue();
+        }
+    }
+
+    public function applySchemaChanges()//: void
+    {
+        if (\XF::$versionId < 2030000)
+        {
+            // XF2.1/XF2.2 compat
+            $this->alterTable('xf_style_property', function (Alter $table) {
+                $this->addOrChangeColumn($table, 'has_variations', 'tinyint')->setDefault(0)->after('value_parameters');
+            });
         }
     }
 
