@@ -16,7 +16,6 @@ class RebuildExtensionCacheJob extends AbstractJob
 
     /**
      * @param float|int $maxRunTime
-     * @return JobResult
      */
     public function run($maxRunTime): JobResult
     {
