@@ -5,6 +5,7 @@
 
 namespace SV\StandardLib;
 
+use SV\StandardLib\Job\RebuildExtensionCacheJob;
 use SV\StandardLib\Job\RebuildOptionCacheJob;
 use SV\StandardLib\XF\AddOn\DataType\StyleProperty as ExtendedStylePropertyDataType;
 use SV\StandardLib\XF\DevelopmentOutput\StyleProperty as ExtendedDevOutputStyleProperty;
@@ -23,7 +24,7 @@ use XF\Entity\Option as OptionEntity;
 use XF\Entity\Phrase as PhraseEntity;
 use XF\Entity\StyleProperty as StylePropertyEntity;
 use XF\Finder\Phrase as PhraseFinder;
-use XF\Repository\Option as OptionRepo;
+use XF\Repository\ClassExtension as ClassExtensionRepository;
 use XF\Template\Templater;
 use XF\Util\File as FileUtil;
 
@@ -132,6 +133,11 @@ class Setup extends AbstractSetup
         $this->patchClassExtension(DevOutputStyleProperty::class, ExtendedDevOutputStyleProperty::class, $preXF23);
 
         $this->patchClassExtension(Templater::class, TemplaterXF21Patch::class, \XF::$versionId < 2020000);
+
+        // Execute option rebuilt in a background task as that runs after this add-on has finished being a zombie with is_processing logic
+        RebuildExtensionCacheJob::enqueue();
+        // no-op the extension rebuild
+        \XF::runOnce('classExtensionRebuild', function (): void { });
     }
 
     protected function patchClassExtension(string $fromClass, string $toClass, bool $value)//: void
