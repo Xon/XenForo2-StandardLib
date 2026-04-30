@@ -130,6 +130,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         initialValue: null,
         form: null,
         choices: null,
+        layoutChangeTimer: null,
 
         init: function()
         {
@@ -325,6 +326,9 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 return;
             }
 
+
+            on(document.body, 'xf:layout', this.layoutUpdate.bind(this));
+
             if (this.options.resetOnSubmit && this.form)
             {
                 //on(this.form, 'ajax-submit:complete', this.onFormReset.bind(this))
@@ -339,6 +343,30 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             on(passedElement, 'control:enabled', this.onControlEnabled.bind(this));
             on(passedElement, 'control:disabled', this.onControlDisabled.bind(this));
             on(passedElement, 'refreshChoices', this.onRefreshChoices.bind(this));
+        },
+
+        layoutUpdate: function (e) {
+            if (this.choices === null) {
+                return;
+            }
+
+            if (this.layoutChangeTimer)
+            {
+                clearTimeout(this.layoutChangeTimer);
+            }
+
+            this.layoutChangeTimer = setTimeout(this.layoutUpdateDeferred.bind(this), 10);
+        },
+
+        layoutUpdateDeferred: function () {
+            this.layoutChangeTimer = null;
+            if (this.choices === null) {
+                return;
+            }
+
+            if (!this.choices._isSelectOneElement) {
+                this.choices.input.setWidth();
+            }
         },
 
         onAddItem: function (event)
