@@ -117,11 +117,32 @@ $obj = Helper::repository(\XF\Repository\User::class);
 ```
 For static analysis and IDE, `$obj` will have the type `\XF\Repository\User`
 
+## \SV\StandardLib\Repository\Helper::isFeatureFlagEnabled
+
+Basic feature flag support by adding entires into `config.php`
+
+In `config.php`
+```php
+$config['svFeatureFlags']['flag'] = true;
+```
+
+It can then be used via
+```php
+if (Helper::isFeatureFlagEnabled('flag'))
+{
+...
+}
+```
+And in templates;
+```xml
+<xf:if is="sv_feature_flag('flag')">...</xf:if>
+```
+
 # Template additions
 
 ## choices.js integration
 
-Enrich a select box with [choices.js](https://github.com/Xon/Choices.js). 
+Enrich a select box with [choices.js](https://github.com/Xon/Choices.js).
 
 Single select example:
 ```html
