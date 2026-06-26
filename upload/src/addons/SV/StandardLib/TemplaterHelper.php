@@ -247,6 +247,7 @@ class TemplaterHelper
         $this->addFunction('abs', 'fnAbs');
         $this->addFunction('is_toggle_set', 'fnIsToggleSet');
         $this->addFunction('is_addon_active', 'fnIsAddonActive');
+        $this->addFunction('sv_feature_flag', 'fnSvFeatureFlag');
         // legacy
         $this->addFunction('sv_array_reverse', \XF::$debugMode ? 'fnArrayReverseOld' : 'fnArrayReverse');
     }
@@ -262,6 +263,11 @@ class TemplaterHelper
     public function fnIsAddonActive(BaseTemplater $templater, bool &$escape, string $addOnId, $versionId = null, string $operator = '>='): bool
     {
         return Helper::isAddOnActive($addOnId, $versionId, $operator);
+    }
+
+    public function fnSvFeatureFlag(BaseTemplater $templater, bool &$escape, string $addonId, string $flagName): bool
+    {
+        return Helper::isFeatureFlagEnabled($addonId, $flagName);
     }
 
     /**
