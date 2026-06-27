@@ -1,0 +1,9 @@
+{
+    "template": "style_variation_macros",
+    "description": "XF2.3 Remove token from link (for non-live)",
+    "execution_order": 1,
+    "enabled": true,
+    "action": "str_replace",
+    "find": "'t': csrf_token(),",
+    "replace": ""
+}

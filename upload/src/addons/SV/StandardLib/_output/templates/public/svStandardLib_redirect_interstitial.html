@@ -1,0 +1,13 @@
+<xf:title>{{ phrase('svStandardLib_redirect_interstitial') }}</xf:title>
+
+<xf:head option="metaNoindex"><meta name="robots" content="noindex" /></xf:head>
+
+<xf:form id="autoSubmit" action="{$route}" class="block">
+	<xf:submitrow rowtype="simple" submit="{{ phrase('redirect') }}" />
+</xf:form>
+
+<script type="text/javascript">
+	document.addEventListener('DOMContentLoaded', () => {
+		setTimeout(function(){ document.querySelector('form#autoSubmit').submit(); }, 0);
+	})
+</script>

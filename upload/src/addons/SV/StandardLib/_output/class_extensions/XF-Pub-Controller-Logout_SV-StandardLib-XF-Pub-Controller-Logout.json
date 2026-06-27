@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Pub\\Controller\\Logout",
+    "to_class": "SV\\StandardLib\\XF\\Pub\\Controller\\Logout",
+    "execute_order": 1,
+    "active": true
+}

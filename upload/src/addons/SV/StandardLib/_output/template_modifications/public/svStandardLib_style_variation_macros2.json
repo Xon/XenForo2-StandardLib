@@ -1,0 +1,9 @@
+{
+    "template": "style_variation_macros",
+    "description": "XF2.3 Rewrite link to use link-post (for non-live)",
+    "execution_order": 2,
+    "enabled": true,
+    "action": "str_replace",
+    "find": "$live ? 'style-variation' : ''",
+    "replace": "$live ? 'style-variation' : 'link-post'"
+}

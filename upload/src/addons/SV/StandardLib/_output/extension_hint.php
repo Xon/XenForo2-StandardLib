@@ -21,6 +21,7 @@ namespace SV\StandardLib\XF\AddOn\DataType
 
 namespace SV\StandardLib\XF\Admin\Controller
 {
+	class XFCP_AccountController extends \XF\Admin\Controller\AccountController {}
 	class XFCP_AddOn extends \XF\Admin\Controller\AddOn {}
 	class XFCP_Template extends \XF\Admin\Controller\Template {}
 }
@@ -50,6 +51,8 @@ namespace SV\StandardLib\XF\Mvc
 namespace SV\StandardLib\XF\Pub\Controller
 {
 	class XFCP_Forum extends \XF\Pub\Controller\Forum {}
+	class XFCP_Logout extends \XF\Pub\Controller\Logout {}
+	class XFCP_Misc extends \XF\Pub\Controller\Misc {}
 	class XFCP_Watched extends \XF\Pub\Controller\Watched {}
 }
 

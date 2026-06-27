@@ -1,0 +1,9 @@
+{
+    "template": "language_chooser",
+    "description": "XF2.1/XF2.2/XF2.3 Rewrite link to use link-post",
+    "execution_order": 1,
+    "enabled": true,
+    "action": "preg_replace",
+    "find": "#(href=\"{{ link\\(.*?, {.*?)(?:,|)\\s*'t': csrf_token\\(\\)\\s*(}\\)\\s*}}\\s*\")#msi",
+    "replace": "$1$2 data-xf-click=\"link-post\""
+}

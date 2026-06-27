@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Admin\\Controller\\AccountController",
+    "to_class": "SV\\StandardLib\\XF\\Admin\\Controller\\AccountController",
+    "execute_order": 1,
+    "active": true
+}
