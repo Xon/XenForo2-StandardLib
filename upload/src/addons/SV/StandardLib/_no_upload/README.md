@@ -106,7 +106,6 @@ namespace SV\ElasticSearchEssentials\XF\Repository;
         ? \SV\ElasticSearchEssentials\XF\Repository\XF2\Search::class
         : \SV\ElasticSearchEssentials\XF\Repository\XF22\Search::class
     \XF\Repository\Search::class
-    \XF\Repository\Search::class
 );
 ```
 
