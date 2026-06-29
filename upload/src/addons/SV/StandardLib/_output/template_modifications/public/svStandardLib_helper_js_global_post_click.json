@@ -5,5 +5,5 @@
     "enabled": true,
     "action": "preg_replace",
     "find": "#<xf:macro (?:id|name)=\"head\".*?>#sim",
-    "replace": "$0\n<xf:if is=\"$xf.versionId < 2040000\">\n<xf:js src=\"sv/lib/post-click.js\" addon=\"SV/StandardLib\" min=\"1\" />\n</xf:if>"
+    "replace": "$0\n<xf:if is=\"$xf.versionId < 2040000\">\n<xf:js src=\"sv/lib/link-post.js\" addon=\"SV/StandardLib\" min=\"1\" />\n</xf:if>"
 }
