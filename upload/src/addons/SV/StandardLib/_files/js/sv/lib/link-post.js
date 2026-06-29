@@ -66,18 +66,20 @@ var SV = window.SV || {};
         }
     })
 
-    const oldUpdateVariation = XF.StyleVariation.updateVariation;
-    XF.StyleVariation.updateVariation = function (variation) {
-        const oldAjax = XF.ajax;
-        XF.ajax = function (method, url, data = {}, successCallback, options = {}) {
-            return oldAjax('POST', url, data, successCallback, options);
-        }
-        try {
-            oldUpdateVariation(variation);
-        } finally {
-            XF.ajax = oldAjax;
-        }
-    };
+    if ('StyleVariation' in XF) {
+        const oldUpdateVariation = XF.StyleVariation.updateVariation;
+        XF.StyleVariation.updateVariation = function (variation) {
+            const oldAjax = XF.ajax;
+            XF.ajax = function (method, url, data = {}, successCallback, options = {}) {
+                return oldAjax('POST', url, data, successCallback, options);
+            }
+            try {
+                oldUpdateVariation(variation);
+            } finally {
+                XF.ajax = oldAjax;
+            }
+        };
+    }
 
     XF.Event.register('click', 'link-post', 'SV.LinkPostClick')
 } (window, document));
