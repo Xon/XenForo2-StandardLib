@@ -5,6 +5,11 @@
  */
 
 $classmap = [];
+if (\XF::$versionId < 2031170)
+{
+    include(__DIR__ . '/shim/RequestKnownIps.php');
+    RequestKnownIps::update();
+}
 if (\XF::$versionId < 2030036)
 {
     $classmap[\XF\Entity\ViewableInterface::class] = __DIR__ . '/shim/XF/Entity/ViewableInterface.php';
