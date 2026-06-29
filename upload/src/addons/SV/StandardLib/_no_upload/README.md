@@ -180,6 +180,13 @@ Multi-select example:
 The initial structure is pre-rendered to reduce/prevent page jank.
 To opt-out add the `skip-rendering="true"` attribute to the `<xf:select>` or `<xf:selectrow>` element
 
+## link-post backport
+
+Backport's `data-xf-click='link-post'` javascript and `SV\StandardLib\ControllerPlugin\RedirectPlugin::actionPost` php helper for XF2.1/XF2.2/XF2.3
+
+Applies to;
+- Front end; logout/style/style variation (xf2.3)/advanced cookie consent (xf2.3)
+- Admin; language/style variation
 
 ## ajax pagination
 
