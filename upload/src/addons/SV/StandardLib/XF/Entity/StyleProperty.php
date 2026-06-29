@@ -16,6 +16,16 @@ if (\XF::$versionId < 2030000)
      */
     class StyleProperty extends XFCP_StyleProperty
     {
+        public function canHaveVariations(): bool
+        {
+            if ($this->value_type === 'radio')
+            {
+                return true;
+            }
+
+            return parent::canHaveVariations();
+        }
+
         protected function getPropertyValue()
         {
             $value = $this->property_value_;
@@ -47,5 +57,16 @@ if (\XF::$versionId < 2030000)
 }
 else
 {
-    class StyleProperty extends XFCP_StyleProperty { }
+    class StyleProperty extends XFCP_StyleProperty
+    {
+        public function canHaveVariations(): bool
+        {
+            if ($this->value_type === 'radio')
+            {
+                return true;
+            }
+
+            return parent::canHaveVariations();
+        }
+    }
 }

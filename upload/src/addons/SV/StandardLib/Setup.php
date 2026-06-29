@@ -132,7 +132,7 @@ class Setup extends AbstractSetup
 
         $preXF23 = \XF::$versionId < 2030000;
         $this->patchClassExtension(StylePropertyDataType::class, ExtendedStylePropertyDataType::class, $preXF23);
-        $this->patchClassExtension(StylePropertyEntity::class, ExtendedStylePropertyEntity::class, $preXF23);
+        //$this->patchClassExtension(StylePropertyEntity::class, ExtendedStylePropertyEntity::class, $preXF23);
         $this->patchClassExtension(DevOutputStyleProperty::class, ExtendedDevOutputStyleProperty::class, $preXF23);
 
         $this->patchClassExtension(Templater::class, TemplaterXF21Patch::class, \XF::$versionId < 2020000);
