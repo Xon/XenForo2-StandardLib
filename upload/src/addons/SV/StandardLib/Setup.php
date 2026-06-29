@@ -124,6 +124,9 @@ class Setup extends AbstractSetup
 
     public function syncClassExtensions()//: void
     {
+        // only enable for pre XF2.3.11
+        $this->patchClassExtension(\XF\Data\Robot::class, \SV\StandardLib\XF\Data\Robot::class, \XF::$versionId < 2031170);
+
         // only enable for pre XF2.3.8
         $this->patchClassExtension(OptionEntity::class, ExtendedOptionEntity::class, \XF::$versionId < 2030870);
 

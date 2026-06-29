@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Data\\Robot",
+    "to_class": "SV\\StandardLib\\XF\\Data\\Robot",
+    "execute_order": 1,
+    "active": false
+}

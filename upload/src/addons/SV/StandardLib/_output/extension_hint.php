@@ -32,6 +32,11 @@ namespace SV\StandardLib\XF
 	class XFCP_InputFilterer extends \XF\InputFilterer {}
 }
 
+namespace SV\StandardLib\XF\Data
+{
+	class XFCP_Robot extends \XF\Data\Robot {}
+}
+
 namespace SV\StandardLib\XF\DevelopmentOutput
 {
 	class XFCP_StyleProperty extends \XF\DevelopmentOutput\StyleProperty {}
