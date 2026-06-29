@@ -5,9 +5,10 @@
 <xf:form id="autoSubmit" action="{$route}" class="block">
 	<xf:submitrow rowtype="simple" submit="{{ phrase('redirect') }}" />
 </xf:form>
-
+<xf:if is="$autoSubmit">
 <script type="text/javascript">
 	document.addEventListener('DOMContentLoaded', () => {
 		setTimeout(function(){ document.querySelector('form#autoSubmit').submit(); }, 0);
 	})
 </script>
+</xf:if>

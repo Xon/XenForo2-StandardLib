@@ -4,6 +4,7 @@ namespace SV\StandardLib\ControllerPlugin;
 
 use XF\ControllerPlugin\AbstractPlugin;
 use XF\Mvc\Reply\AbstractReply;
+use function array_key_exists;
 
 class RedirectPlugin extends AbstractPlugin
 {
@@ -30,6 +31,7 @@ class RedirectPlugin extends AbstractPlugin
         $templateName = $templateName ?? 'public:svStandardLib_redirect_interstitial';
 
         $params['route'] = $route;
+        $params['autoSubmit'] = $params['autoSubmit'] ?? (\XF::session()->exists() && $this->request->getRobotName() === '');
 
         return $this->view('SV\StandardLib:Redirect', $templateName, $params);
     }
