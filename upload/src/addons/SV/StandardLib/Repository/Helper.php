@@ -12,6 +12,7 @@ use XF\Entity\AddOn;
 use XF\Entity\User as UserEntity;
 use XF\Mvc\Entity\Entity;
 use XF\Mvc\Entity\Repository;
+use XF\Repository\StyleRepository;
 use XF\Util\File as FileUtil;
 use function abs;
 use function ceil;
@@ -19,6 +20,7 @@ use function class_alias;
 use function count;
 use function floor;
 use function in_array;
+use function is_callable;
 use function is_numeric;
 use function is_string;
 use function mb_strtolower;
@@ -567,5 +569,36 @@ EOL;
         {
             \XF::logException($e, false, 'Suppressed:');
         }
+    }
+
+    /**
+     * Backport for XF2.3.0-XF2.3.4 support
+     */
+    public function getSelectedStyleIdForUser(?UserEntity $user = null): int
+    {
+        $styleRepo = \XF::repository(StyleRepository::class);
+
+        if (is_callable([$styleRepo, 'getSelectedStyleIdForUser']))
+        {
+            return $styleRepo->getSelectedStyleIdForUser($user);
+        }
+
+        $user = $user ?? \XF::visitor();
+
+        $styleId = $user->style_id !== 0
+            ? $user->style_id
+            : (int) \XF::options()->defaultStyleId;
+
+        $styles = \XF::app()->container('style.cache');
+        $selectedStyle = $styles[$styleId] ?? null;
+        if (
+            !$selectedStyle ||
+            !$selectedStyle['user_selectable'] && !$user->is_admin
+        )
+        {
+            $styleId = (int) \XF::options()->defaultStyleId;
+        }
+
+        return $styleId;
     }
 }

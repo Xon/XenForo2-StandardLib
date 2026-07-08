@@ -3,9 +3,9 @@
 namespace SV\StandardLib\XF\Pub\Controller;
 
 use SV\StandardLib\ControllerPlugin\RedirectPlugin;
+use SV\StandardLib\Helper;
 use XF\CookieConsent;
 use XF\Mvc\Reply\AbstractReply;
-use XF\Repository\StyleRepository;
 use function in_array;
 
 /**
@@ -72,8 +72,7 @@ class Misc extends XFCP_Misc
         else
         {
             $visitor = \XF::visitor();
-            $styleRepo = \XF::repository(StyleRepository::class);
-            $selectedStyleId = $styleRepo->getSelectedStyleIdForUser($visitor);
+            $selectedStyleId = Helper::repo()->getSelectedStyleIdForUser($visitor);
             $style = \XF::app()->style($selectedStyleId);
             if (!$visitor->canChangeStyleVariation($style, $error))
             {
