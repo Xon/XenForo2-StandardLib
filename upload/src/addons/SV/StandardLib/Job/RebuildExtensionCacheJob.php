@@ -11,7 +11,7 @@ class RebuildExtensionCacheJob extends AbstractJob
 {
     public static function enqueue(): void
     {
-        \XF::app()->jobManager()->enqueue(self::class, [], false);
+        \XF::app()->jobManager()->enqueueLater('', \XF::$time + 1, self::class, [], false);
     }
 
     /**

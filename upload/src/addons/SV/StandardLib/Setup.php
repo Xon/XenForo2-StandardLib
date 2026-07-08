@@ -72,7 +72,6 @@ class Setup extends AbstractSetup
 
     public function upgrade2001230000Step1()//: void
     {
-        $this->syncClassExtensions();
     }
 
     public function upgrade2001230000Step2()//: void
