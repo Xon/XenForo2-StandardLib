@@ -35,12 +35,12 @@ class Setup extends AbstractSetup
     use StepRunnerUpgradeTrait;
     use StepRunnerUninstallTrait;
 
-    protected function installStep1()//:void
+    public function installStep1()//:void
     {
         $this->applySchemaChanges();
     }
 
-    protected function upgrade1110001Step1()// : void
+    public function upgrade1110001Step1()// : void
     {
         $this->renameOption('svAdvancedBbCodeLogLessFunc', 'svLogLessFunc', true);
     }
@@ -142,7 +142,7 @@ class Setup extends AbstractSetup
         \XF::runOnce('classExtensionRebuild', function (): void { });
     }
 
-    protected function patchClassExtension(string $fromClass, string $toClass, bool $value)//: void
+    public function patchClassExtension(string $fromClass, string $toClass, bool $value)//: void
     {
         $classExtension = Helper::findOne(ClassExtensionEntity::class, [
             'from_class' => $fromClass,
