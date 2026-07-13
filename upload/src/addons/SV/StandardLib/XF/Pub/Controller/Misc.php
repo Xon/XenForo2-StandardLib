@@ -18,7 +18,7 @@ class Misc extends XFCP_Misc
         if ($this->request->exists('style_id'))
         {
             $redirectPlugin = $this->plugin(RedirectPlugin::class);
-            $redirectPlugin->assertIsPostRequest($this->buildLink('misc/style',null,[
+            $redirectPlugin->assertIsPostRequest($this->buildLink('misc/style',null, [
                 'style_id' => $this->filter('style_id', 'uint'),
                 '_xfRedirect' => $this->filter('_xfRedirect', 'str'),
             ]));
@@ -50,8 +50,33 @@ class Misc extends XFCP_Misc
 
         if ($this->filter('update', 'bool'))
         {
+            $parms = [
+                'update' => 1,
+            ];
+
+            if ($this->filter('accept', 'bool'))
+            {
+                $parms['accept'] = 1;
+            }
+            else if ($this->filter('reject', 'bool'))
+            {
+                $parms['reject'] = 1;
+            }
+            if ($this->filter('accept', 'bool'))
+            {
+                $parms['consent'] = $this->filter('consent', 'array-bool');
+                if ($this->filter('add', 'bool'))
+                {
+                    $parms['add'] = 1;
+                }
+                else if ($this->filter('remove', 'bool'))
+                {
+                    $parms['remove'] = 1;
+                }
+            }
+
             $redirectPlugin = $this->plugin(RedirectPlugin::class);
-            $redirectPlugin->assertIsPostRequest($this->buildLink('misc/cookies', null, ['update' => 1]));
+            $redirectPlugin->assertIsPostRequest($this->buildLink('misc/cookies', null, $parms));
         }
 
         return parent::actionCookies();
