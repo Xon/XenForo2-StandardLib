@@ -1,7 +1,7 @@
 {
     "template": "PAGE_CONTAINER",
     "description": "XF2.1/XF2.2/XF2.3 Rewrite logout link to use link-post",
-    "execution_order": 1,
+    "execution_order": 2147483640,
     "enabled": true,
     "action": "str_replace",
     "find": "href=\"{{ link('logout', null, {'t': csrf_token()}) }}\"",

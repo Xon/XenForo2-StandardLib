@@ -1,7 +1,7 @@
 {
     "template": "helper_js_global",
     "description": "XF2.1/XF2.2/XF2.3 - Inject backported link-post handler",
-    "execution_order": 1,
+    "execution_order": 2147483640,
     "enabled": true,
     "action": "preg_replace",
     "find": "#<xf:macro (?:id|name)=\"head\".*?>#sim",
