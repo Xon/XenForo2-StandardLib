@@ -1,0 +1,9 @@
+{
+    "template": "misc_cookies",
+    "description": "XF2.2/XF2.3 Rewrite link to use link-post",
+    "execution_order": 2147483641,
+    "enabled": true,
+    "action": "str_replace",
+    "find": "data-xf-click=\"cookie-consent\"",
+    "replace": "data-xf-click=\"link-post\""
+}
