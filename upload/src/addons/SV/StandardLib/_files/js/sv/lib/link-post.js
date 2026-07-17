@@ -1,5 +1,8 @@
 // noinspection ES6ConvertVarToLetConst
 var SV = window.SV || {};
+// XF22 compat shim
+/** @type jQuery */
+SV.$ = SV.$ || window.jQuery || null;
 // noinspection JSUnusedLocalSymbols
 (function (window, document, _undefined)
 {
