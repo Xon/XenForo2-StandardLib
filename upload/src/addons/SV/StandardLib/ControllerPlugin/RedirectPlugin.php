@@ -21,9 +21,6 @@ class RedirectPlugin extends AbstractPlugin
 
         $token = $this->filter('_xfToken', 'str');
         $this->request()->set($tokenKey, $token);
-
-        $url = $this->filter('_xfRedirect', 'str') ?: $this->buildLink('');
-        $this->request()->set('_xfRedirect', $url);
     }
 
     public function actionPost(string $route, ?string $templateName = null): AbstractReply
@@ -32,6 +29,7 @@ class RedirectPlugin extends AbstractPlugin
 
         $params['route'] = $route;
         $params['autoSubmit'] = $params['autoSubmit'] ?? (\XF::session()->exists() && $this->request->getRobotName() === '');
+        $params['redirect'] = $this->getDynamicRedirect();
 
         return $this->view('SV\StandardLib:Redirect', $templateName, $params);
     }

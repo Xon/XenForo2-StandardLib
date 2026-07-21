@@ -3,7 +3,7 @@
     "description": "XF2.3 Remove token from link (for non-live)",
     "execution_order": 2147483640,
     "enabled": true,
-    "action": "str_replace",
-    "find": "'t': csrf_token(),",
-    "replace": ""
+    "action": "preg_replace",
+    "find": "#(?:,\\s*)?'t': csrf_token\\(\\)(?:\\s*,\\s*'_xfRedirect'\\s*:.*?(\\s*}\\)))?#msi",
+    "replace": "$1"
 }

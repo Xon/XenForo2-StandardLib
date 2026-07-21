@@ -24,9 +24,6 @@ class AccountController extends XFCP_AccountController
         {
             $token = $this->filter('_xfToken', 'str');
             $this->request()->set('t', $token);
-
-            $url = $this->buildLink('');
-            $this->request()->set('_xfRedirect', $url);
         }
         else
         {

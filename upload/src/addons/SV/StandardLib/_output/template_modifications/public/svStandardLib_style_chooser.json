@@ -4,6 +4,6 @@
     "execution_order": 2147483640,
     "enabled": true,
     "action": "preg_replace",
-    "find": "#(href=\"{{ link\\(.*?, {.*?)(?:,|)\\s*'t': csrf_token\\(\\)\\s*(}\\)\\s*}}\\s*\")#msi",
+    "find": "#(href=\"{{ link\\(.*?, {.*?)(?:,\\s*'_xfRedirect':[^,]+)?(?:,)?\\s*'t': csrf_token\\(\\)\\s*(}\\)\\s*}}\\s*\")#msi",
     "replace": "$1$2 data-xf-click=\"link-post\""
 }

@@ -20,7 +20,6 @@ class Misc extends XFCP_Misc
             $redirectPlugin = $this->plugin(RedirectPlugin::class);
             $redirectPlugin->assertIsPostRequest($this->buildLink('misc/style',null, [
                 'style_id' => $this->filter('style_id', 'uint'),
-                '_xfRedirect' => $this->filter('_xfRedirect', 'str'),
             ]));
         }
 
@@ -34,7 +33,6 @@ class Misc extends XFCP_Misc
             $redirectPlugin = $this->plugin(RedirectPlugin::class);
             $redirectPlugin->assertIsPostRequest($this->buildLink('misc/language', null, [
                 'language_id' => $this->filter('language_id', 'uint'),
-                '_xfRedirect' => $this->filter('_xfRedirect', 'str'),
             ]));
         }
 
