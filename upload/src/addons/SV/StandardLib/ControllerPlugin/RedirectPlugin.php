@@ -4,7 +4,7 @@ namespace SV\StandardLib\ControllerPlugin;
 
 use XF\ControllerPlugin\AbstractPlugin;
 use XF\Mvc\Reply\AbstractReply;
-use function array_key_exists;
+use function strcasecmp;
 
 class RedirectPlugin extends AbstractPlugin
 {
@@ -29,7 +29,8 @@ class RedirectPlugin extends AbstractPlugin
 
         $params['route'] = $route;
         $params['autoSubmit'] = $params['autoSubmit'] ?? (\XF::session()->exists() && $this->request->getRobotName() === '');
-        $params['redirect'] = $this->getDynamicRedirect();
+        $redirect = $this->getDynamicRedirect();
+        $params['redirect'] = strcasecmp($redirect, $route) !== 0 ? $redirect : $this->buildLink('index');
 
         return $this->view('SV\StandardLib:Redirect', $templateName, $params);
     }
