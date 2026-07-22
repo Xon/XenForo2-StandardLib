@@ -61,6 +61,12 @@ SV.$ = SV.$ || window.jQuery || null;
             csrfInput.value = csrf;
             form.append(csrfInput)
 
+            const redirectUrl = document.createElement('input');
+            redirectUrl.type = 'hidden';
+            redirectUrl.name = '_xfRedirect';
+            redirectUrl.value = window.location.href;
+            form.append(redirectUrl)
+
             if (trigger(form, 'submit')) {
                 form.submit()
             }
