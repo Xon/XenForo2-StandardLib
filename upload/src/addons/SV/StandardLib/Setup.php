@@ -100,6 +100,7 @@ class Setup extends AbstractSetup
     public function doRebuilds()// : void
     {
         Helper::repo()->rebuildAddOnVersionCache();
+        Helper::repo()->markAsCriticalAddon();
         Helper::repo()->clearShimCache();
         $this->syncClassExtensions();
 

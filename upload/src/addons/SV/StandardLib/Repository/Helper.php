@@ -154,6 +154,8 @@ class Helper extends Repository
 
     public function rebuildAddOnVersionCache(): array
     {
+        // this function must not touch the container() or anything complex to avoid unexpected recursion!
+
         // unlike \XF::isAddOnActive, the add-on must not be in a processing state
         $data = \XF::db()->fetchPairs('
             SELECT addon_id, version_string
@@ -161,12 +163,11 @@ class Helper extends Repository
             WHERE `active` = 1 AND is_processing = 0
         ');
         \XF::app()->registry()->set('addon.versionCache', $data);
-        $this->markAsCriticalAddon();
 
         return $data;
     }
 
-    protected function markAsCriticalAddon(): void
+    public function markAsCriticalAddon(): void
     {
         if ($this->hasDesiredAddOnVersion('SV/InstallerAppHelper', null))
         {
