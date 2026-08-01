@@ -4,13 +4,11 @@ namespace SV\StandardLib\XF\Template;
 
 use XF\Mvc\Entity\Entity;
 use XF\Phrase;
-use function array_replace;
 use function array_slice;
 use function count;
 use function explode;
 use function in_array;
 use function is_array;
-use function stripos;
 use function strval;
 use function substr;
 
@@ -51,18 +49,9 @@ class Templater extends XFCP_Templater
     {
         if (\XF::$versionId >= 2030000)
         {
-            $tmpOptions = array_replace([
-                'src'   => null,
-                'defer' => true,
-                'addon' => null,
-                'min'   => null,
-                'dev'   => null,
-                'prod'  => null,
-                'root'  => false,
-            ], $options);
-
-            $addOnJsMap = $this->svIncludeJsMap[$tmpOptions['addon']] ?? [];
-            $extraIncludeJsArr = $addOnJsMap[$tmpOptions['src']] ?? [];
+            $map = $this->svIncludeJsMap;
+            $addOnJsMap = $map[$options['addon']] ?? [];
+            $extraIncludeJsArr = $addOnJsMap[$options['src']] ?? [];
             if (is_array($extraIncludeJsArr))
             {
                 foreach ($extraIncludeJsArr as $extraIncludeJs)
