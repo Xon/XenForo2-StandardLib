@@ -348,7 +348,9 @@
          */
         Dropdown.prototype.show = function () {
             addClassesToElement(this.element, this.classNames.activeState);
-            this.element.setAttribute('aria-expanded', 'true');
+            if (this.type !== PassedElementTypes.Text) {
+                this.element.setAttribute('aria-expanded', 'true');
+            }
             this.isActive = true;
             return this;
         };
@@ -357,7 +359,9 @@
          */
         Dropdown.prototype.hide = function () {
             removeClassesFromElement(this.element, this.classNames.activeState);
-            this.element.setAttribute('aria-expanded', 'false');
+            if (this.type !== PassedElementTypes.Text) {
+                this.element.setAttribute('aria-expanded', 'false');
+            }
             this.isActive = false;
             return this;
         };
@@ -1725,12 +1729,14 @@
             }
             return inp;
         },
-        dropdown: function (_a) {
+        dropdown: function (_a, passedElementType) {
             var _b = _a.classNames, list = _b.list, listDropdown = _b.listDropdown;
             var div = document.createElement('div');
             addClassesToElement(div, list);
             addClassesToElement(div, listDropdown);
-            div.setAttribute('aria-expanded', 'false');
+            if (passedElementType !== PassedElementTypes.Text) {
+                div.setAttribute('aria-expanded', 'false');
+            }
             return div;
         },
         notice: function (_a, innerHTML, type) {
@@ -2105,13 +2111,14 @@
                 // eslint-disable-next-line no-param-reassign
                 preventInputFocus = !this._canSearch;
             }
+            // to ensure a virtual keyboard trigger as expected, the focus/animation must be started from the input event and not an animation frame which
             this.dropdown.show();
+            var rect = this.dropdown.element.getBoundingClientRect();
+            this.containerOuter.open(rect.bottom, rect.height);
             if (!preventInputFocus) {
                 this.input.focus();
             }
             requestAnimationFrame(function () {
-                var rect = _this.dropdown.element.getBoundingClientRect();
-                _this.containerOuter.open(rect.bottom, rect.height);
                 _this.passedElement.triggerEvent(EventType.showDropdown);
                 var activeElement = _this.choiceList.element.querySelector(getClassNamesSelector(_this.config.classNames.selectedState));
                 if (activeElement !== null && !isScrolledIntoView(activeElement, _this.choiceList.element)) {
@@ -3231,7 +3238,8 @@
                     }
                 }
                 else {
-                    var currentEl = this.dropdown.element.querySelector(getClassNamesSelector(this.config.classNames.highlightedState));
+                    var currentEl = this.dropdown.element.querySelector(getClassNamesSelector(this.config.classNames.highlightedState)) ||
+                        this.dropdown.element.querySelector(getClassNamesSelector(this.config.classNames.selectedState));
                     if (currentEl) {
                         nextEl = getAdjacentEl(currentEl, selectableChoiceIdentifier, directionInt);
                     }
@@ -3607,7 +3615,7 @@
                 element: templating.itemList(config, isSelectOneElement),
             });
             this.dropdown = new Dropdown({
-                element: templating.dropdown(config),
+                element: templating.dropdown(config, elementType),
                 classNames: classNames,
                 type: elementType,
             });
