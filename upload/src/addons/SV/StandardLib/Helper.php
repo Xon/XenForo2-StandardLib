@@ -90,11 +90,12 @@ class Helper
         {
             $entityName = str_replace('\\Entity\\', ':', $entityName);
         }
-        $class = \XF::stringToClass($entityName, '%s\Entity\%s');
         // detect invalid content type+entity configuration; Vault Wiki appears a major offender
         // note; SV/TitleEditHistory can also trigger this
         try
         {
+            // stringToClass can throw
+            $class = \XF::stringToClass($entityName, '%s\Entity\%s');
             if (@!class_exists($class))
             {
                 return null;
