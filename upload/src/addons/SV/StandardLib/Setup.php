@@ -159,7 +159,7 @@ class Setup extends AbstractSetup
             return;
         }
 
-        if ($classExtension->active !== $value)
+        if ($classExtension->active === $value)
         {
             return;
         }
