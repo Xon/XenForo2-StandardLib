@@ -124,26 +124,31 @@ class Setup extends AbstractSetup
 
     public function syncClassExtensions()//: void
     {
+        $hasChange = false;
         // only enable for pre XF2.3.11
-        $this->patchClassExtension(\XF\Data\Robot::class, \SV\StandardLib\XF\Data\Robot::class, \XF::$versionId < 2031170);
+        $this->patchClassExtension(\XF\Data\Robot::class, \SV\StandardLib\XF\Data\Robot::class, \XF::$versionId < 2031170, $hasChange);
 
         // only enable for pre XF2.3.8
-        $this->patchClassExtension(OptionEntity::class, ExtendedOptionEntity::class, \XF::$versionId < 2030870);
+        $this->patchClassExtension(OptionEntity::class, ExtendedOptionEntity::class, \XF::$versionId < 2030870, $hasChange);
 
         $preXF23 = \XF::$versionId < 2030000;
-        $this->patchClassExtension(StylePropertyDataType::class, ExtendedStylePropertyDataType::class, $preXF23);
+        $this->patchClassExtension(StylePropertyDataType::class, ExtendedStylePropertyDataType::class, $preXF23, $hasChange);
         //$this->patchClassExtension(StylePropertyEntity::class, ExtendedStylePropertyEntity::class, $preXF23);
-        $this->patchClassExtension(DevOutputStyleProperty::class, ExtendedDevOutputStyleProperty::class, $preXF23);
+        $this->patchClassExtension(DevOutputStyleProperty::class, ExtendedDevOutputStyleProperty::class, $preXF23, $hasChange);
 
-        $this->patchClassExtension(Templater::class, TemplaterXF21Patch::class, \XF::$versionId < 2020000);
+        $this->patchClassExtension(Templater::class, TemplaterXF21Patch::class, \XF::$versionId < 2020000, $hasChange);
 
+        if (!$hasChange)
+        {
+            return;
+        }
         // Execute option rebuilt in a background task as that runs after this add-on has finished being a zombie with is_processing logic
         RebuildExtensionCacheJob::enqueue();
         // no-op the extension rebuild
         \XF::runOnce('classExtensionRebuild', function (): void { });
     }
 
-    public function patchClassExtension(string $fromClass, string $toClass, bool $value)//: void
+    public function patchClassExtension(string $fromClass, string $toClass, bool $value, bool &$hasChange)
     {
         $classExtension = Helper::findOne(ClassExtensionEntity::class, [
             'from_class' => $fromClass,
@@ -154,6 +159,12 @@ class Setup extends AbstractSetup
             return;
         }
 
+        if ($classExtension->active !== $value)
+        {
+            return;
+        }
+
+        $hasChange = true;
         $classExtension->active = $value;
         $classExtension->saveIfChanged();
     }
