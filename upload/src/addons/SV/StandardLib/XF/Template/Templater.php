@@ -50,13 +50,17 @@ class Templater extends XFCP_Templater
         if (\XF::$versionId >= 2030000)
         {
             $map = $this->svIncludeJsMap;
-            $addOnJsMap = $map[$options['addon'] ?? ''] ?? [];
-            $extraIncludeJsArr = $addOnJsMap[$options['src'] ?? ''] ?? [];
-            if (is_array($extraIncludeJsArr))
+            $addOn = $options['addon'] ?? '';
+            $src = $options['src'] ?? '';
+            if (is_string($addOn) && is_string($src))
             {
-                foreach ($extraIncludeJsArr as $extraIncludeJs)
+                $extraIncludeJsArr = $map[$addOn][$src] ?? [];
+                if (is_array($extraIncludeJsArr))
                 {
-                    parent::includeJs($extraIncludeJs);
+                    foreach ($extraIncludeJsArr as $extraIncludeJs)
+                    {
+                        parent::includeJs($extraIncludeJs);
+                    }
                 }
             }
         }
