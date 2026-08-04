@@ -22,9 +22,7 @@ use XF\DevelopmentOutput\StyleProperty as DevOutputStyleProperty;
 use XF\Entity\ClassExtension as ClassExtensionEntity;
 use XF\Entity\Option as OptionEntity;
 use XF\Entity\Phrase as PhraseEntity;
-use XF\Entity\StyleProperty as StylePropertyEntity;
 use XF\Finder\Phrase as PhraseFinder;
-use XF\Repository\ClassExtension as ClassExtensionRepository;
 use XF\Template\Templater;
 use XF\Util\File as FileUtil;
 
@@ -151,6 +149,7 @@ class Setup extends AbstractSetup
     public function patchClassExtension(string $fromClass, string $toClass, bool $value, bool &$hasChange)
     {
         $classExtension = Helper::findOne(ClassExtensionEntity::class, [
+            'addon_id' => 'SV/StandardLib',
             'from_class' => $fromClass,
             'to_class'   => $toClass,
         ]);
