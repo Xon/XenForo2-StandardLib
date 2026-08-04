@@ -10,7 +10,7 @@ use SV\StandardLib\Job\RebuildOptionCacheJob;
 use SV\StandardLib\XF\AddOn\DataType\StyleProperty as ExtendedStylePropertyDataType;
 use SV\StandardLib\XF\DevelopmentOutput\StyleProperty as ExtendedDevOutputStyleProperty;
 use SV\StandardLib\XF\Entity\Option as ExtendedOptionEntity;
-use SV\StandardLib\XF\Entity\StyleProperty as ExtendedStylePropertyEntity;
+// use SV\StandardLib\XF\Entity\StyleProperty as ExtendedStylePropertyEntity;
 use SV\StandardLib\XF\Template\TemplaterXF21Patch;
 use XF\AddOn\AbstractSetup;
 use XF\AddOn\DataType\StyleProperty as StylePropertyDataType;
@@ -23,8 +23,10 @@ use XF\Entity\ClassExtension as ClassExtensionEntity;
 use XF\Entity\Option as OptionEntity;
 use XF\Entity\Phrase as PhraseEntity;
 use XF\Finder\Phrase as PhraseFinder;
+use XF\Job\Atomic as AtomicJob;
 use XF\Template\Templater;
 use XF\Util\File as FileUtil;
+use function count;
 
 class Setup extends AbstractSetup
 {
@@ -135,15 +137,6 @@ class Setup extends AbstractSetup
         $this->patchClassExtension(DevOutputStyleProperty::class, ExtendedDevOutputStyleProperty::class, $preXF23, $hasChange);
 
         $this->patchClassExtension(Templater::class, TemplaterXF21Patch::class, \XF::$versionId < 2020000, $hasChange);
-
-        if (!$hasChange)
-        {
-            return;
-        }
-        // Execute option rebuilt in a background task as that runs after this add-on has finished being a zombie with is_processing logic
-        RebuildExtensionCacheJob::enqueue();
-        // no-op the extension rebuild
-        \XF::runOnce('classExtensionRebuild', function (): void { });
     }
 
     public function patchClassExtension(string $fromClass, string $toClass, bool $value, bool &$hasChange)
@@ -165,6 +158,14 @@ class Setup extends AbstractSetup
 
         $hasChange = true;
         $classExtension->active = $value;
+        if ($classExtension->hasBehavior('XF:DevOutputWritable'))
+        {
+            $classExtension->getBehavior('XF:DevOutputWritable')->setOption('write_dev_output', false);
+        }
         $classExtension->saveIfChanged();
+        if ($classExtension->hasBehavior('XF:DevOutputWritable'))
+        {
+            $classExtension->getBehavior('XF:DevOutputWritable')->resetOptions();
+        }
     }
 }
