@@ -1054,7 +1054,10 @@ abstract class RequestKnownIps extends Request
     public static function update(): void
     {
         Request::$googleIps = self::$_googleIps;
-        Request::$googleCloudIps = self::$_googleCloudIps;
+        if (\XF::$versionId >= 2020770)
+        {
+            Request::$googleCloudIps = self::$_googleCloudIps;
+        }
         Request::$cloudFlareIps = self::$_cloudFlareIps;
     }
 }
