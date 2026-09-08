@@ -5,7 +5,7 @@
  */
 
 $classmap = [];
-if (\XF::$versionId < 2031170)
+if (\XF::$versionId < 2031370)
 {
     include(__DIR__ . '/shim/RequestKnownIps.php');
     RequestKnownIps::update();
