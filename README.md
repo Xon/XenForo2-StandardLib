@@ -194,7 +194,7 @@ Load pagination pages via ajax instead of requiring full page-loads. Useful for 
 
 ```html
 <xf:js src="sv/vendor/domurl/url.js" addon="SV/StandardLib" min="1" />
-<xf:js src="sv/lib/ajaxPagination.js" addon="SV/Threadmarks" min="1" />
+<xf:js src="sv/lib/ajaxPagination.js" addon="SV/StandardLib" min="1" />
 ...
 <div class="block" data-xf-init="sv-ajax-pagination" data-content-wrapper=".block-body--wrapper">
     ...
