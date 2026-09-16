@@ -128,7 +128,7 @@ class Template extends XFCP_Template
                 {
                     $viewParams['compiledTemplate'] = \XF::app()->templateCompiler()->compile($templateStr);
                 }
-                    /** @noinspection PhpRedundantCatchClauseInspection */
+                /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (TemplateCompilerException $exception)
                 {
                     $viewParams['compilerErrors'] = $exception->getMessages();

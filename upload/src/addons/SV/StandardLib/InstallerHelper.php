@@ -253,9 +253,9 @@ trait InstallerHelper
 
                         // phrases exist per language, so ensure the correct existing phrase is replaced
                         $existingPhrase = Helper::finder(PhraseFinder::class)
-                                           ->where('title', '=', $newTitle)
-                                           ->where('language_id', '=', $phrase->language_id)
-                                           ->fetchOne();
+                                                ->where('title', '=', $newTitle)
+                                                ->where('language_id', '=', $phrase->language_id)
+                                                ->fetchOne();
 
                         if ($existingPhrase !== null)
                         {

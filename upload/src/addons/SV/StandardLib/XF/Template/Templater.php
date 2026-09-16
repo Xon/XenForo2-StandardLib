@@ -4,11 +4,16 @@ namespace SV\StandardLib\XF\Template;
 
 use XF\Mvc\Entity\Entity;
 use XF\Phrase;
+use function array_filter;
+use function array_key_exists;
 use function array_slice;
 use function count;
 use function explode;
+use function implode;
 use function in_array;
 use function is_array;
+use function is_string;
+use function preg_replace;
 use function strval;
 use function substr;
 

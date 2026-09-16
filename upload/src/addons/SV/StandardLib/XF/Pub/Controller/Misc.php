@@ -6,6 +6,7 @@ use SV\StandardLib\ControllerPlugin\RedirectPlugin;
 use SV\StandardLib\Helper;
 use XF\CookieConsent;
 use XF\Mvc\Reply\AbstractReply;
+use function count;
 use function in_array;
 
 /**
