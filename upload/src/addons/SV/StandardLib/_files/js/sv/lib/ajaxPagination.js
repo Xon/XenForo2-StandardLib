@@ -203,7 +203,7 @@ SV.$ = SV.$ || window.jQuery || null;
             }
 
             for (const pageNavWrapper of pageNavWrappers) {
-                for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href]')) {
+                for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href], .pageNavSimple a[href]')) {
                     on(pageNavLink, 'click', this.ajaxLoadNewPage.bind(this))
                 }
                 XF.activate(pageNavWrapper);
@@ -237,7 +237,7 @@ SV.$ = SV.$ || window.jQuery || null;
             var currentUrl = new Url(url);
             if ('page' in currentUrl.query)
             {
-                return parseInt(currentUrl.query['page']) || 1;
+                return parseInt(currentUrl.query['page'], 10) || 1;
             }
 
             return 1;
@@ -248,20 +248,30 @@ SV.$ = SV.$ || window.jQuery || null;
          */
         ajaxLoadNewPage: function(e)
         {
+            const target = e.currentTarget || e.target;
+            var url = target.getAttribute('href');
+            if (!url) {
+                return;
+            }
             e.preventDefault();
-            var page = this.getPageFromAhref(e.target);
-            if (page !== this.lastPageSelected)
-            {
-                this.lastPageSelected = page;
-                this.resetPage = false;
-                try
-                {
-                    XF.ajax('GET', e.target.getAttribute('href'), {}, this._paginationAjaxResponse.bind(this));
-                }
-                finally
-                {
-                    this.resetPage = true;
-                }
+            var page = this.getPageFromAhref(target);
+            this.ajaxLoadPage(page, url);
+        },
+
+        /**
+         * @param {int} page
+         * @param {string} url
+         */
+        ajaxLoadPage(page, url) {
+            if (page === this.lastPageSelected) {
+                return;
+            }
+            this.lastPageSelected = page;
+            this.resetPage = false;
+            try {
+                XF.ajax('GET', url, {}, this._paginationAjaxResponse.bind(this));
+            } finally {
+                this.resetPage = true;
             }
         },
 
@@ -314,7 +324,7 @@ SV.$ = SV.$ || window.jQuery || null;
                 return 1;
             }
 
-            var lastPageSelected = parseInt(this.lastPageSelected) || null;
+            var lastPageSelected = parseInt(this.lastPageSelected, 10) || null;
             if (lastPageSelected)
             {
                 return lastPageSelected;

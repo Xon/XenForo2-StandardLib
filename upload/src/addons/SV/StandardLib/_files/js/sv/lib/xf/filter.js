@@ -345,7 +345,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
             }
 
             for (const pageNavWrapper of pageNavWrappers) {
-                for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href]')) {
+                for (const pageNavLink of pageNavWrapper.querySelectorAll('.pageNav a[href], .pageNavSimple a[href]')) {
                     on(pageNavLink, 'click', this.ajaxLoadNewPage.bind(this))
                 }
                 XF.activate(pageNavWrapper);
@@ -380,19 +380,24 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
         {
             e.preventDefault();
 
-            var page = this.getPageFromAhref(e.target);
-            if (page != this.svLastPageSelected)
-            {
-                this.svLastPageSelected = page;
-                this.resetPage = false;
-                try
-                {
-                    this.update();
-                }
-                finally
-                {
-                    this.resetPage = true;
-                }
+            const target = e.currentTarget || e.target;
+            var page = this.getPageFromAhref(target);
+            this.ajaxLoadPage(page);
+        },
+
+        /**
+         * @param {int} page
+         */
+        ajaxLoadPage(page) {
+            if (page === this.svLastPageSelected) {
+                return;
+            }
+            this.svLastPageSelected = page;
+            this.resetPage = false;
+            try {
+                this.update();
+            } finally {
+                this.resetPage = true;
             }
         },
 
@@ -423,7 +428,7 @@ SV.extendObject = SV.extendObject || XF.extendObject || jQuery.extend;
                 return 1;
             }
 
-            var lastPageSelected = parseInt(this.svLastPageSelected) || null;
+            var lastPageSelected = this.svLastPageSelected;
             if (lastPageSelected)
             {
                 return lastPageSelected;
