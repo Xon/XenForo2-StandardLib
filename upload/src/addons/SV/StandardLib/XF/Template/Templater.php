@@ -20,10 +20,16 @@ class Templater extends XFCP_Templater
     protected $svIncludeJsMap = [
         'SV/StandardLib' => [
             'sv/lib/storage.js'           => [
-                ['dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
+                ['minVersion' => 2030000, 'dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
             ],
             'sv/lib/xf/core/structure.js' => [
-                ['dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
+                ['minVersion' => 2030000, 'dev' => 'xf/structure.js', 'prod' => 'xf/structure.min.js'],
+            ],
+            'sv/lib/xf/filter.js' => [
+                ['src' => 'sv/lib/ajaxPageJump.js', 'addon' => 'SV/StandardLib']
+            ],
+            'sv/lib/ajaxPagination.js' => [
+                ['src' => 'sv/lib/ajaxPageJump.js', 'addon' => 'SV/StandardLib']
             ],
         ],
     ];
@@ -47,20 +53,26 @@ class Templater extends XFCP_Templater
 
     public function includeJs(array $options)
     {
-        if (\XF::$versionId >= 2030000)
+        $map = $this->svIncludeJsMap;
+        $addOn = $options['addon'] ?? '';
+        $src = $options['src'] ?? '';
+        if (is_string($addOn) && is_string($src))
         {
-            $map = $this->svIncludeJsMap;
-            $addOn = $options['addon'] ?? '';
-            $src = $options['src'] ?? '';
-            if (is_string($addOn) && is_string($src))
+            $extraIncludeJsArr = $map[$addOn][$src] ?? [];
+            if (is_array($extraIncludeJsArr))
             {
-                $extraIncludeJsArr = $map[$addOn][$src] ?? [];
-                if (is_array($extraIncludeJsArr))
+                foreach ($extraIncludeJsArr as $extraIncludeJs)
                 {
-                    foreach ($extraIncludeJsArr as $extraIncludeJs)
+                    if (array_key_exists('minVersion', $extraIncludeJs))
                     {
-                        parent::includeJs($extraIncludeJs);
+                        if (\XF::$versionId < $extraIncludeJs['minVersion'])
+                        {
+                            continue;
+                        }
+                        unset($extraIncludeJs['minVersion']);
                     }
+
+                    parent::includeJs($extraIncludeJs);
                 }
             }
         }
