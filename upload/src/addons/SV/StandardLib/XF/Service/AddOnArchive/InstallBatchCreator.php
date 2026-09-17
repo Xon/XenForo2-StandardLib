@@ -114,8 +114,23 @@ class InstallBatchCreator extends XFCP_InstallBatchCreator
 
     protected function verifyAddons(array $addOns): void
     {
-        $existingAddOnVersionString = HelperRepo::get()->getAddonVersions();
-        $existingAddOnVersionIds = \XF::app()->container('addon.cache');
+        // Fetch the list of active add-ons, but include ones stuck in is_processing
+        // `addon.versionCache` skips is_processing (so templates work sanely to avoid half-zombie addons)
+        // while `addon.cache` doesn't store the version string
+        // These two caches are effectively eventually consistent, which can lead to missing dependency errors
+        $rows = \XF::db()->fetchAll('
+            SELECT addon_id, version_string, version_id
+            FROM xf_addon
+            WHERE active = 1
+        ');
+        $existingAddOnVersionString = $existingAddOnVersionIds = [];
+        foreach ($rows as $row)
+        {
+            $addOnId = $row['addon_id'];
+            $existingAddOnVersionString[$addOnId] = $row['version_string'];
+            $existingAddOnVersionIds[$addOnId] = $row['version_id'];
+        }
+        // push proposed updates into the version-set, this allows updating a chain of dependent add-ons in a single update
         foreach ($addOns as $addOnId => $json)
         {
             $existingAddOnVersionString[$addOnId] = $json['version_string'];
