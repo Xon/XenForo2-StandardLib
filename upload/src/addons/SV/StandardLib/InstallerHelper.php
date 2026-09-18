@@ -489,7 +489,7 @@ trait InstallerHelper
     {
         $json = $this->addOn->getJson();
         $composerPath = $json['composer_autoload'] ?? '';
-        if (strlen($composerPath) === 0)
+        if ($composerPath !== '')
         {
             $vendorDirectory = $this->addOn->getAddOnDirectory() . \XF::$DS . $composerPath;
             if (!file_exists($vendorDirectory))
