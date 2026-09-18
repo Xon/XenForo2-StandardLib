@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingParentCallCommonInspection
+ */
 
 namespace SV\StandardLib\XF\Data;
 
@@ -9,6 +13,7 @@ use function preg_match;
 use function strtolower;
 
 /**
+ * This extension is only applied for pre-XF2.3.11
  * @extends \XF\Data\Robot
  */
 class Robot extends XFCP_Robot
@@ -104,7 +109,7 @@ class Robot extends XFCP_Robot
         $bots = $this->getRobotUserAgents();
 
         if (preg_match(
-            '#(' . implode('|', array_map('preg_quote', array_keys($bots))) . ')#i',
+            '/(' . implode('|', array_map('preg_quote', array_keys($bots))) . ')/i',
             strtolower($userAgent),
             $match
         ))
