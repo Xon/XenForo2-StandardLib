@@ -25,8 +25,8 @@ class AddOn extends XFCP_AddOn
         if (count($uploads) === 1)
         {
             $upload = reset($uploads);
-            $fileName = $upload->getFileName();
-            if (preg_match('/^SV-StandardLib.*.zip$/i', $fileName))
+            $fileName = (string) $upload->getFileName();
+            if (preg_match('/^SV-StandardLib.*\.zip$/i', $fileName))
             {
                 return parent::getBatchCreatorService($uploads);
             }
