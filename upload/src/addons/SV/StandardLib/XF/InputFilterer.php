@@ -117,9 +117,9 @@ class InputFilterer extends XFCP_InputFilterer
                 $year = $this->svIntSanitizer($year, 1970, null);
                 $month = $this->svIntSanitizer($month, 1, 12);
                 $day = $this->svIntSanitizer($day, 1, 31);
-                $hh = $this->svIntSanitizer($hh, 0, 24);
-                $mm = $this->svIntSanitizer($mm, 0, 60);
-                $ss = $this->svIntSanitizer($ss, 0, 60);
+                $hh = $this->svIntSanitizer($hh, 0, 23);
+                $mm = $this->svIntSanitizer($mm, 0, 59);
+                $ss = $this->svIntSanitizer($ss, 0, 59);
 
                 if (is_string($tz) && $tz !== '')
                 {
