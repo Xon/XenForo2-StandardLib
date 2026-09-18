@@ -202,7 +202,7 @@ trait SqlJoinTrait
             foreach ($indexHints as $indexHint)
             {
                 /** @noinspection PhpUndefinedMethodInspection */
-                $hints[] = $this->buildIndexHint($indexHint[0], $indexHint[0]);
+                $hints[] = $this->buildIndexHint($indexHint[0], $indexHint[1]);
             }
         }
 
