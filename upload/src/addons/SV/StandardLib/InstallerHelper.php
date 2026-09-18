@@ -599,6 +599,7 @@ trait InstallerHelper
      */
     protected function checkSoftRequires(array &$errors, array &$warnings): void
     {
+        $json = $this->addOn->getJson();
         $requirements = $json['require-soft'] ?? null;
         if (is_array($requirements) && count($requirements) !== 0)
         {
