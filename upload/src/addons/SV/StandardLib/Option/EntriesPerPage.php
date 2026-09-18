@@ -37,13 +37,13 @@ abstract class EntriesPerPage extends AbstractOption
 
         foreach ($value as $perPage)
         {
-            $value = is_int($perPage) ? $perPage : (int)$perPage['value'];
-            if ($value === 0)
+            $val = is_int($perPage) ? $perPage : (int)($perPage['value'] ?? 0);
+            if ($val === 0)
             {
                 continue;
             }
 
-            $output[] = $value;
+            $output[] = $val;
         }
 
         sort($output);
