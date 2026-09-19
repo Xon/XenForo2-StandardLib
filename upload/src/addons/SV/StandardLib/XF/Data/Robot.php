@@ -102,9 +102,14 @@ class Robot extends XFCP_Robot
     public function userAgentMatchesRobot($userAgent)
     {
         $bots = $this->getRobotUserAgents();
+        $userAgents = [];
+        foreach ($bots as $ua => $null)
+        {
+            $userAgents[] = preg_quote($ua, '#');
+        }
 
         if (preg_match(
-            '#(' . implode('|', array_map('preg_quote', array_keys($bots))) . ')#i',
+            '#(' . implode('|', $userAgents) . ')#i',
             strtolower($userAgent),
             $match
         ))
