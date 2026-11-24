@@ -10,7 +10,7 @@ class RedirectPlugin extends AbstractPlugin
 {
     public function assertIsPostRequest(string $route, string $tokenKey = 't'): void
     {
-        if (\XF::$versionId >= 2040000)
+        if (\XF::$versionId >= 2031400)
         {
             return;
         }
