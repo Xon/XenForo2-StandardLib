@@ -18,7 +18,10 @@ class Misc extends XFCP_Misc
     {
         if ($this->request->exists('style_id'))
         {
-            $this->assertNotEmbeddedImageRequest();
+            if (is_callable([$this, 'assertNotEmbeddedImageRequest']))
+            {
+                $this->assertNotEmbeddedImageRequest();
+            }
             $redirectPlugin = $this->plugin(RedirectPlugin::class);
             $redirectPlugin->assertIsPostRequest($this->buildLink('misc/style',null, [
                 'style_id' => $this->filter('style_id', 'uint'),
@@ -32,7 +35,10 @@ class Misc extends XFCP_Misc
     {
         if ($this->request->exists('language_id'))
         {
-            $this->assertNotEmbeddedImageRequest();
+            if (is_callable([$this, 'assertNotEmbeddedImageRequest']))
+            {
+                $this->assertNotEmbeddedImageRequest();
+            }
             $redirectPlugin = $this->plugin(RedirectPlugin::class);
             $redirectPlugin->assertIsPostRequest($this->buildLink('misc/language', null, [
                 'language_id' => $this->filter('language_id', 'uint'),
