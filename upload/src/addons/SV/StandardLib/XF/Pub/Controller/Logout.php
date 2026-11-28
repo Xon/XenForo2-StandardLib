@@ -17,7 +17,7 @@ class Logout extends XFCP_Logout
             $this->assertNotEmbeddedImageRequest();
         }
         $redirectPlugin = $this->plugin(RedirectPlugin::class);
-        $redirectPlugin->assertIsPostRequest($this->buildLink('logout'));
+        $redirectPlugin->assertIsPostRequest($this->buildLink('logout'), 't', null);
 
         return parent::actionIndex();
     }

@@ -8,9 +8,9 @@ use function strcasecmp;
 
 class RedirectPlugin extends AbstractPlugin
 {
-    public function assertIsPostRequest(string $route, string $tokenKey = 't'): void
+    public function assertIsPostRequest(string $route, string $tokenKey = 't', ?int $versionId = 2031400): void
     {
-        if (\XF::$versionId >= 2031400)
+        if ($versionId !== null && \XF::$versionId >= $versionId)
         {
             return;
         }
